@@ -1,0 +1,5 @@
+.vectorInput {
+    display: flex;
+    align-items: baseline;
+    column-gap: 0.25em;
+}

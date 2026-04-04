@@ -1,15 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>Asgn0: Vector Library</title>
+    <link rel="stylesheet" href="asgn0.css">
   </head>
 
   <body onload="main()">
     <canvas id="canvas" width="400" height="400">
       Please use a browser that supports "canvas"
     </canvas>
+
     <script src="lib/cuon-matrix-cse160.js"></script>
     <script src="asgn0.js"></script>
+
+    <div class="vectorInput">
+      <p><strong>v1:</strong></p>
+      <p>x</p>
+      <input type="text" id="v1x" size="4"/>
+      <p>y</p>
+      <input type="text" id="v1y" size="4"/>
+    </div>
+    <div class="vectorInput">
+      <p><strong>v2:</strong></p>
+      <p>x</p>
+      <input type="text" id="v2x" size="4"/>
+      <p>y</p>
+      <input type="text" id="v2y" size="4"/>
+    </div>
+
+    <button id="drawButton">Draw</button>
+
   </body>
 </html>

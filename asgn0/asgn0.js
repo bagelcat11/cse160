@@ -12,6 +12,8 @@ function main() {
   // set up button listeners
   let drawButton = document.getElementById("drawButton");
   drawButton.addEventListener("click", handleDrawEvent);
+  let opButton = document.getElementById("opButton");
+  opButton.addEventListener("click", handleDrawOperationEvent);
 
   // draw black background
   ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
@@ -57,4 +59,57 @@ function handleDrawEvent() {
     // clear inputs?
     // v1x.value = "";
     // v1y.value = "";
+}
+
+function handleDrawOperationEvent() {
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext("2d");
+    let v1x = document.getElementById("v1x");
+    let v1y = document.getElementById("v1y");
+    let v2x = document.getElementById("v2x");
+    let v2y = document.getElementById("v2y");
+    let v1 = new Vector3([v1x.value, v1y.value, 0]);
+    let v2 = new Vector3([v2x.value, v2y.value, 0]);
+    // draw the two input vectors first
+    handleDrawEvent();
+
+    // draw extra green vector(s) to show results
+    let op = document.getElementById("op");
+    let scalar = document.getElementById("scalar");
+    let resultVecs = [];
+    switch (op.value) {
+        case "add":
+            var res = new Vector3();
+            res.set(v1.add(v2));
+            resultVecs.push(res);
+            break;
+        case "sub":
+            var res = new Vector3();    // this has to be var and not let??
+            res.set(v1.sub(v2));
+            resultVecs.push(res);
+            break;
+        case "mul":
+            var res1 = new Vector3();   //TODO: ok to draw over existing vecs?
+            var res2 = new Vector3();
+            res1.set(v1.mul(scalar.value));
+            res2.set(v2.mul(scalar.value));
+            resultVecs.push(res1);
+            resultVecs.push(res2);
+            break;
+        case "div":
+            var res1 = new Vector3();
+            var res2 = new Vector3();
+            res1.set(v1.div(scalar.value));
+            res2.set(v2.div(scalar.value ));
+            resultVecs.push(res1);
+            resultVecs.push(res2);
+            break;
+        default:
+            break;
+    }
+
+    console.log(resultVecs)
+    for (let i = 0; i < resultVecs.length; i++) {
+        drawVector(resultVecs[i], "green");
+    }
 }

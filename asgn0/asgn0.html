@@ -14,15 +14,16 @@
     <script src="lib/cuon-matrix-cse160.js"></script>
     <script src="asgn0.js"></script>
 
+    <!-- for inputting two vectors -->
     <div class="vectorInput">
-      <p><strong>v1:</strong></p>
+      <p><strong>v1 (red):</strong></p>
       <p>x</p>
       <input type="text" id="v1x" size="4"/>
       <p>y</p>
       <input type="text" id="v1y" size="4"/>
     </div>
     <div class="vectorInput">
-      <p><strong>v2:</strong></p>
+      <p><strong>v2 (blue):</strong></p>
       <p>x</p>
       <input type="text" id="v2x" size="4"/>
       <p>y</p>
@@ -30,6 +31,21 @@
     </div>
 
     <button id="drawButton">Draw</button>
+
+    <!-- for doing operations -->
+    <div class="vectorInput">
+      <p><strong>Operation:</strong></p>
+      <select id="op">
+        <option value="add">Add</option>
+        <option value="sub">Subtract</option>
+        <option value="mul">Multiply (scalar)</option>
+        <option value="div">Divide (scalar)</option>
+      </select>
+      <p><strong>Scalar:</strong><p>
+      <input type="text" id="scalar" size="4"/>
+    </div>
+
+    <button id="opButton">Draw</button>
 
   </body>
 </html>

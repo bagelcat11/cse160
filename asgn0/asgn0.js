@@ -127,6 +127,10 @@ function handleDrawOperationEvent() {
         case "angle":
             console.log("Angle:", angleBetween(v1, v2));
             break;
+        case "area":
+            // ||a x b|| = parallelogram area, so divide by 2 for triangle
+            console.log("Triangle area:", Vector3.cross(v1, v2).magnitude() / 2);
+            break;
         default:
             break;
     }

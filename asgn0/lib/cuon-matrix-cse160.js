@@ -100,7 +100,7 @@ class Vector3 {
     };
 
     /**
-      * Calcualte the dop product between this vector and other.
+      * Calculate the dot product between this vector and other.
       * @return scalar
       */
     static dot(other1, other2) {
@@ -115,13 +115,18 @@ class Vector3 {
     }
 
     /**
-      * Calcualte the cross product between this vector and other.
+      * Calculate the cross product between this vector and other.
       * @return new vector
       */
     static cross(other1, other2) {
         // Insert your code here.
         // This function should create and return a new vector.
-        let v3 = new Vector3(); // Modify this line to calculate cross product between other1 and other2.
+        let a = other1.elements;
+        let b = other2.elements;
+        // formula: Sarrus's rule
+        let v3 = new Vector3([a[1] * b[2] - a[2] * b[1],
+                                -(a[0] * b[2] - a[2] * b[0]),
+                                a[0] * b[1] - a[1] * b[0]]); // Modify this line to calculate cross product between other1 and other2.
 
         // Don't delete the return statement.
         return v3;

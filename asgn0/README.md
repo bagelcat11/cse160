@@ -1,0 +1,1 @@
+All external references are from [MDN](https://developer.mozilla.org/en-US/docs/Web) docs for HTML and CSS.

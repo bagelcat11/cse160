@@ -17,7 +17,7 @@
     <!-- for inputting two vectors -->
     <div class="vectorInput">
       <p><strong>v1 (red):</strong></p>
-      <p>x</p>
+      <p>x</p>  <!-- future: can use labels for horizonal align w/o CSS -->
       <input type="text" id="v1x" size="4"/>
       <p>y</p>
       <input type="text" id="v1y" size="4"/>
@@ -40,6 +40,9 @@
         <option value="sub">Subtract</option>
         <option value="mul">Multiply (scalar)</option>
         <option value="div">Divide (scalar)</option>
+        <option value="magnitude">Print magnitude</option>
+        <option value="normalize">Normalize</option>
+        <option value="angle">Print angle between</option>
       </select>
       <p><strong>Scalar:</strong><p>
       <input type="text" id="scalar" size="4"/>

@@ -40,6 +40,14 @@ function drawVector(v, color) {
     ctx.stroke();
 }
 
+function angleBetween(v1, v2) {
+    // formula: dot(v1, v2) = ||v1|| * ||v2|| * cos(theta)
+    let res = Math.acos(Vector3.dot(v1, v2) / (v1.magnitude() * v2.magnitude()));
+    // convert to degrees
+    return res * (180 / Math.PI);
+}
+
+// -- handler definitions --
 function handleDrawEvent() {
     let canvas = document.getElementById("canvas");
     let ctx = canvas.getContext("2d");
@@ -89,7 +97,7 @@ function handleDrawOperationEvent() {
             resultVecs.push(res);
             break;
         case "mul":
-            var res1 = new Vector3();   //TODO: ok to draw over existing vecs?
+            var res1 = new Vector3();
             var res2 = new Vector3();
             res1.set(v1.mul(scalar.value));
             res2.set(v2.mul(scalar.value));
@@ -104,11 +112,25 @@ function handleDrawOperationEvent() {
             resultVecs.push(res1);
             resultVecs.push(res2);
             break;
+        case "magnitude":
+            console.log("Magnitude v1:", v1.magnitude());
+            console.log("Magnitude v2:", v2.magnitude());
+            break;
+        case "normalize":
+            var res1 = new Vector3();
+            var res2 = new Vector3();
+            res1.set(v1.normalize());
+            res2.set(v2.normalize());
+            resultVecs.push(res1);
+            resultVecs.push(res2);
+            break;
+        case "angle":
+            console.log("Angle:", angleBetween(v1, v2));
+            break;
         default:
             break;
     }
 
-    console.log(resultVecs)
     for (let i = 0; i < resultVecs.length; i++) {
         drawVector(resultVecs[i], "green");
     }

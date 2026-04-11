@@ -49,9 +49,11 @@ function connectVariablesToGLSL() {
   // get storage locations of attribute vars from gl.program, which can
   // only be referenced after initShaders is called
   a_Position = gl.getAttribLocation(gl.program, "a_Position");
+  // console.log("init a pos", a_Position);
   // get location of uniform var
   u_PointSize = gl.getUniformLocation(gl.program, "u_PointSize");
   u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
+  // console.log("init size", u_PointSize);
 }
 
 // globals for HTML selections
@@ -74,14 +76,17 @@ function addActionsForHtmlUI() {
   let sizeSlider = document.getElementById("sizeSlider");
   sizeSlider.addEventListener("mouseup", () => {
     g_selectedSize = sizeSlider.value;
-  })
+  });
 
   let clearButton = document.getElementById("clearButton");
   clearButton.addEventListener("click", () => {
     // clear canvas by clearing shapes list
     g_shapesList = [];
     renderAllShapes();
-  })
+  });
+
+  let shapeSelector = document.getElementById("shapeSelector");
+  shapeSelector.value = "point";
 }
 
 
@@ -104,6 +109,9 @@ function main() {
 
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
+
+  // drawTriangle([0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
+  // drawTriangle([0.9, 0.9, 0.8, 0.8, 0.75, 0.6]);
 }
 
 
@@ -117,13 +125,18 @@ var g_shapesList = [];
 function click(event) {
   let [x, y] = convertCoordinatesEventToGL(event);
 
-  // set up a new Point and add it to the shapes list
-  let p = new Point();
-  p.position = [x, y];
-  p.color = g_selectedColor.slice();  // slice to send copy
-  p.size = g_selectedSize;
+  // set up a new shape depending on selector, and add it to the shapes list
+  let shape;
+  if (shapeSelector.value === "point") {
+    shape = new Point();
+  } else if (shapeSelector.value === "triangle") {
+    shape = new Triangle();
+  }
+  shape.position = [x, y];
+  shape.color = g_selectedColor.slice();  // slice to send copy
+  shape.size = g_selectedSize;
 
-  g_shapesList.push(p);
+  g_shapesList.push(shape);
   renderAllShapes();
 }
 

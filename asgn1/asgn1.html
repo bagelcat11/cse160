@@ -15,7 +15,14 @@
     </canvas>
 
     <div>
-      <label>Red</label>
+      <label><strong>Shape: </strong></label>
+      <select id="shapeSelector">
+        <option value="point">Point</option>
+        <option value="triangle">Triangle</option>
+      </select>
+    </div>
+    <div>
+      <label><strong>Color: </strong>Red</label>
       <input type="range" min="0" max="100" value="100" class="slider" id="redSlider">
       <label>Green</label>
       <input type="range" min="0" max="100" value="100" class="slider" id="greenSlider">
@@ -23,7 +30,7 @@
       <input type="range" min="0" max="100" value="100" class="slider" id="blueSlider">
     </div>
     <div>
-      <label>Size</label>
+      <label><strong>Size: </strong></label>
       <input type="range" min="2" max="40" value="10" class="slider" id="sizeSlider">
     </div>
     <div>
@@ -35,6 +42,7 @@
     <script src="lib/cuon-utils.js"></script>
     <!-- <script src="lib/cuon-matrix-cse160.js"></script> -->
     <script src="Point.js"></script>
+    <script src="Triangle.js"></script>
     <script src="asgn1.js"></script>
 
   </body>

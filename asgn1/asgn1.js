@@ -31,7 +31,8 @@ function setupWebGL() {
   canvas = document.getElementById("webgl");
 
   // Get the rendering context for WebGL
-  gl = getWebGLContext(canvas);
+  // gl = getWebGLContext(canvas);
+  gl = canvas.getContext("webgl", {preserveDrawingBuffer: true});
   if (!gl) {
     console.log("Failed to get the rendering context for WebGL");
     return;
@@ -74,6 +75,13 @@ function addActionsForHtmlUI() {
   sizeSlider.addEventListener("mouseup", () => {
     g_selectedSize = sizeSlider.value;
   })
+
+  let clearButton = document.getElementById("clearButton");
+  clearButton.addEventListener("click", () => {
+    // clear canvas by clearing shapes list
+    g_shapesList = [];
+    renderAllShapes();
+  })
 }
 
 
@@ -88,6 +96,8 @@ function main() {
 
   // set up click listener to call click handler
   canvas.onmousedown = click;
+  // click if mouse held and dragged
+  canvas.onmousemove = (event) => { if (event.buttons == 1) click(event);};
 
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -99,26 +109,21 @@ function main() {
 
 // -- Extra helper funcs/things --
 
-// global array for mouse click points
-// we need to store all points since buffer gets cleared on draw
-var g_points = [];
-var g_colors = [];
-var g_sizes = [];
+// global array for all drawn shapes, which need to be stored
+// since buffer is cleared on draw
+var g_shapesList = [];
 
 // define click handler
 function click(event) {
   let [x, y] = convertCoordinatesEventToGL(event);
 
-  // push xy components
-  g_points.push([x, y]);
+  // set up a new Point and add it to the shapes list
+  let p = new Point();
+  p.position = [x, y];
+  p.color = g_selectedColor.slice();  // slice to send copy
+  p.size = g_selectedSize;
 
-  // push colors
-  // slice it to send a copy of array
-  g_colors.push(g_selectedColor.slice());
-
-  // push size
-  g_sizes.push(g_selectedSize);
-  
+  g_shapesList.push(p);
   renderAllShapes();
 }
 
@@ -137,18 +142,8 @@ function renderAllShapes() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  // for each point, set position attribute with x and y, color uniform, and then draw
-  for (let i = 0; i < g_points.length; i++) {
-    var xy = g_points[i];
-    var rgba = g_colors[i];
-    var size = g_sizes[i];
-
-    gl.vertexAttrib3f(a_Position, xy[0], xy[1], 0.0);
-    gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
-    gl.uniform1f(u_PointSize, size);
-    
-    // Draw a point
-    // mode, first vertex to draw from, number of vertices to draw
-    gl.drawArrays(gl.POINTS, 0, 1);
+  // each shape knows how to render itself
+  for (let i = 0; i < g_shapesList.length; i++) {
+    g_shapesList[i].render();
   }
 }

@@ -8,15 +8,14 @@ class Triangle {
 
   render() {
     let xy = this.position;
-    let s = this.size / 150;    // distance between vertices
+    let s = this.size / 150;    // distance from click position to vertices
 
-    // set values for vertex/frag shaders
-    gl.vertexAttrib3f(a_Position, xy[0], xy[1], 0.0);
+    // set values for color (size/position are later)
     gl.uniform4f(u_FragColor, this.color[0], this.color[1], this.color[2], this.color[3]);
-    gl.uniform1f(u_PointSize, this.size);
 
-    // use our own drawTriangle function to handle buffer things
-    this.drawTriangle([xy[0], xy[1], xy[0] + s, xy[1], xy[0], xy[1] + s]);
+    // use our own drawTriangle function since we need to handle buffer things
+    // array is components of all 3 vertices of the triangle
+    this.drawTriangle([xy[0], xy[1] + s, xy[0] - s, xy[1] - s, xy[0] + s, xy[1] - s]);
   }
 
   drawTriangle(vertices) {

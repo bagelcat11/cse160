@@ -61,6 +61,8 @@ let g_selectedColor = [1.0, 1.0, 1.0, 1.0];
 let g_selectedSize = 5;
 let g_selectedShape = "point";
 let g_numSegments = 16;
+let g_partyModeSelector;
+
 function addActionsForHtmlUI() {
   let redSlider = document.getElementById("redSlider");
   let greenSlider = document.getElementById("greenSlider");
@@ -102,6 +104,9 @@ function addActionsForHtmlUI() {
   segmentCountSlider.addEventListener("mouseup", () => {
     g_numSegments = segmentCountSlider.value;
   });
+
+  g_partyModeSelector = document.getElementById("partyModeSelect");
+  g_partyModeSelector.value = "off";  // default
 }
 
 
@@ -110,9 +115,6 @@ function main() {
   setupWebGL();
   connectVariablesToGLSL();
   addActionsForHtmlUI();
-
-  // initialize point size
-  // gl.vertexUniform1f(u_PointSize, 10.0);
 
   // set up click listener to call click handler
   canvas.onmousedown = click;
@@ -124,10 +126,28 @@ function main() {
 
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
-
-  // drawTriangle([0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
-  // drawTriangle([0.9, 0.9, 0.8, 0.8, 0.75, 0.6]);
 }
+
+// awesome "zen board" feature: shapes fade away over time
+  // var alphaFadeTimer = setTimeout(alphaFader, 10);
+  
+  // function alphaFader() {
+  //   let numToRemove = 0;
+  //   g_shapesList.forEach(shape => {
+  //     if (shape.color[3] > 0) {
+  //       shape.color[3] -= 0.01;
+  //     } else {
+  //       numToRemove++;
+  //     }
+  //   });
+
+  //   for (let i = 0; i < numToRemove; i++) {
+  //     g_shapesList.pop();
+  //   }
+
+  //   // console.log("in timer")
+  //   alphaFadeTimer = setTimeout(alphaFader, 10);
+  // }
 
 
 // -- Extra helper funcs/things --
@@ -179,8 +199,15 @@ function renderAllShapes() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT);
 
+  // track performance
+  let fpsCounter = document.getElementById("fpsCounter");
+  let start = performance.now();
+
   // each shape knows how to render itself
   for (let i = 0; i < g_shapesList.length; i++) {
     g_shapesList[i].render();
   }
+
+  //TODO: fix formula
+  fpsCounter.textContent = (performance.now() - start) / 60;
 }

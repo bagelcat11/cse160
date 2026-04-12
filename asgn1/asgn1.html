@@ -15,6 +15,13 @@
     </canvas>
 
     <div>
+      <p>
+        <strong>FPS: </strong>
+        <span id="fpsCounter"></span>
+      </p>
+    </div>
+
+    <div>
       <label><strong>Shape: </strong></label>
       <!-- radio button input could be nicer here... -->
       <input type="radio" id="selectPoint" name="shapeSelect" value="point" checked/>
@@ -29,6 +36,7 @@
         <!-- <option value="circle">Circle</option> -->
       <!-- </select> -->
     </div>
+    <p></p>
     <div>
       <label><strong>Color: </strong>Red</label>
       <input type="range" min="0" max="100" value="100" class="slider" id="redSlider">
@@ -37,12 +45,22 @@
       <label>Blue</label>
       <input type="range" min="0" max="100" value="100" class="slider" id="blueSlider">
     </div>
+    <p></p>
+    <div>
+      <label><strong>Party mode: </strong></label>
+      <select id="partyModeSelect">
+        <option value="off">Off</option>
+        <option value="on">On</option>
+      </select>
+    </div>
+    <p></p>
     <div>
       <label><strong>Size: </strong></label>
       <input type="range" min="2" max="40" value="10" class="slider" id="sizeSlider">
       <label><strong>(Circles) segment count: </strong></label>
       <input type="range" min="5" max="32" value="16" class="slider" id="segmentCountSlider">
     </div>
+    <p></p>
     <div>
       <button id="clearButton">Clear canvas</button>
     </div>

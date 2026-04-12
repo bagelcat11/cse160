@@ -25,7 +25,8 @@ class Circle {
       let pt1 = [xy[0] + vec1[0], xy[1] + vec1[1]];
       let pt2 = [xy[0] + vec2[0], xy[1] + vec2[1]];
 
-      Triangle.drawTriangle([xy[0], xy[1], pt1[0], pt1[1], pt2[0], pt2[1]]);
+      let tri = new Triangle(); // bad solution to having to make drawTri non-static because it uses this.color
+      tri.drawTriangle([xy[0], xy[1], pt1[0], pt1[1], pt2[0], pt2[1]]);
     }
   }
 }

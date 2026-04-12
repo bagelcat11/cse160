@@ -10,16 +10,13 @@ class Triangle {
     let xy = this.position;
     let s = this.size / 150;    // distance from click position to vertices
 
-    // set values for color (size/position are later)
-    gl.uniform4f(u_FragColor, this.color[0], this.color[1], this.color[2], this.color[3]);
-
     // use our own drawTriangle function since we need to handle buffer things
     // array is components of all 3 vertices of the triangle
-    Triangle.drawTriangle([xy[0], xy[1] + s, xy[0] - s, xy[1] - s, xy[0] + s, xy[1] - s]);
+    this.drawTriangle([xy[0], xy[1] + s, xy[0] - s, xy[1] - s, xy[0] + s, xy[1] - s]);
   }
 
-  // make it static so others can call
-  static drawTriangle(vertices) {
+  // make it static so others can call------------
+  drawTriangle(vertices) {
     var n = 3;  // number of vertices
 
     // create buffer object
@@ -31,10 +28,22 @@ class Triangle {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
 
     // assign buffer to attribute var
-    // var, # comps per vertex, type, normalize to [-1, 1], stride, offset
+    // var, # comps per vertex, type, f=normalize to [-1, 1], stride, offset
     gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
     // enable assignment
     gl.enableVertexAttribArray(a_Position);
+
+    // randomize tri color if party mode
+    //TODO: I would like for each vertex to be a different color, but it seems that
+    // involves having color be handled by the vertex shader rather than fragment,
+    // so we will see if I want to make that change later
+    // ... it does still look cool for circles made of tris though
+    if (g_partyModeSelector.value === "on") {
+        this.color[0] = Math.random();
+        this.color[1] = Math.random();
+        this.color[2] = Math.random();
+    }
+    gl.uniform4f(u_FragColor, this.color[0], this.color[1], this.color[2], this.color[3]);
 
     gl.drawArrays(gl.TRIANGLES, 0, n);
   }

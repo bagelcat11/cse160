@@ -158,6 +158,10 @@ var g_shapesList = [];
 
 // define click handler
 function click(event) {
+   // track performance
+  let fpsCounter = document.getElementById("fpsCounter");
+  let start = performance.now();
+  
   let [x, y] = convertCoordinatesEventToGL(event);
 
   // set up a new shape depending on selector, and add it to the shapes list
@@ -182,6 +186,10 @@ function click(event) {
 
   g_shapesList.push(shape);
   renderAllShapes();
+
+  // update performance
+  let msElapsed = performance.now() - start; 
+  fpsCounter.textContent = (1000 / msElapsed).toFixed(0);
 }
 
 function convertCoordinatesEventToGL(event) {
@@ -199,15 +207,8 @@ function renderAllShapes() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  // track performance
-  let fpsCounter = document.getElementById("fpsCounter");
-  let start = performance.now();
-
   // each shape knows how to render itself
   for (let i = 0; i < g_shapesList.length; i++) {
     g_shapesList[i].render();
   }
-
-  //TODO: fix formula
-  fpsCounter.textContent = (performance.now() - start) / 60;
 }

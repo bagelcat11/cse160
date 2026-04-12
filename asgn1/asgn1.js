@@ -59,6 +59,8 @@ function connectVariablesToGLSL() {
 // globals for HTML selections
 let g_selectedColor = [1.0, 1.0, 1.0, 1.0];
 let g_selectedSize = 5;
+let g_selectedShape = "point";
+let g_numSegments = 16;
 function addActionsForHtmlUI() {
   let redSlider = document.getElementById("redSlider");
   let greenSlider = document.getElementById("greenSlider");
@@ -85,8 +87,21 @@ function addActionsForHtmlUI() {
     renderAllShapes();
   });
 
-  let shapeSelector = document.getElementById("shapeSelector");
-  shapeSelector.value = "point";
+  let shapeSelectors = document.getElementsByName("shapeSelect");
+  //TODO: curiosity: looping with for loop didn't work (clicking any button made
+  // it be circle) because of something to do with maybe needing closures?
+  // https://stackoverflow.com/a/19586183
+  // but it seems forEach captures scope properly...
+  shapeSelectors.forEach(s => {
+    s.addEventListener("click", () => {
+      g_selectedShape = s.value;
+    });
+  });
+
+  let segmentCountSlider = document.getElementById("segmentCountSlider");
+  segmentCountSlider.addEventListener("mouseup", () => {
+    g_numSegments = segmentCountSlider.value;
+  });
 }
 
 
@@ -127,10 +142,19 @@ function click(event) {
 
   // set up a new shape depending on selector, and add it to the shapes list
   let shape;
-  if (shapeSelector.value === "point") {
-    shape = new Point();
-  } else if (shapeSelector.value === "triangle") {
-    shape = new Triangle();
+  switch (g_selectedShape) {
+    case "point":
+      shape = new Point();
+      break;
+    case "triangle":
+      shape = new Triangle();
+      break;
+    case "circle":
+      shape = new Circle();
+      shape.segments = g_numSegments;
+      break;
+    default:
+      break;
   }
   shape.position = [x, y];
   shape.color = g_selectedColor.slice();  // slice to send copy

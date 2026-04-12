@@ -17,10 +17,17 @@
     <div>
       <label><strong>Shape: </strong></label>
       <!-- radio button input could be nicer here... -->
-      <select id="shapeSelector">
-        <option value="point">Point</option>
-        <option value="triangle">Triangle</option>
-      </select>
+      <input type="radio" id="selectPoint" name="shapeSelect" value="point" checked/>
+      <label for="selectPoint">Point</label>
+      <input type="radio" id="selectTriangle" name="shapeSelect" value="triangle"/>
+      <label for="selectTriangle">Triangle</label>
+      <input type="radio" id="selectCircle" name="shapeSelect" value="circle"/>
+      <label for="selectCircle">Circle</label>
+      <!-- <select id="shapeSelector"> -->
+        <!-- <option value="point">Point</option> -->
+        <!-- <option value="triangle">Triangle</option> -->
+        <!-- <option value="circle">Circle</option> -->
+      <!-- </select> -->
     </div>
     <div>
       <label><strong>Color: </strong>Red</label>
@@ -33,6 +40,8 @@
     <div>
       <label><strong>Size: </strong></label>
       <input type="range" min="2" max="40" value="10" class="slider" id="sizeSlider">
+      <label><strong>(Circles) segment count: </strong></label>
+      <input type="range" min="5" max="32" value="16" class="slider" id="segmentCountSlider">
     </div>
     <div>
       <button id="clearButton">Clear canvas</button>
@@ -44,6 +53,7 @@
     <!-- <script src="lib/cuon-matrix-cse160.js"></script> -->
     <script src="Point.js"></script>
     <script src="Triangle.js"></script>
+    <script src="Circle.js"></script>
     <script src="asgn1.js"></script>
 
   </body>

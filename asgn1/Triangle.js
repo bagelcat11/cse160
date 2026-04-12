@@ -15,10 +15,11 @@ class Triangle {
 
     // use our own drawTriangle function since we need to handle buffer things
     // array is components of all 3 vertices of the triangle
-    this.drawTriangle([xy[0], xy[1] + s, xy[0] - s, xy[1] - s, xy[0] + s, xy[1] - s]);
+    Triangle.drawTriangle([xy[0], xy[1] + s, xy[0] - s, xy[1] - s, xy[0] + s, xy[1] - s]);
   }
 
-  drawTriangle(vertices) {
+  // make it static so others can call
+  static drawTriangle(vertices) {
     var n = 3;  // number of vertices
 
     // create buffer object

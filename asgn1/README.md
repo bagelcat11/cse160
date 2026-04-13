@@ -1,3 +1,5 @@
+**Awesome thing:** "Party mode", which makes your shapes change color. try it out with my personal drawing! 
+
 **bug(?):** it seems that on Firefox, slider positions/radio button selections are saved upon refreshing the page, but their JS values are internally reset, causing inconsistent-looking behavior. this does not appear to be a problem on Chrome, where selections are reset upon refresh.
 
 

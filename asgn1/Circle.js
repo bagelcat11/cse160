@@ -11,7 +11,7 @@ class Circle {
     let xy = this.position;
 
     // set values for color
-    gl.uniform4f(u_FragColor, this.color[0], this.color[1], this.color[2], this.color[3]);
+    // gl.uniform4f(u_FragColor, this.color[0], this.color[1], this.color[2], this.color[3]);
 
     let s = this.size / 150;    // distance from click position to vertices
 
@@ -26,6 +26,7 @@ class Circle {
       let pt2 = [xy[0] + vec2[0], xy[1] + vec2[1]];
 
       let tri = new Triangle(); // bad solution to having to make drawTri non-static because it uses this.color
+      tri.color = this.color;
       tri.drawTriangle([xy[0], xy[1], pt1[0], pt1[1], pt2[0], pt2[1]]);
     }
   }

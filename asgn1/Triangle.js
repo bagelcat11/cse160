@@ -4,20 +4,26 @@ class Triangle {
     this.position = [0.0, 0.0, 0.0];
     this.color = [1.0, 1.0, 1.0, 1.0];
     this.size = 5.0;
+    // allow others (me) to specify custom vertices
+    this.vertices; 
   }
 
   render() {
-    let xy = this.position;
-    let s = this.size / 150;    // distance from click position to vertices
+    // if no custom vertices, use default from position
+    if (this.vertices === undefined) {
+      let xy = this.position;
+      let s = this.size / 150;  // distance from click position to vertices
+      this.vertices = [xy[0], xy[1] + s, xy[0] - s, xy[1] - s, xy[0] + s, xy[1] - s];
+    }
 
     // use our own drawTriangle function since we need to handle buffer things
     // array is components of all 3 vertices of the triangle
-    this.drawTriangle([xy[0], xy[1] + s, xy[0] - s, xy[1] - s, xy[0] + s, xy[1] - s]);
+    this.drawTriangle(this.vertices);
   }
 
   // make it static so others can call------------
   drawTriangle(vertices) {
-    var n = 3;  // number of vertices
+    var n = vertices.length / 2;  // num tris = vertices / 2 comps per vertex
 
     // create buffer object
     var vertexBuffer = gl.createBuffer();

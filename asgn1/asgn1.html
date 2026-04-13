@@ -6,7 +6,6 @@
   <head>
     <meta charset="utf-8"/>
     <title>Asgn1: Painting Program</title>
-    <!-- <link rel="stylesheet" href="asgn1.css"> -->
   </head>
 
   <body onload="main()">
@@ -26,18 +25,12 @@
 
     <div>
       <label><strong>Shape: </strong></label>
-      <!-- radio button input could be nicer here... -->
       <input type="radio" id="selectPoint" name="shapeSelect" value="point" checked/>
       <label for="selectPoint">Point</label>
       <input type="radio" id="selectTriangle" name="shapeSelect" value="triangle"/>
       <label for="selectTriangle">Triangle</label>
       <input type="radio" id="selectCircle" name="shapeSelect" value="circle"/>
       <label for="selectCircle">Circle</label>
-      <!-- <select id="shapeSelector"> -->
-        <!-- <option value="point">Point</option> -->
-        <!-- <option value="triangle">Triangle</option> -->
-        <!-- <option value="circle">Circle</option> -->
-      <!-- </select> -->
     </div>
     <p></p>
     <div>
@@ -61,6 +54,7 @@
         <option value="off">Off</option>
         <option value="on">On</option>
       </select>
+      <label>(flashing colors)</label>
     </div>
     <p></p>
     <div>
@@ -84,6 +78,7 @@
     <script src="Point.js"></script>
     <script src="Triangle.js"></script>
     <script src="Circle.js"></script>
+    <script src="LynnsPictureDrawer.js"></script>
     <script src="asgn1.js"></script>
 
   </body>

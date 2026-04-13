@@ -107,6 +107,9 @@ function addActionsForHtmlUI() {
 
   g_partyModeSelector = document.getElementById("partyModeSelect");
   g_partyModeSelector.value = "off";  // default
+
+  let lynnPicButton = document.getElementById("lynnPicButton");
+  lynnPicButton.addEventListener("click", addLynnPictureShapes);
 }
 
 
@@ -127,28 +130,6 @@ function main() {
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
 }
-
-// awesome "zen board" feature: shapes fade away over time
-  // var alphaFadeTimer = setTimeout(alphaFader, 10);
-  
-  // function alphaFader() {
-  //   let numToRemove = 0;
-  //   g_shapesList.forEach(shape => {
-  //     if (shape.color[3] > 0) {
-  //       shape.color[3] -= 0.01;
-  //     } else {
-  //       numToRemove++;
-  //     }
-  //   });
-
-  //   for (let i = 0; i < numToRemove; i++) {
-  //     g_shapesList.pop();
-  //   }
-
-  //   // console.log("in timer")
-  //   alphaFadeTimer = setTimeout(alphaFader, 10);
-  // }
-
 
 // -- Extra helper funcs/things --
 
@@ -211,4 +192,183 @@ function renderAllShapes() {
   for (let i = 0; i < g_shapesList.length; i++) {
     g_shapesList[i].render();
   }
+}
+
+// draw picture with my initials!
+function addLynnPictureShapes() {
+  console.log("hi")
+  // we will just add a ton of colored triangles to the shapes list so they can be rendered as normal
+  // GO COUNTER-CLOCKWISE
+  let bg = [
+    -1, -1,
+    1, 1,
+    -1, 1,
+
+    -1, -1,
+    1, -1,
+    1, 1
+  ];
+  let darkPinkTris_L = [
+    -0.6, 0.5,
+    -0.5, 0.5,
+    -0.5, 0.6,
+
+    -0.6, 0.4,
+    -0.5, 0.5,
+    -0.6, 0.5,
+
+    -0.7, 0.4,
+    -0.6, 0.4,
+    -0.6, 0.5,
+
+    -0.7, 0.3,
+    -0.6, 0.4,
+    -0.7, 0.4,
+
+    -0.7, 0.3,
+    -0.6, 0.3,
+    -0.6, 0.4,
+
+    -0.6, 0.1,
+    -0.6, 0.3,
+    -0.8, 0.3,
+
+    -0.6, 0.1,
+    -0.8, 0.3,
+    -0.8, 0.1,
+
+    -0.9, 0.2,
+    -0.8, 0.3,
+    -0.9, 0.4,
+
+    -0.8, 0.1,
+    -0.8, 0.3,
+    -0.9, 0.2,
+
+    -0.7, 0.0,
+    -0.6, 0.1,
+    -0.8, 0.1,
+
+    -0.7, 0.0,
+    -0.6, 0.0,
+    -0.6, 0.1,
+
+    -0.6, -0.1,
+    -0.5, 0.0,
+    -0.6, 0.0,
+
+    -0.4, 0.0,
+    -0.5, 0.1,
+    -0.6, 0.0,
+    
+    -0.9, -0.2,
+    -0.7, -0.2,
+    -0.9, 0.0,
+
+    -0.7, -0.4,
+    -0.5, -0.2,
+    -0.9, -0.2,
+
+    -0.3, -0.4,
+    -0.3, -0.2,
+    -0.5, -0.4,
+
+    -0.3, -0.4,
+    -0.2, -0.3,
+    -0.3, -0.2,
+
+    -0.3, -0.4,
+    -0.2, -0.4,
+    -0.2, -0.3,
+
+    -0.2, -0.4,
+    -0.1, -0.3,
+    -0.2, -0.3
+  ];
+  let orangeTris_L = [
+    -0.6, 0.3,
+    -0.5, 0.4,
+    -0.6, 0.4,
+
+    -0.6, 0.2,
+    -0.5, 0.3,
+    -0.6, 0.3,
+
+    -0.9, 0.0,
+    -0.7, 0.0,
+    -0.8, 0.1,
+
+    -0.7, -0.2,
+    -0.7, 0.0,
+    -0.9, 0.0,
+
+    -0.7, -0.2,
+    -0.6, -0.2,
+    -0.7, 0.0,
+
+    -0.6, -0.2,
+    -0.6, 0.0,
+    -0.7, 0.0,
+
+    -0.7, -0.4,
+    -0.5, -0.4,
+    -0.5, -0.2,
+
+    -0.5, -0.4,
+    -0.3, -0.2,
+    -0.5, -0.2,
+
+    -0.2, -0.3,
+    -0.2, -0.1,
+    -0.3, -0.2,
+
+    -0.1, -0.3,
+    -0.1, -0.1,
+    -0.2, -0.2,
+
+    -0.2, -0.3,
+    -0.1, -0.3,
+    -0.2, -0.2,
+  ];
+  let eyes = [
+    -0.8, 0.3,
+    -0.7, 0.4,
+    -0.8, 0.4,
+
+    -0.7, 0.3,
+    -0.7, 0.4,
+    -0.8, 0.3,
+
+    0.7, 0.3,
+    0.8, 0.4,
+    0.7, 0.4,
+
+    0.8, 0.3,
+    0.8, 0.4,
+    0.7, 0.3
+  ];
+
+  // colors
+  let darkPink = [1.0, 0.0, 1.0, 1.0];
+  let orange = [1.0, 0.5, 0.0, 1.0];
+  let blue = [0.0, 1.0, 1.0, 1.0];
+  let black = [0.1, 0.1, 0.1, 1.0];
+
+  drawManyTriangles(bg, blue);
+  drawManyTriangles(darkPinkTris_L, darkPink);
+  drawManyTriangles(orangeTris_L, orange);
+  drawManyTriangles(eyes, black);
+}
+
+function drawManyTriangles(vertices, color) {
+  // var n = 3;  // number of vertices
+
+  var vertexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
+  gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(a_Position);
+  gl.uniform4f(u_FragColor, color[0], color[1], color[2], color[3]);
+
+  gl.drawArrays(gl.TRIANGLES, 0, (vertices.length / 2));
 }

@@ -159,7 +159,7 @@ var g_shapesList = [];
 // define click handler
 function click(event) {
    // track performance
-  let fpsCounter = document.getElementById("fpsCounter");
+  let msCounter = document.getElementById("msCounter");
   let start = performance.now();
   
   let [x, y] = convertCoordinatesEventToGL(event);
@@ -189,7 +189,7 @@ function click(event) {
 
   // update performance
   let msElapsed = performance.now() - start; 
-  fpsCounter.textContent = (1000 / msElapsed).toFixed(0);
+  msCounter.textContent = (msElapsed).toFixed(0) + " ms";
 }
 
 function convertCoordinatesEventToGL(event) {

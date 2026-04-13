@@ -87,6 +87,7 @@ function addActionsForHtmlUI() {
     // clear canvas by clearing shapes list
     g_shapesList = [];
     renderAllShapes();
+    lynnPicRef.style.visibility = "hidden";
   });
 
   let shapeSelectors = document.getElementsByName("shapeSelect");
@@ -109,7 +110,11 @@ function addActionsForHtmlUI() {
   g_partyModeSelector.value = "off";  // default
 
   let lynnPicButton = document.getElementById("lynnPicButton");
-  lynnPicButton.addEventListener("click", addLynnPictureShapes);
+  let lynnPicRef = document.getElementById("lynnPicRef");
+  lynnPicButton.addEventListener("click", () => {
+    lynnPicRef.style.visibility = "visible";
+    addLynnPictureShapes();
+  });
 }
 
 

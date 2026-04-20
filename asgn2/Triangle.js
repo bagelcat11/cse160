@@ -6,6 +6,7 @@ class Triangle {
     this.size = 5.0;
     // allow others (me) to specify custom vertices
     this.vertices; 
+    this.matrix;
   }
 
   render() {
@@ -54,6 +55,9 @@ class Triangle {
     gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_Position);
     gl.uniform4f(u_FragColor, this.color[0], this.color[1], this.color[2], this.color[3]);
+
+    // matrix transform!!
+    gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 
     gl.drawArrays(gl.TRIANGLES, 0, n);
   }

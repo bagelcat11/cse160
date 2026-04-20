@@ -2,11 +2,11 @@
 // we use \n and + so that errors give us line numbers
 var VSHADER_SOURCE = 
   'attribute vec4 a_Position;\n' +  // attributes: external vars that can vary for each vertex
-  'uniform float u_PointSize;\n'+
+  'uniform mat4 u_ModelMatrix;\n'+  // for rotating parts of the model
+  'uniform mat4 u_GlobalRotateMatrix;\n' +  // for the camera
   '\n' +
   'void main() {\n' +
-  '  gl_Position = a_Position;\n' + // Set the vertex coordinates of the point
-  '  gl_PointSize = u_PointSize;\n' +                    // Set the point size
+  '  gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' + // now transformable with mtx!
   '}\n';
 
 // -- Fragment shader program --
@@ -22,8 +22,10 @@ var FSHADER_SOURCE =
 let canvas;
 let gl;
 let a_Position;
-let u_PointSize;
 let u_FragColor;
+let u_ModelMatrix;
+let u_GlobalRotateMatrix;
+let g_cameraAngle = 0;
 
 // -- Setup helpers --
 function setupWebGL() {
@@ -37,6 +39,9 @@ function setupWebGL() {
     console.log("Failed to get the rendering context for WebGL");
     return;
   }
+
+  // for 3D
+  gl.enable(gl.DEPTH_TEST);
 }
 
 function connectVariablesToGLSL() {
@@ -49,21 +54,23 @@ function connectVariablesToGLSL() {
   // get storage locations of attribute vars from gl.program, which can
   // only be referenced after initShaders is called
   a_Position = gl.getAttribLocation(gl.program, "a_Position");
-  // console.log("init a pos", a_Position);
   // get location of uniform var
-  u_PointSize = gl.getUniformLocation(gl.program, "u_PointSize");
   u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
-  // console.log("init size", u_PointSize);
+  u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
+  u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotateMatrix");
+  
+  // set up identity mtx by default
+  let identityM = new Matrix4();
+  gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
 }
 
-// globals for HTML selections
-let g_selectedColor = [1.0, 1.0, 1.0, 1.0];
-let g_selectedSize = 5;
-let g_selectedShape = "point";
-let g_numSegments = 16;
-
 function addActionsForHtmlUI() {
-  
+  let cameraSlider = document.getElementById("cameraSlider");
+  //TODO: this really redraws whenever the mouse moves over, not clicks and drags, so it's a little wasteful
+  cameraSlider.addEventListener("mousemove", () => {
+    g_cameraAngle = cameraSlider.value;
+    renderAllShapes();
+  });
 }
 
 
@@ -72,11 +79,6 @@ function main() {
   setupWebGL();
   connectVariablesToGLSL();
   addActionsForHtmlUI();
-
-  // set up click listener to call click handler
-  // canvas.onmousedown = click;
-  // click if mouse held and dragged
-  // canvas.onmousemove = (event) => { if (event.buttons == 1) click(event);};
 
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -93,34 +95,6 @@ function main() {
 // since buffer is cleared on draw
 var g_shapesList = [];
 
-// define click handler
-function click(event) {
-  let [x, y] = convertCoordinatesEventToGL(event);
-
-  // set up a new shape depending on selector, and add it to the shapes list
-  let shape;
-  switch (g_selectedShape) {
-    case "point":
-      shape = new Point();
-      break;
-    case "triangle":
-      shape = new Triangle();
-      break;
-    case "circle":
-      shape = new Circle();
-      shape.segments = g_numSegments;
-      break;
-    default:
-      break;
-  }
-  shape.position = [x, y];
-  shape.color = g_selectedColor.slice();  // slice to send copy
-  shape.size = g_selectedSize;
-
-  g_shapesList.push(shape);
-  renderAllShapes();
-}
-
 function convertCoordinatesEventToGL(event) {
   // transform browser coords -> canvas coords -> webgl coords
   var x = event.clientX;
@@ -134,14 +108,21 @@ function convertCoordinatesEventToGL(event) {
 
 function renderAllShapes() {
   // clear canvas
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // each shape knows how to render itself
   // for (let i = 0; i < g_shapesList.length; i++) {
   //   g_shapesList[i].render();
   // }
 
-  var testcube = new Cube();
+  // global transform for camera angle
+  let globalRotMtx = new Matrix4().rotate(g_cameraAngle, 0, 1, 0);
+  gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
+
+  let testcube = new Cube();
   testcube.color = [1.0, 0.0, 1.0, 1.0];
+  // degrees, rotation axis xyz
+  testcube.matrix.rotate(45, 1, 1, 0); 
+  testcube.matrix.translate(-1, -1, 0);
   testcube.render();
 }

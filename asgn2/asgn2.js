@@ -69,7 +69,7 @@ function addActionsForHtmlUI() {
   //TODO: this really redraws whenever the mouse moves over, not clicks and drags, so it's a little wasteful
   cameraSlider.addEventListener("mousemove", () => {
     g_cameraAngle = cameraSlider.value;
-    renderAllShapes();
+    renderScene();
   });
 }
 
@@ -83,10 +83,7 @@ function main() {
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-  // Clear <canvas>
-  // gl.clear(gl.COLOR_BUFFER_BIT);
-
-  renderAllShapes();
+  renderScene();
 }
 
 // -- Extra helper funcs/things --
@@ -106,21 +103,24 @@ function convertCoordinatesEventToGL(event) {
   return [x, y]
 }
 
-function renderAllShapes() {
+function renderScene() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  // each shape knows how to render itself
-  // for (let i = 0; i < g_shapesList.length; i++) {
-  //   g_shapesList[i].render();
-  // }
+  // gl.clear(gl.COLOR_BUFFER_BIT);
 
   // global transform for camera angle
   let globalRotMtx = new Matrix4().rotate(g_cameraAngle, 0, 1, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
+  
+  // each shape knows how to render itself
+  // for (let i = 0; i < g_shapesList.length; i++) {
+  //   g_shapesList[i].render();
+  // }
+
   let testcube = new Cube();
   testcube.color = [1.0, 0.0, 1.0, 1.0];
+  testcube.matrix.scale(0.5, 0.5, 0.5);
   // degrees, rotation axis xyz
   testcube.matrix.rotate(45, 1, 1, 0); 
   testcube.matrix.translate(-1, -1, 0);

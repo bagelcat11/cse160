@@ -1,36 +1,31 @@
-class Cube {
+class Cube extends Shape {
     constructor() {
-        this.type = "cube";
-        this.color = [1.0, 1.0, 1.0, 1.0];
-        this.matrix = new Matrix4();
+        super();
     }
 
     render() {
-        var rgba = this.color;
+        var rgba = this.color.slice();
         // gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
 
-        let tri = new Triangle();
-        tri.color = rgba;
-        tri.matrix = this.matrix;
         // draw front
         // CCW
-        tri.drawTriangle3D([0,0,0, 1,0,0, 1,1,0,]);
-        tri.drawTriangle3D([0,0,0, 1,1,0, 0,1,0,]);
+        this.drawTriangles3D([0,0,0, 1,0,0, 1,1,0,], rgba);
+        this.drawTriangles3D([0,0,0, 1,1,0, 0,1,0,], rgba);
 
         // top
         // fake some lighting first
-        tri.color = tri.color.map(c => c * 0.5);
-        tri.drawTriangle3D([0,1,0, 1,1,-1, 0,1,-1,]);
-        tri.drawTriangle3D([0,1,0, 1,1,0, 1,1,-1,]);
+        rgba = rgba.map(c => c * 0.5);
+        this.drawTriangles3D([0,1,0, 1,1,-1, 0,1,-1,], rgba);
+        this.drawTriangles3D([0,1,0, 1,1,0, 1,1,-1,], rgba);
 
         // bottom
-        tri.color = tri.color.map(c => c * 0.5);
-        tri.drawTriangle3D([0,0,0, 1,0,-1, 0,0,-1,]);
-        tri.drawTriangle3D([0,0,0, 1,0,0, 1,0,-1,]);
+        rgba = rgba.map(c => c * 0.5);
+        this.drawTriangles3D([0,0,0, 1,0,-1, 0,0,-1,], rgba);
+        this.drawTriangles3D([0,0,0, 1,0,0, 1,0,-1,], rgba);
 
         // back
-        tri.color = tri.color.map(c => c * 0.5);
-        tri.drawTriangle3D([0,0,-1, 1,1,-1, 1,0,-1,]);
-        tri.drawTriangle3D([0,0,-1, 0,1,-1, 1,1,-1,]);
+        rgba = rgba.map(c => c * 0.5);
+        this.drawTriangles3D([0,0,-1, 1,1,-1, 1,0,-1,], rgba);
+        this.drawTriangles3D([0,0,-1, 0,1,-1, 1,1,-1,], rgba);
     }
 }

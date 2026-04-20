@@ -25,7 +25,10 @@ let a_Position;
 let u_FragColor;
 let u_ModelMatrix;
 let u_GlobalRotateMatrix;
-let g_cameraAngle = 0;
+let g_cameraAngle = 45;
+
+let g_blueAngle = 0;
+let g_greenAngle = 0;
 
 // -- Setup helpers --
 function setupWebGL() {
@@ -71,6 +74,18 @@ function addActionsForHtmlUI() {
     g_cameraAngle = cameraSlider.value;
     renderScene();
   });
+
+  let blueSlider = document.getElementById("blueSlider");
+  blueSlider.addEventListener("mousemove", () => {
+    g_blueAngle = blueSlider.value;
+    renderScene();
+  });
+
+  let greenSlider = document.getElementById("greenSlider");
+  greenSlider.addEventListener("mousemove", () => {
+    g_greenAngle = greenSlider.value;
+    renderScene();
+  });
 }
 
 
@@ -83,6 +98,7 @@ function main() {
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
+  setUpScene();
   renderScene();
 }
 
@@ -100,29 +116,57 @@ function convertCoordinatesEventToGL(event) {
   x = ((x - rect.left) - canvas.height / 2) / (canvas.height / 2);
   y = (canvas.width / 2 - (y - rect.top)) / (canvas.width / 2);
 
-  return [x, y]
+  return [x, y];
 }
 
+function setUpScene() {
+  
+}
+
+  
 function renderScene() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  // gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
   // global transform for camera angle
   let globalRotMtx = new Matrix4().rotate(g_cameraAngle, 0, 1, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
-  
-  // each shape knows how to render itself
-  // for (let i = 0; i < g_shapesList.length; i++) {
-  //   g_shapesList[i].render();
-  // }
-
+  // make any transforms from the sliders
+  // g_shapesList[1].matrix.rotate(g_blueAngle, 1, 0, 0);
   let testcube = new Cube();
   testcube.color = [1.0, 0.0, 1.0, 1.0];
   testcube.matrix.scale(0.5, 0.5, 0.5);
   // degrees, rotation axis xyz
-  testcube.matrix.rotate(45, 1, 1, 0); 
-  testcube.matrix.translate(-1, -1, 0);
+  testcube.matrix.rotate(-15, 1, 0, 0);
+  // testcube.matrix.rotate(-15, 0, 1, 0); 
+  testcube.matrix.translate(-0.5, -1, 0);
+  // g_shapesList.push(testcube);
+
+  let testcube2 = new Cube();
+  testcube2.matrix = new Matrix4().set(testcube.matrix);  // copy
+  testcube2.color = [0.0, 0.0, 1.0, 1.0];
+  testcube2.matrix.rotate(g_blueAngle, 1, 0, 0);
+  //TODO: can save checkpoints like let bluecoords = copy test2 to ref later
+  testcube2.matrix.scale(0.5, 1, 0.5);
+  testcube2.matrix.translate(0.5, 1, 0);
+  // g_shapesList.push(testcube2);
+
+  let testcube3 = new Cube();
+  testcube3.matrix = new Matrix4().set(testcube2.matrix);  // copy
+  testcube3.color = [0.5, 1.0, 0.5, 1.0];
+  testcube3.matrix.scale(1, 0.5, 2);
+  testcube3.matrix.translate(0, 2, 0.25);
+    testcube3.matrix.rotate(g_greenAngle, 0, 0, 1);
+  // g_shapesList.push(testcube3);
+
+  // render!
+  // for (let i = 0; i < g_shapesList.length; i++) {
+  //   g_shapesList[i].render();
+  // }
+
   testcube.render();
+  testcube2.render();
+  testcube3.render();
 }

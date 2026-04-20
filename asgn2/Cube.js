@@ -14,17 +14,27 @@ class Cube extends Shape {
 
         // top
         // fake some lighting first
-        rgba = rgba.map(c => c * 0.5);
+        rgba = rgba.map(c => c * 0.75);
         this.drawTriangles3D([0,1,0, 1,1,-1, 0,1,-1,], rgba);
         this.drawTriangles3D([0,1,0, 1,1,0, 1,1,-1,], rgba);
 
+        // left
+        rgba = rgba.map(c => c * 0.75);
+        this.drawTriangles3D([0,1,0, 0,0,-1, 0,0,0,], rgba);
+        this.drawTriangles3D([0,1,0, 0,0,-1, 0,1,-1,], rgba);
+
+        // right
+        rgba = rgba.map(c => c * 0.75);
+        this.drawTriangles3D([1,1,0, 1,0,-1, 1,0,0,], rgba);
+        this.drawTriangles3D([1,1,0, 1,0,-1, 1,1,-1,], rgba);
+
         // bottom
-        rgba = rgba.map(c => c * 0.5);
+        rgba = rgba.map(c => c * 0.75);
         this.drawTriangles3D([0,0,0, 1,0,-1, 0,0,-1,], rgba);
         this.drawTriangles3D([0,0,0, 1,0,0, 1,0,-1,], rgba);
 
         // back
-        rgba = rgba.map(c => c * 0.5);
+        rgba = rgba.map(c => c * 0.75);
         this.drawTriangles3D([0,0,-1, 1,1,-1, 1,0,-1,], rgba);
         this.drawTriangles3D([0,0,-1, 0,1,-1, 1,1,-1,], rgba);
     }

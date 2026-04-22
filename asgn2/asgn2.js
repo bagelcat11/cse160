@@ -25,7 +25,9 @@ let a_Position;
 let u_FragColor;
 let u_ModelMatrix;
 let u_GlobalRotateMatrix;
-let g_cameraAngle = 45;
+let g_identityM = new Matrix4();
+let g_cameraXAngle = 45;
+let g_cameraYAngle = 90;
 
 let g_blueAngle = 0;
 let g_greenAngle = 0;
@@ -67,16 +69,20 @@ function connectVariablesToGLSL() {
   u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
   u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotateMatrix");
   
-  // set up identity mtx by default
-  let identityM = new Matrix4();
-  gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
+  gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
 }
 
 function addActionsForHtmlUI() {
-  let cameraSlider = document.getElementById("cameraSlider");
+  let cameraXSlider = document.getElementById("cameraXSlider");
   // use "input" event rather than mouseover!
-  cameraSlider.addEventListener("input", () => {
-    g_cameraAngle = cameraSlider.value;
+  cameraXSlider.addEventListener("input", () => {
+    g_cameraXAngle = cameraXSlider.value;
+  });
+
+  let cameraYSlider = document.getElementById("cameraYSlider");
+  // use "input" event rather than mouseover!
+  cameraYSlider.addEventListener("input", () => {
+    g_cameraYAngle = cameraYSlider.value;
   });
 
   let blueSlider = document.getElementById("blueSlider");
@@ -127,10 +133,6 @@ function tick() {
 
 // -- Extra helper funcs/things --
 
-// global array for all drawn shapes, which need to be stored
-// since buffer is cleared on draw
-var g_shapesList = [];
-
 function convertCoordinatesEventToGL(event) {
   // transform browser coords -> canvas coords -> webgl coords
   var x = event.clientX;
@@ -142,12 +144,19 @@ function convertCoordinatesEventToGL(event) {
   return [x, y];
 }
 
-//TODO: move things here if possible??
+let g_shapesList = {};  // make it an object so it's dict-like
+//TODO: unfortunately I think all we can really move here is the object construction;
+//      their matrices really do need to be reset and recalculated every frame
 function setUpScene() {
-  
+  // g_shapesList["testcube"] = new Cube();
+  // g_shapesList["testcube2"] = new Cube();
+  // g_shapesList["testcube3"] = new Cube();
+  g_shapesList["head"] = new Head();
 }
 
 // if animation is on, update things here rather than in render function
+//TODO: when turning these on they may snap because the animation is just based
+//      on time rather than current position plus any kind of time...
 function updateAnimatedTransforms() {
   if (g_bobAnim === "on") {
     g_pinkHeight = -0.25 * Math.sin(g_elapsedTime) - 1;
@@ -157,48 +166,49 @@ function updateAnimatedTransforms() {
 function renderScene() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  // gl.clear(gl.COLOR_BUFFER_BIT);
 
   // global transform for camera angle
-  let globalRotMtx = new Matrix4().rotate(g_cameraAngle, 0, 1, 0);
+  let globalRotMtx = new Matrix4();
+  globalRotMtx.rotate(g_cameraXAngle, 0, 1, 0);
+  globalRotMtx.rotate(g_cameraYAngle, 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
-  // make any transforms from the sliders
-  // g_shapesList[1].matrix.rotate(g_blueAngle, 1, 0, 0);
-  let testcube = new Cube();
-  testcube.color = [1.0, 0.0, 1.0, 1.0];
-  testcube.matrix.scale(0.5, 0.5, 0.5);
-  // degrees, rotation axis xyz
-  testcube.matrix.rotate(-15, 1, 0, 0);
-  // testcube.matrix.rotate(-15, 0, 1, 0); 
-  
-  // bobbing over time!!!
-  testcube.matrix.translate(-0.5, g_pinkHeight, 0);
-  // g_shapesList.push(testcube);
+  // set up local refs
+  let head = g_shapesList["head"];
 
-  let testcube2 = new Cube();
-  testcube2.matrix = new Matrix4().set(testcube.matrix);  // copy
-  testcube2.color = [0.0, 0.0, 1.0, 1.0];
-  testcube2.matrix.rotate(g_blueAngle, 1, 0, 0);
-  //TODO: can save checkpoints like let bluecoords = copy test2 to ref later
-  testcube2.matrix.scale(0.5, 1, 0.5);
-  testcube2.matrix.translate(0.5, 1, 0);
-  // g_shapesList.push(testcube2);
+  head.color = [0.8, 0.4, 0.0, 1.0];
+  head.matrix.set(g_identityM); // reset every frame
+  head.matrix.scale(0.5, 0.5, 0.5);
+  head.render();
 
-  let testcube3 = new Cube();
-  testcube3.matrix = new Matrix4().set(testcube2.matrix);  // copy
-  testcube3.color = [0.5, 1.0, 0.5, 1.0];
-  testcube3.matrix.scale(1, 0.5, 2);
-  testcube3.matrix.translate(0, 2, 0.25);
-  testcube3.matrix.rotate(g_greenAngle, 0, 0, 1);
-  // g_shapesList.push(testcube3);
+  // let t1 = g_shapesList["testcube"];
+  // t1.matrix.set(g_identityM);
+  // let t2 = g_shapesList["testcube2"];
+  // t2.matrix.set(g_identityM);
+  // let t3 = g_shapesList["testcube3"];
+  // t3.matrix.set(g_identityM);
 
-  // render!
-  // for (let i = 0; i < g_shapesList.length; i++) {
-  //   g_shapesList[i].render();
-  // }
+  // t1.color = [1.0, 0.0, 1.0, 1.0];
+  // t1.matrix.scale(0.5, 0.5, 0.5);
+  // // degrees, rotation axis xyz
+  // t1.matrix.rotate(-15, 1, 0, 0);
+  // // bobbing over time!!!
+  // t1.matrix.translate(-0.5, g_pinkHeight, 0);
+  // t1.render();
 
-  testcube.render();
-  testcube2.render();
-  testcube3.render();
+
+  // t2.matrix = new Matrix4().set(t1.matrix);  // copy
+  // t2.color = [0.0, 0.0, 1.0, 1.0];
+  // t2.matrix.rotate(g_blueAngle, 1, 0, 0);
+  // //TODO: can save checkpoints like let bluecoords = copy test2 to ref later
+  // t2.matrix.scale(0.5, 1, 0.5);
+  // t2.matrix.translate(0.5, 1, 0);
+  // t2.render();
+
+  // t3.matrix = new Matrix4().set(t2.matrix);  // copy
+  // t3.color = [0.5, 1.0, 0.5, 1.0];
+  // t3.matrix.scale(1, 0.5, 2);
+  // t3.matrix.translate(0, 2, 0.25);
+  // t3.matrix.rotate(g_greenAngle, 0, 0, 1);
+  // t3.render();
 }

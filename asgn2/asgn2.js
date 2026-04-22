@@ -29,6 +29,11 @@ let g_cameraAngle = 45;
 
 let g_blueAngle = 0;
 let g_greenAngle = 0;
+let g_bobAnim = "on";
+let g_pinkHeight = 0;
+
+let g_startTime = performance.now() / 1000;
+let g_elapsedTime = performance.now() / 1000 - g_startTime;
 
 // -- Setup helpers --
 function setupWebGL() {
@@ -69,22 +74,26 @@ function connectVariablesToGLSL() {
 
 function addActionsForHtmlUI() {
   let cameraSlider = document.getElementById("cameraSlider");
-  //TODO: this really redraws whenever the mouse moves over, not clicks and drags, so it's a little wasteful
-  cameraSlider.addEventListener("mousemove", () => {
+  // use "input" event rather than mouseover!
+  cameraSlider.addEventListener("input", () => {
     g_cameraAngle = cameraSlider.value;
-    renderScene();
   });
 
   let blueSlider = document.getElementById("blueSlider");
-  blueSlider.addEventListener("mousemove", () => {
+  blueSlider.addEventListener("input", () => {
     g_blueAngle = blueSlider.value;
-    renderScene();
   });
 
   let greenSlider = document.getElementById("greenSlider");
-  greenSlider.addEventListener("mousemove", () => {
+  greenSlider.addEventListener("input", () => {
     g_greenAngle = greenSlider.value;
-    renderScene();
+  });
+
+  let bobAnimToggles = document.getElementsByName("bobAnimToggle");
+  bobAnimToggles.forEach(s => {
+    s.addEventListener("click", () => {
+      g_bobAnim = s.value;
+    });
   });
 }
 
@@ -99,7 +108,21 @@ function main() {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
   setUpScene();
+  // start update function
+  requestAnimationFrame(tick);
+}
+
+// update function that runs every frame
+function tick() {
+  g_elapsedTime = performance.now() / 1000 - g_startTime;
+  // console.log(g_elapsedTime);
+
+  // before rendering, update animated values based on current time
+  updateAnimatedTransforms();
   renderScene();
+
+  // repeat as soon as browser can
+  requestAnimationFrame(tick);
 }
 
 // -- Extra helper funcs/things --
@@ -119,15 +142,22 @@ function convertCoordinatesEventToGL(event) {
   return [x, y];
 }
 
+//TODO: move things here if possible??
 function setUpScene() {
   
 }
 
+// if animation is on, update things here rather than in render function
+function updateAnimatedTransforms() {
+  if (g_bobAnim === "on") {
+    g_pinkHeight = -0.25 * Math.sin(g_elapsedTime) - 1;
+  }
+}
   
 function renderScene() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  // gl.clear(gl.COLOR_BUFFER_BIT);
 
   // global transform for camera angle
   let globalRotMtx = new Matrix4().rotate(g_cameraAngle, 0, 1, 0);
@@ -141,7 +171,9 @@ function renderScene() {
   // degrees, rotation axis xyz
   testcube.matrix.rotate(-15, 1, 0, 0);
   // testcube.matrix.rotate(-15, 0, 1, 0); 
-  testcube.matrix.translate(-0.5, -1, 0);
+  
+  // bobbing over time!!!
+  testcube.matrix.translate(-0.5, g_pinkHeight, 0);
   // g_shapesList.push(testcube);
 
   let testcube2 = new Cube();
@@ -158,7 +190,7 @@ function renderScene() {
   testcube3.color = [0.5, 1.0, 0.5, 1.0];
   testcube3.matrix.scale(1, 0.5, 2);
   testcube3.matrix.translate(0, 2, 0.25);
-    testcube3.matrix.rotate(g_greenAngle, 0, 0, 1);
+  testcube3.matrix.rotate(g_greenAngle, 0, 0, 1);
   // g_shapesList.push(testcube3);
 
   // render!

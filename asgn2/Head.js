@@ -70,7 +70,7 @@ class Head extends Shape {
         this.drawTriangles3D([-0.2,0.3,-0.25, 0,0.7,0, 0,0.7,-0.5], this.PINK, gl.TRIANGLES);
 
         // roof of mouth
-        this.drawTriangles3D([0,0,0, 0.35,-0.2,0, 0.35,0,0, 0.65,-0.2,0, 0.65,0,0, 1,0,0], this.RED, gl.TRIANGLE_STRIP);
+        this.drawRectangle3D([0,0,0, 0.35,-0.2,0, 1,0,0, 0.65,-0.2,0,], this.RED, gl.TRIANGLE_STRIP);
 
         // top teeth!!!
         this.drawTriangles3D([0.3,-0.1,0.1, 0.4,-0.05,0, 0.3,-0.15,0, 0.2,-0.05,0,], this.WHITE, gl.TRIANGLE_FAN);

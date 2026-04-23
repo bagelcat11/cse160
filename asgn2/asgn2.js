@@ -152,6 +152,8 @@ function setUpScene() {
   // g_shapesList["testcube2"] = new Cube();
   // g_shapesList["testcube3"] = new Cube();
   g_shapesList["head"] = new Head();
+  g_shapesList["earLeft"] = new Ear();
+  g_shapesList["earRight"] = new Ear();
 }
 
 // if animation is on, update things here rather than in render function
@@ -175,11 +177,25 @@ function renderScene() {
 
   // set up local refs
   let head = g_shapesList["head"];
+  let earLeft = g_shapesList["earLeft"];
+  let earRight = g_shapesList["earRight"];
 
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
   head.matrix.scale(0.5, 0.5, 0.5);
+  head.matrix.translate(-0.5, -0.5, 0.5);
   head.render();
+
+  earLeft.matrix.set(head.matrix);
+  earLeft.matrix.translate(0.9,0.2,-1.3);
+  earLeft.render();
+
+  earRight.matrix.set(head.matrix);
+  earRight.matrix.translate(0.1,0.2,-1.3);
+  earRight.matrix.scale(-1,1,1);
+  earRight.render();
+
+
 
   // let t1 = g_shapesList["testcube"];
   // t1.matrix.set(g_identityM);

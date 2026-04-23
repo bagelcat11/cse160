@@ -10,13 +10,26 @@ class Shape {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
     gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_Position);
+
+    // handy colors
+    this.RED = [1.0, 0.0, 0.0, 1.0];
+    this.GREEN = [0.0, 1.0, 0.0, 1.0];
+    this.BLUE = [0.0, 0.0, 1.0, 1.0];
+    this.YELLOW = [1.0, 1.0, 0.0, 1.0];
+    this.MAGENTA = [1.0, 0.0, 1.0, 1.0];
+    this.CYAN = [0.0, 1.0, 1.0];
+    this.WHITE = [1.0, 1.0, 1.0, 1.0];
+    this.GRAY = [0.5, 0.5, 0.5, 1.0];
+    this.PINK = [1.0, 0.5, 0.5, 1.0];
+    this.INDIGO = [0.5, 0.5, 1.0, 1.0];
+    this.LIME = [0.5, 1.0, 0.5, 1.0];
   }
 
   render() {
     this.drawTriangles3D(this.vertices);
   }
 
-  drawTriangles3D(vertices, color) {
+  drawTriangles3D(vertices, color, mode) {
     let n = vertices.length / 3;  // num tris = vertices / 3 comps per vertex
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
@@ -24,8 +37,7 @@ class Shape {
     // matrix transform!!
     gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 
-    //TODO: consider tri fan?
-    gl.drawArrays(gl.TRIANGLES, 0, n);
+    gl.drawArrays(mode, 0, n);
   }
 
   drawRectangle3D(corners, color) {
@@ -34,6 +46,6 @@ class Shape {
     gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 
     // using a strip means the last 2 vertices of the prev tri are used for the next tri
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, corners.length / 3);  // 3 comps per corner
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 }

@@ -28,7 +28,7 @@ let u_GlobalRotateMatrix;
 let g_identityM = new Matrix4();
 let g_cameraXAngle = 45;
 let g_cameraYAngle = 90;
-let g_cameraZoom = 2;
+let g_cameraZoom = 4;
 
 let g_blueAngle = 0;
 let g_greenAngle = 0;
@@ -160,6 +160,12 @@ function setUpScene() {
   g_shapesList["earLeft"] = new Ear();
   g_shapesList["earRight"] = new Ear();
   g_shapesList["body"] = new Body();
+
+  // tail is just going to be many segments
+  g_shapesList["tail1"] = new Cube();
+  g_shapesList["tail2"] = new Cube();
+  g_shapesList["tail3"] = new Cube();
+  g_shapesList["tail4"] = new Cube();
 }
 
 // if animation is on, update things here rather than in render function
@@ -187,6 +193,10 @@ function renderScene() {
   let earLeft = g_shapesList["earLeft"];
   let earRight = g_shapesList["earRight"];
   let body = g_shapesList["body"];
+  let tail1 = g_shapesList["tail1"];
+  let tail2 = g_shapesList["tail2"];
+  let tail3 = g_shapesList["tail3"];
+  let tail4 = g_shapesList["tail4"];
 
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
@@ -196,16 +206,39 @@ function renderScene() {
 
   earLeft.matrix.set(head.matrix);
   earLeft.matrix.translate(0.9,0.2,-1.3);
-  // earLeft.render();
+  earLeft.render();
 
   earRight.matrix.set(head.matrix);
   earRight.matrix.translate(0.1,0.2,-1.3);
   earRight.matrix.scale(-1,1,1);
-  // earRight.render();
+  earRight.render();
 
   body.matrix.set(g_identityM);
   body.matrix.translate(0, -0.25, 0.25);
   body.render();
+
+  // tail segments!
+  tail1.color = [1.0, 0.0, 0.0, 1.0];
+  tail1.matrix.set(g_identityM);
+  tail1.matrix.translate(0, 0.75, 0.1);
+  let tail1Coords = new Matrix4().set(tail1.matrix);
+  // tail1.matrix.rotate(45, 1, 0, 0);
+  tail1.matrix.scale(0.1, 0.25, 0.1);
+  tail1.render();
+
+  tail2.color = [1.0, 0.0, 0.5, 1.0];
+  tail2.matrix.set(tail1Coords);
+  tail2.matrix.translate(0, 0.2, 0.1);
+  tail2.matrix.rotate(45, 1, 0, 0);
+  tail2.matrix.scale(0.1, 0.25, 0.1);
+  tail2.render();
+
+  tail2.color = [1.0, 0.0, 0.5, 1.0];
+  tail2.matrix.set(tail1Coords);
+  tail2.matrix.translate(0, 0.2, 0.1);
+  tail2.matrix.rotate(45, 1, 0, 0);
+  tail2.matrix.scale(0.1, 0.25, 0.1);
+  tail2.render();
 
 
 

@@ -28,6 +28,7 @@ let u_GlobalRotateMatrix;
 let g_identityM = new Matrix4();
 let g_cameraXAngle = 45;
 let g_cameraYAngle = 90;
+let g_cameraZoom = 2;
 
 let g_blueAngle = 0;
 let g_greenAngle = 0;
@@ -80,27 +81,31 @@ function addActionsForHtmlUI() {
   });
 
   let cameraYSlider = document.getElementById("cameraYSlider");
-  // use "input" event rather than mouseover!
   cameraYSlider.addEventListener("input", () => {
     g_cameraYAngle = cameraYSlider.value;
   });
 
-  let blueSlider = document.getElementById("blueSlider");
-  blueSlider.addEventListener("input", () => {
-    g_blueAngle = blueSlider.value;
+  let cameraZoomSlider = document.getElementById("cameraZoomSlider");
+  cameraZoomSlider.addEventListener("input", () => {
+    g_cameraZoom = cameraZoomSlider.value;
   });
 
-  let greenSlider = document.getElementById("greenSlider");
-  greenSlider.addEventListener("input", () => {
-    g_greenAngle = greenSlider.value;
-  });
+  // let blueSlider = document.getElementById("blueSlider");
+  // blueSlider.addEventListener("input", () => {
+  //   g_blueAngle = blueSlider.value;
+  // });
 
-  let bobAnimToggles = document.getElementsByName("bobAnimToggle");
-  bobAnimToggles.forEach(s => {
-    s.addEventListener("click", () => {
-      g_bobAnim = s.value;
-    });
-  });
+  // let greenSlider = document.getElementById("greenSlider");
+  // greenSlider.addEventListener("input", () => {
+  //   g_greenAngle = greenSlider.value;
+  // });
+
+  // let bobAnimToggles = document.getElementsByName("bobAnimToggle");
+  // bobAnimToggles.forEach(s => {
+  //   s.addEventListener("click", () => {
+  //     g_bobAnim = s.value;
+  //   });
+  // });
 }
 
 
@@ -111,7 +116,7 @@ function main() {
   addActionsForHtmlUI();
 
   // Specify the color for clearing <canvas>
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0.0, 0.2, 0.0, 1.0);
 
   setUpScene();
   // start update function
@@ -154,6 +159,7 @@ function setUpScene() {
   g_shapesList["head"] = new Head();
   g_shapesList["earLeft"] = new Ear();
   g_shapesList["earRight"] = new Ear();
+  g_shapesList["body"] = new Body();
 }
 
 // if animation is on, update things here rather than in render function
@@ -173,27 +179,33 @@ function renderScene() {
   let globalRotMtx = new Matrix4();
   globalRotMtx.rotate(g_cameraXAngle, 0, 1, 0);
   globalRotMtx.rotate(g_cameraYAngle, 1, 0, 0);
+  globalRotMtx.scale(g_cameraZoom/5, g_cameraZoom/5, g_cameraZoom/5);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
   // set up local refs
   let head = g_shapesList["head"];
   let earLeft = g_shapesList["earLeft"];
   let earRight = g_shapesList["earRight"];
+  let body = g_shapesList["body"];
 
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
   head.matrix.scale(0.5, 0.5, 0.5);
-  head.matrix.translate(-0.5, -0.5, 0.5);
+  head.matrix.translate(-0.5, -1.5, 0.5);
   head.render();
 
   earLeft.matrix.set(head.matrix);
   earLeft.matrix.translate(0.9,0.2,-1.3);
-  earLeft.render();
+  // earLeft.render();
 
   earRight.matrix.set(head.matrix);
   earRight.matrix.translate(0.1,0.2,-1.3);
   earRight.matrix.scale(-1,1,1);
-  earRight.render();
+  // earRight.render();
+
+  body.matrix.set(g_identityM);
+  body.matrix.translate(0, -0.25, 0.25);
+  body.render();
 
 
 

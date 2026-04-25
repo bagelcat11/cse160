@@ -78,11 +78,13 @@ function addActionsForHtmlUI() {
   // use "input" event rather than mouseover!
   cameraXSlider.addEventListener("input", () => {
     g_cameraXAngle = cameraXSlider.value;
+    [prevX, prevY] = [0, 0];
   });
 
   let cameraYSlider = document.getElementById("cameraYSlider");
   cameraYSlider.addEventListener("input", () => {
     g_cameraYAngle = cameraYSlider.value;
+    [prevX, prevY] = [0, 0];
   });
 
   let cameraZoomSlider = document.getElementById("cameraZoomSlider");
@@ -118,6 +120,12 @@ function main() {
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.2, 0.0, 1.0);
 
+  //TODO: camera control on canvas click and drag
+  // set up click listener to call click handler
+  canvas.onmousedown = click;
+  // click if mouse held and dragged
+  canvas.onmousemove = (event) => { if (event.buttons == 1) click(event);};
+
   setUpScene();
   // start update function
   requestAnimationFrame(tick);
@@ -126,11 +134,18 @@ function main() {
 // update function that runs every frame
 function tick() {
   g_elapsedTime = performance.now() / 1000 - g_startTime;
-  // console.log(g_elapsedTime);
 
+  // track performance
+  let fpsCounter = document.getElementById("fpsCounter");
+  let start = performance.now();
+  
   // before rendering, update animated values based on current time
   updateAnimatedTransforms();
   renderScene();
+
+  // update performance
+  let msElapsed = performance.now() - start; 
+  fpsCounter.textContent = (1000 / msElapsed).toFixed(0);
 
   // repeat as soon as browser can
   requestAnimationFrame(tick);
@@ -147,6 +162,20 @@ function convertCoordinatesEventToGL(event) {
   y = (canvas.width / 2 - (y - rect.top)) / (canvas.width / 2);
 
   return [x, y];
+}
+
+let prevX = 0, prevY = 0;
+// use a delta to keep track of which direction the mouse moves in
+// turns out unpacking with [] is BAD and can lead to random string concatenation
+function click(event) {
+  let [x, y] = convertCoordinatesEventToGL(event);
+  [x, y] = [(x * -100) % 360, (y * 100) % 360];
+  // console.log("X-PREVX:", x-prevX, "with type", typeof(x-prevX));
+  g_cameraXAngle = parseFloat(g_cameraXAngle) + (x - prevX);
+  g_cameraYAngle = parseFloat(g_cameraYAngle) + (y - prevY);
+  // console.log("X angle type:", typeof(g_cameraXAngle))
+
+  prevX = x, prevY = y;
 }
 
 let g_shapesList = {};  // make it an object so it's dict-like
@@ -183,6 +212,9 @@ function renderScene() {
 
   // global transform for camera angle
   let globalRotMtx = new Matrix4();
+  console.log("x angle", g_cameraXAngle)
+  console.log("y angle",g_cameraYAngle)
+  console.log("prev:", prevX, prevY)
   globalRotMtx.rotate(g_cameraXAngle, 0, 1, 0);
   globalRotMtx.rotate(g_cameraYAngle, 1, 0, 0);
   globalRotMtx.scale(g_cameraZoom/5, g_cameraZoom/5, g_cameraZoom/5);
@@ -272,4 +304,12 @@ function renderScene() {
   // t3.matrix.translate(0, 2, 0.25);
   // t3.matrix.rotate(g_greenAngle, 0, 0, 1);
   // t3.render();
+
+  
+  // stress test
+  // for (let i = 0; i < 9000; i++) {
+  //   g_shapesList.i = new Cube();
+  //   g_shapesList.i.matrix.rotate(45, Math.random(), Math.random(), Math.random())
+  //   g_shapesList.i.render();
+  // }
 }

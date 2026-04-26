@@ -193,7 +193,12 @@ function setUpScene() {
   g_shapesList["tail3"] = new Cube();
   g_shapesList["tail4"] = new Cube();
 
+  g_shapesList["neck"] = new Cube();
   g_shapesList["jaw"] = new Jaw();
+
+  g_shapesList["leftArmTop"] = new Cube();
+  g_shapesList["leftArmMiddle"] = new Cube();
+  g_shapesList["leftArmPaw"] = new Cube();
 }
 
 
@@ -230,11 +235,16 @@ function renderScene() {
   let tail2 = g_shapesList["tail2"];
   let tail3 = g_shapesList["tail3"];
   let tail4 = g_shapesList["tail4"];
+  let neck = g_shapesList["neck"];
   let jaw = g_shapesList["jaw"];
+  let leftArmTop = g_shapesList["leftArmTop"];
+  let leftArmMiddle = g_shapesList["leftArmMiddle"];
+  let leftArmPaw = g_shapesList["leftArmPaw"];
+  
 
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
-  head.matrix.scale(0.5, 0.5, 0.5);
+  head.matrix.scale(0.45, 0.45, 0.45);
   head.matrix.translate(-0.5, -1.5, 0.5);
   head.render();
 
@@ -249,7 +259,7 @@ function renderScene() {
 
   body.matrix.set(g_identityM);
   body.matrix.translate(0, -0.25, 0.25);
-  // body.render();
+  body.render();
 
   // tail segments!
   tail1.color = [1.0, 0.0, 0.0, 1.0];
@@ -287,6 +297,12 @@ function renderScene() {
   tail1.matrix.translate(0,0.25,0);
   tail4.render();
 
+  neck.color = [0, 0.5, 0, 1];
+  neck.matrix.set(g_identityM);
+  neck.matrix.translate(0, -0.25, 0.2);
+  neck.matrix.rotate(60, 1, 0, 0);
+  neck.matrix.scale(0.4, 0.4, 0.3);
+  neck.render();
 
   jaw.matrix.set(head.matrix);
   jaw.matrix.translate(0, 0.5, 0);
@@ -294,6 +310,26 @@ function renderScene() {
   // offset so it pivots around inner extends
   jaw.matrix.translate(0, -0.5, 0);
   jaw.render();
+
+  leftArmTop.color = [0,1,1,1]
+  leftArmTop.matrix.set(g_identityM);
+  leftArmTop.matrix.translate(0.16, -0.2, 0.3)
+  leftArmTop.matrix.scale(0.15,0.2,0.3);
+  leftArmTop.render();
+
+  leftArmMiddle.color = [0,0.5,1,1]
+  leftArmMiddle.matrix.set(leftArmTop.matrix);
+  leftArmMiddle.matrix.translate(-0.01, 0.0, 1);
+  // let leftMidCoords = new Matrix4().set(leftArmMiddle.matrix)
+  leftArmMiddle.matrix.scale(0.9,0.75,1);
+  leftArmMiddle.render();
+
+  leftArmPaw.color = [0,0.5,0.5,1]
+  leftArmPaw.matrix.set(leftArmMiddle.matrix);
+  // leftArmPaw.matrix.set(leftMidCoords);
+  leftArmPaw.matrix.translate(0, -0.15, 0.5);
+  leftArmPaw.matrix.scale(1.1, 1.25, 0.3);
+  leftArmPaw.render();
 
   // let t1 = g_shapesList["testcube"];
   // t1.matrix.set(g_identityM);

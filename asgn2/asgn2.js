@@ -204,6 +204,9 @@ function setUpScene() {
 
 let g_tailBaseAngle = 0;
 let g_jawAngle = 0;
+let g_armTopAngle = 0;
+let g_armMiddleAngle = 0;
+let g_armPawAngle = 0;
 
 // if animation is on, update things here rather than in render function
 //TODO: when turning these on they may snap because the animation is just based
@@ -212,6 +215,12 @@ function updateAnimatedTransforms() {
   if (g_autoAnim === "on") {
     g_tailBaseAngle = Math.sin(g_elapsedTime) * 30;
     g_jawAngle = -Math.abs(Math.sin(g_elapsedTime) * 30);
+
+    // sin(2x) = 2x frequency
+    // sin(x) * y = y amplitude (degree output)
+    g_armTopAngle = Math.sin(3 * g_elapsedTime) * 30;
+    g_armMiddleAngle = Math.cos(3 * g_elapsedTime) * 30;
+    g_armPawAngle = -Math.cos(3 * g_elapsedTime) * 20;
   }
 }
   
@@ -262,7 +271,7 @@ function renderScene() {
   body.render();
 
   // tail segments!
-  tail1.color = [1.0, 0.0, 0.0, 1.0];
+  tail1.color = [0.5, 0.1, 0.0, 1.0];
   tail1.matrix.set(g_identityM);
   tail1.matrix.translate(0, 0.75, 0.1);
   tail1.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
@@ -271,7 +280,7 @@ function renderScene() {
   tail1.matrix.translate(0,0.25,0); // offset first so that it pivots around origin
   tail1.render();
 
-  tail2.color = [1.0, 0.0, 1.0, 1.0];
+  tail2.color = tail1.color;
   tail2.matrix.set(tail1Coords);
   tail2.matrix.translate(0, 0.3, 0);
   tail2.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
@@ -280,7 +289,7 @@ function renderScene() {
   tail1.matrix.translate(0,0.25,0);
   tail2.render();
 
-  tail3.color = [0.5, 0.0, 0.5, 1.0];
+  tail3.color = tail1.color;
   tail3.matrix.set(tail2Coords);
   tail3.matrix.translate(0, 0.2, 0);
   tail3.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
@@ -289,7 +298,7 @@ function renderScene() {
   tail1.matrix.translate(0,0.25,0);
   tail3.render();
 
-  tail4.color = [0, 0.0, 0.5, 1.0];
+  tail4.color = tail1.color;
   tail4.matrix.set(tail3Coords);
   tail4.matrix.translate(0, 0.2, 0);
   tail4.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
@@ -314,21 +323,25 @@ function renderScene() {
   leftArmTop.color = [0,1,1,1]
   leftArmTop.matrix.set(g_identityM);
   leftArmTop.matrix.translate(0.16, -0.2, 0.3)
+  leftArmTop.matrix.rotate(g_armTopAngle, 1, 0, 0);
+  let leftArmTopCoords = new Matrix4().set(leftArmTop.matrix);
   leftArmTop.matrix.scale(0.15,0.2,0.3);
   leftArmTop.render();
 
   leftArmMiddle.color = [0,0.5,1,1]
-  leftArmMiddle.matrix.set(leftArmTop.matrix);
-  leftArmMiddle.matrix.translate(-0.01, 0.0, 1);
-  // let leftMidCoords = new Matrix4().set(leftArmMiddle.matrix)
-  leftArmMiddle.matrix.scale(0.9,0.75,1);
+  leftArmMiddle.matrix.set(leftArmTopCoords);
+  leftArmMiddle.matrix.translate(-0.01, 0.0, 0.2);
+  leftArmMiddle.matrix.rotate(g_armMiddleAngle, 1, 0, 0);
+  let leftMidCoords = new Matrix4().set(leftArmMiddle.matrix)
+  leftArmMiddle.matrix.scale(0.12, 0.12, 0.3)
+  leftArmMiddle.matrix.translate(0, 0, 0.2); // offset
   leftArmMiddle.render();
 
   leftArmPaw.color = [0,0.5,0.5,1]
-  leftArmPaw.matrix.set(leftArmMiddle.matrix);
-  // leftArmPaw.matrix.set(leftMidCoords);
-  leftArmPaw.matrix.translate(0, -0.15, 0.5);
-  leftArmPaw.matrix.scale(1.1, 1.25, 0.3);
+  leftArmPaw.matrix.set(leftMidCoords);
+  leftArmPaw.matrix.translate(0, -0.05, 0.18);
+  leftArmPaw.matrix.rotate(g_armPawAngle, 1, 0, 0);
+  leftArmPaw.matrix.scale(0.15, 0.15, 0.07);
   leftArmPaw.render();
 
   // let t1 = g_shapesList["testcube"];

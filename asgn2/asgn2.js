@@ -199,6 +199,16 @@ function setUpScene() {
   g_shapesList["leftArmTop"] = new Cube();
   g_shapesList["leftArmMiddle"] = new Cube();
   g_shapesList["leftArmPaw"] = new Cube();
+  g_shapesList["rightArmTop"] = new Cube();
+  g_shapesList["rightArmMiddle"] = new Cube();
+  g_shapesList["rightArmPaw"] = new Cube();
+
+  g_shapesList["leftLegTop"] = new Cube();
+  g_shapesList["leftLegMiddle"] = new Cube();
+  g_shapesList["leftLegPaw"] = new Cube();
+  g_shapesList["rightLegTop"] = new Cube();
+  g_shapesList["rightLegMiddle"] = new Cube();
+  g_shapesList["rightLegPaw"] = new Cube();
 }
 
 
@@ -218,9 +228,9 @@ function updateAnimatedTransforms() {
 
     // sin(2x) = 2x frequency
     // sin(x) * y = y amplitude (degree output)
-    g_armTopAngle = Math.sin(3 * g_elapsedTime) * 30;
-    g_armMiddleAngle = Math.cos(3 * g_elapsedTime) * 30;
-    g_armPawAngle = -Math.cos(3 * g_elapsedTime) * 20;
+    g_armTopAngle = Math.sin(4 * g_elapsedTime) * 30;
+    g_armMiddleAngle = Math.cos(4 * g_elapsedTime) * 30;
+    g_armPawAngle = -Math.cos(4 * g_elapsedTime) * 20;
   }
 }
   
@@ -249,11 +259,21 @@ function renderScene() {
   let leftArmTop = g_shapesList["leftArmTop"];
   let leftArmMiddle = g_shapesList["leftArmMiddle"];
   let leftArmPaw = g_shapesList["leftArmPaw"];
+  let rightArmTop = g_shapesList["rightArmTop"];
+  let rightArmMiddle = g_shapesList["rightArmMiddle"];
+  let rightArmPaw = g_shapesList["rightArmPaw"];
+  let leftLegTop = g_shapesList["leftLegTop"];
+  let leftLegMiddle = g_shapesList["leftLegMiddle"];
+  let leftLegPaw = g_shapesList["leftLegPaw"];
+  let rightLegTop = g_shapesList["rightLegTop"];
+  let rightLegMiddle = g_shapesList["rightLegMiddle"];
+  let rightLegPaw = g_shapesList["rightLegPaw"];
   
-
+  
+  // HEAD
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
-  head.matrix.scale(0.45, 0.45, 0.45);
+  head.matrix.scale(0.4, 0.4, 0.4);
   head.matrix.translate(-0.5, -1.5, 0.5);
   head.render();
 
@@ -266,11 +286,26 @@ function renderScene() {
   earRight.matrix.scale(-1,1,1);
   earRight.render();
 
+  neck.color = [0, 0.5, 0, 1];
+  neck.matrix.set(g_identityM);
+  neck.matrix.translate(0, -0.25, 0.2);
+  neck.matrix.rotate(60, 1, 0, 0);
+  neck.matrix.scale(0.35, 0.35, 0.25);
+  neck.render();
+
+  jaw.matrix.set(head.matrix);
+  jaw.matrix.translate(0, 0.5, 0);
+  jaw.matrix.rotate(g_jawAngle, 1, 0, 0);
+  // offset so it pivots around inner extends
+  jaw.matrix.translate(0, -0.5, 0);
+  jaw.render();
+
+  // BODY
   body.matrix.set(g_identityM);
   body.matrix.translate(0, -0.25, 0.25);
   body.render();
 
-  // tail segments!
+  // TAIL
   tail1.color = [0.5, 0.1, 0.0, 1.0];
   tail1.matrix.set(g_identityM);
   tail1.matrix.translate(0, 0.75, 0.1);
@@ -306,20 +341,7 @@ function renderScene() {
   tail1.matrix.translate(0,0.25,0);
   tail4.render();
 
-  neck.color = [0, 0.5, 0, 1];
-  neck.matrix.set(g_identityM);
-  neck.matrix.translate(0, -0.25, 0.2);
-  neck.matrix.rotate(60, 1, 0, 0);
-  neck.matrix.scale(0.4, 0.4, 0.3);
-  neck.render();
-
-  jaw.matrix.set(head.matrix);
-  jaw.matrix.translate(0, 0.5, 0);
-  jaw.matrix.rotate(g_jawAngle, 1, 0, 0);
-  // offset so it pivots around inner extends
-  jaw.matrix.translate(0, -0.5, 0);
-  jaw.render();
-
+  // ARMS
   leftArmTop.color = [0,1,1,1]
   leftArmTop.matrix.set(g_identityM);
   leftArmTop.matrix.translate(0.16, -0.2, 0.3)
@@ -344,36 +366,78 @@ function renderScene() {
   leftArmPaw.matrix.scale(0.15, 0.15, 0.07);
   leftArmPaw.render();
 
-  // let t1 = g_shapesList["testcube"];
-  // t1.matrix.set(g_identityM);
-  // let t2 = g_shapesList["testcube2"];
-  // t2.matrix.set(g_identityM);
-  // let t3 = g_shapesList["testcube3"];
-  // t3.matrix.set(g_identityM);
+  rightArmTop.color = [0,1,1,1]
+  rightArmTop.matrix.set(g_identityM);
+  rightArmTop.matrix.translate(-0.16, -0.2, 0.3)
+  rightArmTop.matrix.rotate(-g_armTopAngle, 1, 0, 0);
+  let rightArmTopCoords = new Matrix4().set(rightArmTop.matrix);
+  rightArmTop.matrix.scale(0.15,0.2,0.3);
+  rightArmTop.render();
 
-  // t1.color = [1.0, 0.0, 1.0, 1.0];
-  // t1.matrix.scale(0.5, 0.5, 0.5);
-  // // degrees, rotation axis xyz
-  // t1.matrix.rotate(-15, 1, 0, 0);
-  // // bobbing over time!!!
-  // t1.matrix.translate(-0.5, g_pinkHeight, 0);
-  // t1.render();
+  rightArmMiddle.color = [0,0.5,1,1]
+  rightArmMiddle.matrix.set(rightArmTopCoords);
+  rightArmMiddle.matrix.translate(0.01, 0.0, 0.2);
+  rightArmMiddle.matrix.rotate(-g_armMiddleAngle, 1, 0, 0);
+  let rightMidCoords = new Matrix4().set(rightArmMiddle.matrix)
+  rightArmMiddle.matrix.scale(0.12, 0.12, 0.3)
+  rightArmMiddle.matrix.translate(0, 0, 0.2); // offset
+  rightArmMiddle.render();
 
+  rightArmPaw.color = [0,0.5,0.5,1]
+  rightArmPaw.matrix.set(rightMidCoords);
+  rightArmPaw.matrix.translate(0, -0.05, 0.18);
+  rightArmPaw.matrix.rotate(-g_armPawAngle, 1, 0, 0);
+  rightArmPaw.matrix.scale(0.15, 0.15, 0.07);
+  rightArmPaw.render();
 
-  // t2.matrix = new Matrix4().set(t1.matrix);  // copy
-  // t2.color = [0.0, 0.0, 1.0, 1.0];
-  // t2.matrix.rotate(g_blueAngle, 1, 0, 0);
-  // //TODO: can save checkpoints like let bluecoords = copy test2 to ref later
-  // t2.matrix.scale(0.5, 1, 0.5);
-  // t2.matrix.translate(0.5, 1, 0);
-  // t2.render();
+  // LEGS
+  leftLegTop.color = [0,1,1,1]
+  leftLegTop.matrix.set(g_identityM);
+  leftLegTop.matrix.translate(0.16, 0.65, 0.3)
+  leftLegTop.matrix.rotate(g_armTopAngle, 1, 0, 0);
+  let leftLegTopCoords = new Matrix4().set(leftLegTop.matrix);
+  leftLegTop.matrix.scale(0.15,0.3,0.3);
+  leftLegTop.render();
 
-  // t3.matrix = new Matrix4().set(t2.matrix);  // copy
-  // t3.color = [0.5, 1.0, 0.5, 1.0];
-  // t3.matrix.scale(1, 0.5, 2);
-  // t3.matrix.translate(0, 2, 0.25);
-  // t3.matrix.rotate(g_greenAngle, 0, 0, 1);
-  // t3.render();
+  leftLegMiddle.color = [0,0.5,1,1]
+  leftLegMiddle.matrix.set(leftLegTopCoords);
+  leftLegMiddle.matrix.translate(-0.01, 0.0, 0.2);
+  leftLegMiddle.matrix.rotate(g_armMiddleAngle, 1, 0, 0);
+  let leftLegMidCoords = new Matrix4().set(leftLegMiddle.matrix)
+  leftLegMiddle.matrix.scale(0.12, 0.15, 0.3)
+  leftLegMiddle.matrix.translate(0, 0, 0.2); // offset
+  leftLegMiddle.render();
+
+  leftLegPaw.color = [0,0.5,0.5,1]
+  leftLegPaw.matrix.set(leftLegMidCoords);
+  leftLegPaw.matrix.translate(0, -0.05, 0.18);
+  leftLegPaw.matrix.rotate(g_armPawAngle, 1, 0, 0);
+  leftLegPaw.matrix.scale(0.15, 0.15, 0.07);
+  leftLegPaw.render();
+
+  rightLegTop.color = [0,1,1,1]
+  rightLegTop.matrix.set(g_identityM);
+  rightLegTop.matrix.translate(-0.16, 0.65, 0.3)
+  rightLegTop.matrix.rotate(-g_armTopAngle, 1, 0, 0);
+  let rightLegTopCoords = new Matrix4().set(rightLegTop.matrix);
+  rightLegTop.matrix.scale(0.15,0.3,0.3);
+  rightLegTop.render();
+
+  rightLegMiddle.color = [0,0.5,1,1]
+  rightLegMiddle.matrix.set(rightLegTopCoords);
+  rightLegMiddle.matrix.translate(0.01, 0.0, 0.2);
+  rightLegMiddle.matrix.rotate(-g_armMiddleAngle, 1, 0, 0);
+  let rightLegMidCoords = new Matrix4().set(rightLegMiddle.matrix)
+  rightLegMiddle.matrix.scale(0.12, 0.15, 0.3)
+  rightLegMiddle.matrix.translate(0, 0, 0.2); // offset
+  rightLegMiddle.render();
+
+  rightLegPaw.color = [0,0.5,0.5,1]
+  rightLegPaw.matrix.set(rightLegMidCoords);
+  rightLegPaw.matrix.translate(0, -0.05, 0.18);
+  rightLegPaw.matrix.rotate(-g_armPawAngle, 1, 0, 0);
+  rightLegPaw.matrix.scale(0.15, 0.15, 0.07);
+  rightLegPaw.render();
 
   
   // stress test

@@ -217,6 +217,10 @@ let g_jawAngle = 0;
 let g_armTopAngle = 0;
 let g_armMiddleAngle = 0;
 let g_armPawAngle = 0;
+let g_legTopAngle = 0;
+let g_legMiddleAngle = 0;
+let g_legPawAngle = 0;
+let g_bodyBobHeight = 0;
 
 // if animation is on, update things here rather than in render function
 //TODO: when turning these on they may snap because the animation is just based
@@ -225,12 +229,17 @@ function updateAnimatedTransforms() {
   if (g_autoAnim === "on") {
     g_tailBaseAngle = Math.sin(g_elapsedTime) * 30;
     g_jawAngle = -Math.abs(Math.sin(g_elapsedTime) * 30);
+    g_bodyBobHeight = Math.sin(10 * g_elapsedTime) * 0.01;
 
     // sin(2x) = 2x frequency
     // sin(x) * y = y amplitude (degree output)
-    g_armTopAngle = Math.sin(4 * g_elapsedTime) * 30;
-    g_armMiddleAngle = Math.cos(4 * g_elapsedTime) * 30;
-    g_armPawAngle = -Math.cos(4 * g_elapsedTime) * 20;
+    g_armTopAngle = Math.sin(5 * g_elapsedTime) * 25;
+    g_armMiddleAngle = Math.cos(5 * g_elapsedTime) * 25;
+    g_armPawAngle = -Math.cos(5 * g_elapsedTime) * 20;
+
+    g_legTopAngle = Math.cos(5 * g_elapsedTime) * 25;
+    g_legMiddleAngle = Math.sin(5 * g_elapsedTime) * 25;
+    g_legPawAngle = -Math.sin(5 * g_elapsedTime) * 20;
   }
 }
   
@@ -273,6 +282,7 @@ function renderScene() {
   // HEAD
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
+  head.matrix.translate(0, 0, g_bodyBobHeight);
   head.matrix.scale(0.4, 0.4, 0.4);
   head.matrix.translate(-0.5, -1.5, 0.5);
   head.render();
@@ -286,13 +296,6 @@ function renderScene() {
   earRight.matrix.scale(-1,1,1);
   earRight.render();
 
-  neck.color = [0, 0.5, 0, 1];
-  neck.matrix.set(g_identityM);
-  neck.matrix.translate(0, -0.25, 0.2);
-  neck.matrix.rotate(60, 1, 0, 0);
-  neck.matrix.scale(0.35, 0.35, 0.25);
-  neck.render();
-
   jaw.matrix.set(head.matrix);
   jaw.matrix.translate(0, 0.5, 0);
   jaw.matrix.rotate(g_jawAngle, 1, 0, 0);
@@ -300,14 +303,24 @@ function renderScene() {
   jaw.matrix.translate(0, -0.5, 0);
   jaw.render();
 
+  neck.color = [0, 0.5, 0, 1];
+  neck.matrix.set(g_identityM);
+  neck.matrix.translate(0, 0, g_bodyBobHeight);
+  neck.matrix.translate(0, -0.25, 0.2);
+  neck.matrix.rotate(60, 1, 0, 0);
+  neck.matrix.scale(0.35, 0.35, 0.25);
+  neck.render();
+
   // BODY
   body.matrix.set(g_identityM);
+  body.matrix.translate(0, 0, g_bodyBobHeight);
   body.matrix.translate(0, -0.25, 0.25);
   body.render();
 
   // TAIL
   tail1.color = [0.5, 0.1, 0.0, 1.0];
   tail1.matrix.set(g_identityM);
+  tail1.matrix.translate(0, 0, g_bodyBobHeight);
   tail1.matrix.translate(0, 0.75, 0.1);
   tail1.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
   let tail1Coords = new Matrix4().set(tail1.matrix);  // set ref after rotating
@@ -394,7 +407,7 @@ function renderScene() {
   leftLegTop.color = [0,1,1,1]
   leftLegTop.matrix.set(g_identityM);
   leftLegTop.matrix.translate(0.16, 0.65, 0.3)
-  leftLegTop.matrix.rotate(g_armTopAngle, 1, 0, 0);
+  leftLegTop.matrix.rotate(g_legTopAngle, 1, 0, 0);
   let leftLegTopCoords = new Matrix4().set(leftLegTop.matrix);
   leftLegTop.matrix.scale(0.15,0.3,0.3);
   leftLegTop.render();
@@ -402,7 +415,7 @@ function renderScene() {
   leftLegMiddle.color = [0,0.5,1,1]
   leftLegMiddle.matrix.set(leftLegTopCoords);
   leftLegMiddle.matrix.translate(-0.01, 0.0, 0.2);
-  leftLegMiddle.matrix.rotate(g_armMiddleAngle, 1, 0, 0);
+  leftLegMiddle.matrix.rotate(g_legMiddleAngle, 1, 0, 0);
   let leftLegMidCoords = new Matrix4().set(leftLegMiddle.matrix)
   leftLegMiddle.matrix.scale(0.12, 0.15, 0.3)
   leftLegMiddle.matrix.translate(0, 0, 0.2); // offset
@@ -411,14 +424,14 @@ function renderScene() {
   leftLegPaw.color = [0,0.5,0.5,1]
   leftLegPaw.matrix.set(leftLegMidCoords);
   leftLegPaw.matrix.translate(0, -0.05, 0.18);
-  leftLegPaw.matrix.rotate(g_armPawAngle, 1, 0, 0);
+  leftLegPaw.matrix.rotate(g_legPawAngle, 1, 0, 0);
   leftLegPaw.matrix.scale(0.15, 0.15, 0.07);
   leftLegPaw.render();
 
   rightLegTop.color = [0,1,1,1]
   rightLegTop.matrix.set(g_identityM);
   rightLegTop.matrix.translate(-0.16, 0.65, 0.3)
-  rightLegTop.matrix.rotate(-g_armTopAngle, 1, 0, 0);
+  rightLegTop.matrix.rotate(-g_legTopAngle, 1, 0, 0);
   let rightLegTopCoords = new Matrix4().set(rightLegTop.matrix);
   rightLegTop.matrix.scale(0.15,0.3,0.3);
   rightLegTop.render();
@@ -426,7 +439,7 @@ function renderScene() {
   rightLegMiddle.color = [0,0.5,1,1]
   rightLegMiddle.matrix.set(rightLegTopCoords);
   rightLegMiddle.matrix.translate(0.01, 0.0, 0.2);
-  rightLegMiddle.matrix.rotate(-g_armMiddleAngle, 1, 0, 0);
+  rightLegMiddle.matrix.rotate(-g_legMiddleAngle, 1, 0, 0);
   let rightLegMidCoords = new Matrix4().set(rightLegMiddle.matrix)
   rightLegMiddle.matrix.scale(0.12, 0.15, 0.3)
   rightLegMiddle.matrix.translate(0, 0, 0.2); // offset
@@ -435,7 +448,7 @@ function renderScene() {
   rightLegPaw.color = [0,0.5,0.5,1]
   rightLegPaw.matrix.set(rightLegMidCoords);
   rightLegPaw.matrix.translate(0, -0.05, 0.18);
-  rightLegPaw.matrix.rotate(-g_armPawAngle, 1, 0, 0);
+  rightLegPaw.matrix.rotate(-g_legPawAngle, 1, 0, 0);
   rightLegPaw.matrix.scale(0.15, 0.15, 0.07);
   rightLegPaw.render();
 

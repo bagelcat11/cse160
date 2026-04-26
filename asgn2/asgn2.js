@@ -32,7 +32,7 @@ let g_cameraZoom = 4;
 
 let g_blueAngle = 0;
 let g_greenAngle = 0;
-let g_bobAnim = "on";
+let g_autoAnim = "on";
 let g_pinkHeight = 0;
 
 let g_startTime = performance.now() / 1000;
@@ -102,12 +102,12 @@ function addActionsForHtmlUI() {
   //   g_greenAngle = greenSlider.value;
   // });
 
-  // let bobAnimToggles = document.getElementsByName("bobAnimToggle");
-  // bobAnimToggles.forEach(s => {
-  //   s.addEventListener("click", () => {
-  //     g_bobAnim = s.value;
-  //   });
-  // });
+  let autoAnimToggles = document.getElementsByName("autoAnimToggle");
+  autoAnimToggles.forEach(s => {
+    s.addEventListener("click", () => {
+      g_autoAnim = s.value;
+    });
+  });
 }
 
 
@@ -120,9 +120,6 @@ function main() {
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.2, 0.0, 1.0);
 
-  //TODO: camera control on canvas click and drag
-  // set up click listener to call click handler
-  canvas.onmousedown = click;
   // click if mouse held and dragged
   canvas.onmousemove = (event) => { if (event.buttons == 1) click(event);};
 
@@ -195,14 +192,21 @@ function setUpScene() {
   g_shapesList["tail2"] = new Cube();
   g_shapesList["tail3"] = new Cube();
   g_shapesList["tail4"] = new Cube();
+
+  g_shapesList["jaw"] = new Jaw();
 }
+
+
+let g_tailBaseAngle = 0;
+let g_jawAngle = 0;
 
 // if animation is on, update things here rather than in render function
 //TODO: when turning these on they may snap because the animation is just based
 //      on time rather than current position plus any kind of time...
 function updateAnimatedTransforms() {
-  if (g_bobAnim === "on") {
-    g_pinkHeight = -0.25 * Math.sin(g_elapsedTime) - 1;
+  if (g_autoAnim === "on") {
+    g_tailBaseAngle = Math.sin(g_elapsedTime) * 30;
+    g_jawAngle = -Math.abs(Math.sin(g_elapsedTime) * 30);
   }
 }
   
@@ -212,9 +216,6 @@ function renderScene() {
 
   // global transform for camera angle
   let globalRotMtx = new Matrix4();
-  console.log("x angle", g_cameraXAngle)
-  console.log("y angle",g_cameraYAngle)
-  console.log("prev:", prevX, prevY)
   globalRotMtx.rotate(g_cameraXAngle, 0, 1, 0);
   globalRotMtx.rotate(g_cameraYAngle, 1, 0, 0);
   globalRotMtx.scale(g_cameraZoom/5, g_cameraZoom/5, g_cameraZoom/5);
@@ -229,6 +230,7 @@ function renderScene() {
   let tail2 = g_shapesList["tail2"];
   let tail3 = g_shapesList["tail3"];
   let tail4 = g_shapesList["tail4"];
+  let jaw = g_shapesList["jaw"];
 
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
@@ -247,32 +249,51 @@ function renderScene() {
 
   body.matrix.set(g_identityM);
   body.matrix.translate(0, -0.25, 0.25);
-  body.render();
+  // body.render();
 
   // tail segments!
   tail1.color = [1.0, 0.0, 0.0, 1.0];
   tail1.matrix.set(g_identityM);
   tail1.matrix.translate(0, 0.75, 0.1);
-  let tail1Coords = new Matrix4().set(tail1.matrix);
-  // tail1.matrix.rotate(45, 1, 0, 0);
+  tail1.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
+  let tail1Coords = new Matrix4().set(tail1.matrix);  // set ref after rotating
   tail1.matrix.scale(0.1, 0.25, 0.1);
+  tail1.matrix.translate(0,0.25,0); // offset first so that it pivots around origin
   tail1.render();
 
-  tail2.color = [1.0, 0.0, 0.5, 1.0];
+  tail2.color = [1.0, 0.0, 1.0, 1.0];
   tail2.matrix.set(tail1Coords);
-  tail2.matrix.translate(0, 0.2, 0.1);
-  tail2.matrix.rotate(45, 1, 0, 0);
+  tail2.matrix.translate(0, 0.3, 0);
+  tail2.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
+  let tail2Coords = new Matrix4().set(tail2.matrix);
   tail2.matrix.scale(0.1, 0.25, 0.1);
+  tail1.matrix.translate(0,0.25,0);
   tail2.render();
 
-  tail2.color = [1.0, 0.0, 0.5, 1.0];
-  tail2.matrix.set(tail1Coords);
-  tail2.matrix.translate(0, 0.2, 0.1);
-  tail2.matrix.rotate(45, 1, 0, 0);
-  tail2.matrix.scale(0.1, 0.25, 0.1);
-  tail2.render();
+  tail3.color = [0.5, 0.0, 0.5, 1.0];
+  tail3.matrix.set(tail2Coords);
+  tail3.matrix.translate(0, 0.2, 0);
+  tail3.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
+  let tail3Coords = new Matrix4().set(tail3.matrix);
+  tail3.matrix.scale(0.1, 0.25, 0.1);
+  tail1.matrix.translate(0,0.25,0);
+  tail3.render();
+
+  tail4.color = [0, 0.0, 0.5, 1.0];
+  tail4.matrix.set(tail3Coords);
+  tail4.matrix.translate(0, 0.2, 0);
+  tail4.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
+  tail4.matrix.scale(0.1, 0.25, 0.1);
+  tail1.matrix.translate(0,0.25,0);
+  tail4.render();
 
 
+  jaw.matrix.set(head.matrix);
+  jaw.matrix.translate(0, 0.5, 0);
+  jaw.matrix.rotate(g_jawAngle, 1, 0, 0);
+  // offset so it pivots around inner extends
+  jaw.matrix.translate(0, -0.5, 0);
+  jaw.render();
 
   // let t1 = g_shapesList["testcube"];
   // t1.matrix.set(g_identityM);

@@ -23,7 +23,7 @@ class Body extends Shape {
             v.push(vec1[0], 0, vec1[1], vec2[0], 0, vec2[1],);
         }
 
-        this.drawTriangles3D(v, this.WHITE, gl.TRIANGLE_FAN);
+        this.drawTriangles3D(v, this.BLUE, gl.TRIANGLE_FAN);
 
         // back
         v = [0,length,0];

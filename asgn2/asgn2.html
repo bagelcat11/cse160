@@ -21,14 +21,14 @@
     <div>
       <label><strong>Camera horizontal: </strong></label>
       <input type="range" min="0" max="360" value="45" class="slider" id="cameraXSlider">
-    </div>
-    <div>
       <label><strong>Camera vertical: </strong></label>
       <input type="range" min="0" max="180" value="90" class="slider" id="cameraYSlider">
     </div>
+    <span>(or click and drag on canvas)</span>
+    <p></p>
     <div>
       <label><strong>Camera zoom: </strong></label>
-      <input type="range" min="1" max="5" value="4" class="slider" id="cameraZoomSlider">
+      <input type="range" min="2" max="5" value="4" class="slider" id="cameraZoomSlider">
     </div>
     <p></p>
     <div>
@@ -37,6 +37,11 @@
       <label for="bobOn">On</label>
       <input type="radio" id="animOff" name="autoAnimToggle" value="off"/>
       <label for="bobOff">Off</label>
+    </div>
+    <p></p>
+    <div>
+      <button id="pokeButton">Poke!</button>
+      <label>(or shift click model)</label>
     </div>
     <hr></hr>
     <div>

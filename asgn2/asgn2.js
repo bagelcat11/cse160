@@ -99,6 +99,11 @@ function addActionsForHtmlUI() {
     });
   });
 
+  let pokeButton = document.getElementById("pokeButton");
+  pokeButton.addEventListener("click", () => {
+    poke();
+  });
+
   let jawSlider = document.getElementById("jawSlider");
   jawSlider.addEventListener("input", () => {
     g_jawAngle = jawSlider.value;
@@ -174,6 +179,7 @@ function main() {
   gl.clearColor(0.9, 0.7, 0.9, 1.0);
 
   // click if mouse held and dragged
+  canvas.onmousedown = click;
   canvas.onmousemove = (event) => { if (event.buttons == 1) click(event);};
 
   setUpScene();
@@ -184,6 +190,9 @@ function main() {
 // update function that runs every frame
 function tick() {
   g_elapsedTime = performance.now() / 1000 - g_startTime;
+  if (g_poking) {
+    g_pokeElapsedTime = performance.now() - g_pokeStartTime ;
+  }
 
   // track performance
   let fpsCounter = document.getElementById("fpsCounter");
@@ -215,17 +224,19 @@ function convertCoordinatesEventToGL(event) {
 }
 
 let prevX = 0, prevY = 0;
-// use a delta to keep track of which direction the mouse moves in
-// turns out unpacking with [] is BAD and can lead to random string concatenation
 function click(event) {
-  let [x, y] = convertCoordinatesEventToGL(event);
-  [x, y] = [(x * -100) % 360, (y * 100) % 360];
-  // console.log("X-PREVX:", x-prevX, "with type", typeof(x-prevX));
-  g_cameraXAngle = parseFloat(g_cameraXAngle) + (x - prevX);
-  g_cameraYAngle = parseFloat(g_cameraYAngle) + (y - prevY);
-  // console.log("X angle type:", typeof(g_cameraXAngle))
+  if (event.shiftKey) {  // shift click!
+    poke();
+  } else {
+    // use a delta to keep track of which direction the mouse moves in
+    // turns out unpacking with [] is BAD and can lead to random string concatenation
+    let [x, y] = convertCoordinatesEventToGL(event);
+    [x, y] = [(x * -100) % 360, (y * 100) % 360];
+    g_cameraXAngle = parseFloat(g_cameraXAngle) + (x - prevX);
+    g_cameraYAngle = parseFloat(g_cameraYAngle) + (y - prevY);
 
-  prevX = x, prevY = y;
+    prevX = x, prevY = y;
+  }
 }
 
 let g_shapesList = {};  // make it an object so it's dict-like
@@ -273,14 +284,24 @@ let g_tail1Angle = 0;
 let g_tail2Angle = 0;
 let g_tail3Angle = 0;
 let g_tail4Angle = 0;
+
 let g_jawAngle = 0;
+let g_headAngle = 0;
+let g_earsAngle = 0;
+let g_eyesSquish = 0; //TODO:
+
 let g_armTopAngle = 0;
 let g_armMidAngle = 0;
 let g_armPawAngle = 0;
 let g_legTopAngle = 0;
 let g_legMidAngle = 0;
 let g_legPawAngle = 0;
+
 let g_bodyBobHeight = 0;
+
+let g_poking = false;
+let g_pokeStartTime = 0;
+let g_pokeElapsedTime = 0;
 
 // some colors
 let LOKI_WHITE = [1,0.97,0.97,1];
@@ -296,7 +317,6 @@ function updateAnimatedTransforms() {
   if (g_autoAnim === "on") {
     g_tail1Angle = Math.sin(g_elapsedTime) * 20;
     g_tail2Angle = g_tail3Angle = g_tail4Angle = g_tail1Angle;
-    // g_jawAngle = -Math.abs(Math.sin(g_elapsedTime) * 30);
     g_bodyBobHeight = Math.sin(10 * g_elapsedTime) * 0.01;
 
     // sin(2x) = 2x frequency
@@ -309,6 +329,31 @@ function updateAnimatedTransforms() {
     g_legMidAngle = Math.sin(5 * g_elapsedTime) * 25;
     g_legPawAngle = -Math.sin(5 * g_elapsedTime) * 20;
   }
+
+  // very rudimentary keyframing system
+  if (g_poking) {
+    if (g_pokeElapsedTime < 1000) {
+       g_jawAngle -= 0.8;
+       g_headAngle += 0.2;
+       g_earsAngle += 1.5;
+    } else if (g_pokeElapsedTime > 2000) {
+      g_jawAngle += 1.6;
+      g_headAngle -= 0.4;
+      g_earsAngle -= 3;
+    }
+    if (g_jawAngle >= -0.5) { // within less than a degree of closure
+      g_poking = false;
+      g_jawAngle = 0;
+      g_headAngle = 0;
+      g_earsAngle = 0;
+    }
+  }
+}
+
+// when shift clicked
+function poke() {
+  g_poking = true;
+  g_pokeStartTime = performance.now();
 }
   
 function renderScene() {
@@ -358,16 +403,19 @@ function renderScene() {
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
   head.matrix.translate(0, 0, g_bodyBobHeight);
+  head.matrix.rotate(g_headAngle, 1,0,0)
   head.matrix.scale(0.4, 0.4, 0.4);
   head.matrix.translate(-0.5, -1.5, 0.5);
   head.render();
 
   earLeft.matrix.set(head.matrix);
-  earLeft.matrix.translate(0.9,0.2,-1.3);
+  earLeft.matrix.translate(0.9,0.3,-1.3);
+  earLeft.matrix.rotate(g_earsAngle, 0,0,1);
   earLeft.render();
 
   earRight.matrix.set(head.matrix);
-  earRight.matrix.translate(0.1,0.2,-1.3);
+  earRight.matrix.translate(0.1,0.3,-1.3);
+  earRight.matrix.rotate(-g_earsAngle, 0,0,1);
   earRight.matrix.scale(-1,1,1);
   earRight.render();
 

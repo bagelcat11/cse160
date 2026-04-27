@@ -231,7 +231,7 @@ function click(event) {
     // use a delta to keep track of which direction the mouse moves in
     // turns out unpacking with [] is BAD and can lead to random string concatenation
     let [x, y] = convertCoordinatesEventToGL(event);
-    [x, y] = [(x * -100) % 360, (y * 100) % 360];
+    [x, y] = [(x * -200) % 360, (y * 200) % 360];
     g_cameraXAngle = parseFloat(g_cameraXAngle) + (x - prevX);
     g_cameraYAngle = parseFloat(g_cameraYAngle) + (y - prevY);
 
@@ -243,9 +243,6 @@ let g_shapesList = {};  // make it an object so it's dict-like
 // unfortunately I think all we can really move here is the object construction;
 //      their matrices really do need to be reset and recalculated every frame
 function setUpScene() {
-  // g_shapesList["testcube"] = new Cube();
-  // g_shapesList["testcube2"] = new Cube();
-  // g_shapesList["testcube3"] = new Cube();
   g_shapesList["head"] = new Head();
   g_shapesList["earLeft"] = new Ear();
   g_shapesList["earRight"] = new Ear();
@@ -254,8 +251,13 @@ function setUpScene() {
   g_shapesList["eyeRight"] = new Cube();
   g_shapesList["pupilLeft"] = new Cube();
   g_shapesList["pupilRight"] = new Cube();
+  g_shapesList["whiskerTopLeft"] = new Cube();
+  g_shapesList["whiskerMidLeft"] = new Cube();
+  g_shapesList["whiskerBottomLeft"] = new Cube();
+  g_shapesList["whiskerTopRight"] = new Cube();
+  g_shapesList["whiskerMidRight"] = new Cube();
+  g_shapesList["whiskerBottomRight"] = new Cube();
 
-  // tail is just going to be many segments
   g_shapesList["tail1"] = new Cube();
   g_shapesList["tail2"] = new Cube();
   g_shapesList["tail3"] = new Cube();
@@ -280,6 +282,14 @@ function setUpScene() {
 }
 
 
+// some colors
+let LOKI_WHITE = [1,0.97,0.97,1];
+let LOKI_DARK_BROWN = [0.2, 0.1, 0.0, 1.0];
+let LOKI_MED_BROWN = [0.35, 0.25, 0, 1];
+let LOKI_LIGHT_BROWN = [0.75, 0.6, 0.5, 1];
+let LOKI_YELLOW = [0.9,0.8,0.3,1];
+
+// anim angles and things
 let g_tail1Angle = 0;
 let g_tail2Angle = 0;
 let g_tail3Angle = 0;
@@ -288,7 +298,8 @@ let g_tail4Angle = 0;
 let g_jawAngle = 0;
 let g_headAngle = 0;
 let g_earsAngle = 0;
-let g_eyesSquish = 0; //TODO:
+let g_eyesSquish = 1;
+let g_eyesColor = LOKI_YELLOW;
 
 let g_armTopAngle = 0;
 let g_armMidAngle = 0;
@@ -302,13 +313,6 @@ let g_bodyBobHeight = 0;
 let g_poking = false;
 let g_pokeStartTime = 0;
 let g_pokeElapsedTime = 0;
-
-// some colors
-let LOKI_WHITE = [1,0.97,0.97,1];
-let LOKI_DARK_BROWN = [0.2, 0.1, 0.0, 1.0];
-let LOKI_MED_BROWN = [0.4, 0.3, 0, 1];
-let LOKI_LIGHT_BROWN = [0.7, 0.5, 0.3, 1];
-let LOKI_YELLOW = [1,0.9,0.3,1];
 
 // if animation is on, update things here rather than in render function
 //TODO: when turning these on they may snap because the animation is just based
@@ -341,11 +345,17 @@ function updateAnimatedTransforms() {
       g_headAngle -= 0.4;
       g_earsAngle -= 3;
     }
+    g_eyesSquish = 0.5;
+    g_eyesColor = [0,0,0,1];
+
+    // reset things on anim end
     if (g_jawAngle >= -0.5) { // within less than a degree of closure
       g_poking = false;
       g_jawAngle = 0;
       g_headAngle = 0;
       g_earsAngle = 0;
+      g_eyesSquish = 1;
+      g_eyesColor = LOKI_YELLOW;
     }
   }
 }
@@ -398,29 +408,38 @@ function renderScene() {
   let rightLegMiddle = g_shapesList["rightLegMiddle"];
   let rightLegPaw = g_shapesList["rightLegPaw"];
 
+  let whiskerTopLeft = g_shapesList["whiskerTopLeft"];
+  let whiskerMidLeft = g_shapesList["whiskerMidLeft"];
+  let whiskerBottomLeft = g_shapesList["whiskerBottomLeft"];
+  let whiskerTopRight = g_shapesList["whiskerTopRight"];
+  let whiskerMidRight = g_shapesList["whiskerMidRight"];
+  let whiskerBottomRight = g_shapesList["whiskerBottomRight"];
+
   
   // HEAD
   head.color = [0.8, 0.4, 0.0, 1.0];
   head.matrix.set(g_identityM); // reset every frame
   head.matrix.translate(0, 0, g_bodyBobHeight);
   head.matrix.rotate(g_headAngle, 1,0,0)
-  head.matrix.scale(0.4, 0.4, 0.4);
+  head.matrix.scale(0.4, 0.4, 0.37);
   head.matrix.translate(-0.5, -1.5, 0.5);
   head.render();
 
   earLeft.matrix.set(head.matrix);
-  earLeft.matrix.translate(0.9,0.3,-1.3);
+  earLeft.matrix.translate(0.85,0.3,-1.35);
   earLeft.matrix.rotate(g_earsAngle, 0,0,1);
+  earLeft.matrix.scale(0.9, 1, 1.2);
   earLeft.render();
 
   earRight.matrix.set(head.matrix);
-  earRight.matrix.translate(0.1,0.3,-1.3);
+  earRight.matrix.translate(0.15,0.3,-1.35);
   earRight.matrix.rotate(-g_earsAngle, 0,0,1);
+  earRight.matrix.scale(0.9, 1, 1.2);
   earRight.matrix.scale(-1,1,1);
   earRight.render();
 
   jaw.matrix.set(head.matrix);
-  jaw.matrix.translate(0, 0.5, 0);
+  jaw.matrix.translate(0, 0.5, 0.01);
   jaw.matrix.rotate(g_jawAngle, 1, 0, 0);
   // offset so it pivots around inner extends
   jaw.matrix.translate(0, -0.5, 0);
@@ -434,33 +453,87 @@ function renderScene() {
   neck.matrix.scale(0.35, 0.35, 0.25);
   neck.render();
 
-  eyeLeft.color = LOKI_YELLOW;
+  eyeLeft.color = g_eyesColor;
   eyeLeft.matrix.set(head.matrix);
-  eyeLeft.matrix.translate(0.8, 0, -0.6);
+  eyeLeft.matrix.translate(0.77, 0.1, -0.55);
   let eyeLeftCoords = new Matrix4().set(eyeLeft.matrix);
   // eyeLeft.matrix.rotate(45, 0,1,0);
-  eyeLeft.matrix.scale(0.25, 0.25, 0.25);
+  eyeLeft.matrix.scale(1, 1, g_eyesSquish);
+  eyeLeft.matrix.scale(0.25, 0.25, 0.15);
   eyeLeft.render();
 
-  pupilLeft.color = [0,0,0,1];
-  pupilLeft.matrix.set(eyeLeftCoords);
-  pupilLeft.matrix.translate(0,-0.01,0)
-  pupilLeft.matrix.scale(0.1, 0.25, 0.24)
-  pupilLeft.render();
-
-  eyeRight.color = LOKI_YELLOW;
+  eyeRight.color = g_eyesColor;
   eyeRight.matrix.set(head.matrix);
-  eyeRight.matrix.translate(0.2, 0, -0.6);
+  eyeRight.matrix.translate(0.23, 0.1, -0.55);
   let eyeRightCoords = new Matrix4().set(eyeRight.matrix);
+  eyeRight.matrix.scale(1, 1, g_eyesSquish);
   // eyeRight.matrix.rotate(45, 0,1,0);
-  eyeRight.matrix.scale(0.25, 0.25, 0.25);
+  eyeRight.matrix.scale(0.25, 0.25, 0.15);
   eyeRight.render();
 
-  pupilRight.color = [0,0,0,1];
-  pupilRight.matrix.set(eyeRightCoords);
-  pupilRight.matrix.translate(0,-0.01,0)
-  pupilRight.matrix.scale(0.1, 0.25, 0.24)
-  pupilRight.render();
+   if (!g_poking) {
+    pupilLeft.color = [0,0,0,1];
+    pupilLeft.matrix.set(eyeLeftCoords);
+    pupilLeft.matrix.translate(0,-0.01,-0.03)
+    pupilLeft.matrix.scale(0.1, 0.25, 0.1);
+    pupilLeft.render();
+
+    pupilRight.color = [0,0,0,1];
+    pupilRight.matrix.set(eyeRightCoords);
+    pupilRight.matrix.translate(0,-0.01,-0.03)
+    pupilRight.matrix.scale(0.1, 0.25, 0.1)
+    pupilRight.render();
+  }
+
+  whiskerTopRight.color = [1,1,1,1];
+  whiskerTopRight.matrix.set(head.matrix);
+  whiskerTopRight.matrix.translate(0.15,-0.05,-0.95);
+  whiskerTopRight.matrix.rotate(-60, 1,3,0);
+  whiskerTopRight.matrix.scale(0.5, 0.01, 0.01);
+  whiskerTopRight.render();
+
+  whiskerTopLeft.color = [1,1,1,1];
+  whiskerTopLeft.matrix.set(head.matrix);
+  whiskerTopLeft.matrix.translate(0.85,-0.05,-0.95);
+  whiskerTopLeft.matrix.rotate(180, 1,0,0)
+  whiskerTopLeft.matrix.rotate(-60, 1,3,0);
+  whiskerTopLeft.matrix.scale(-0.5, 0.01, 0.01);
+  whiskerTopLeft.render();
+
+  whiskerMidRight.color = [1,1,1,1];
+  whiskerMidRight.matrix.set(head.matrix);
+  whiskerMidRight.matrix.translate(0,-0.15,-0.39);
+  whiskerMidRight.matrix.rotate(30,0,0,1);
+  whiskerMidRight.matrix.rotate(-20, 1,2,0);
+  whiskerMidRight.matrix.scale(0.5, 0.01, 0.01);
+  whiskerMidRight.render();
+
+  whiskerMidLeft.color = [1,1,1,1];
+  whiskerMidLeft.matrix.set(head.matrix);
+  whiskerMidLeft.matrix.translate(1,-0.15,-0.39);
+  whiskerMidLeft.matrix.rotate(-30,0,0,1);
+  whiskerMidLeft.matrix.rotate(180, 0,0,1)
+  whiskerMidLeft.matrix.rotate(-20, 1,2,0);
+  whiskerMidLeft.matrix.scale(0.5, 0.01, 0.01);
+  whiskerMidLeft.render();
+
+  whiskerBottomRight.color = [1,1,1,1];
+  whiskerBottomRight.matrix.set(head.matrix);
+  whiskerBottomRight.matrix.translate(0,-0.15,-0.19);
+  whiskerBottomRight.matrix.rotate(30,0,0,1);
+  whiskerBottomRight.matrix.rotate(20, 1,2,0);
+  whiskerBottomRight.matrix.scale(0.5, 0.01, 0.01);
+  whiskerBottomRight.render();
+
+  whiskerBottomLeft.color = [1,1,1,1];
+  whiskerBottomLeft.matrix.set(head.matrix);
+  whiskerBottomLeft.matrix.translate(1,-0.15,-0.19);
+  whiskerBottomLeft.matrix.rotate(-30,0,0,1);
+  whiskerBottomLeft.matrix.rotate(180, 0,0,1)
+  whiskerBottomLeft.matrix.rotate(20, 1,2,0);
+  whiskerBottomLeft.matrix.scale(0.5, 0.01, 0.01);
+  whiskerBottomLeft.render();
+
 
   // BODY
   body.matrix.set(g_identityM);
@@ -512,15 +585,15 @@ function renderScene() {
   // ARMS
   leftArmTop.color = LOKI_WHITE;
   leftArmTop.matrix.set(g_identityM);
-  leftArmTop.matrix.translate(0.16, -0.2, 0.3)
+  leftArmTop.matrix.translate(0.16, -0.2, 0.35)
   leftArmTop.matrix.rotate(g_armTopAngle, 1, 0, 0);
   let leftArmTopCoords = new Matrix4().set(leftArmTop.matrix);
-  leftArmTop.matrix.scale(0.15,0.2,0.3);
+  leftArmTop.matrix.scale(0.15,0.2,0.2);
   leftArmTop.render();
 
   leftArmMiddle.color = LOKI_DARK_BROWN;
   leftArmMiddle.matrix.set(leftArmTopCoords);
-  leftArmMiddle.matrix.translate(-0.01, 0.0, 0.2);
+  leftArmMiddle.matrix.translate(-0.01, 0.0, 0.15);
   leftArmMiddle.matrix.rotate(g_armMidAngle, 1, 0, 0);
   let leftMidCoords = new Matrix4().set(leftArmMiddle.matrix)
   leftArmMiddle.matrix.scale(0.12, 0.12, 0.3)
@@ -536,10 +609,10 @@ function renderScene() {
 
   rightArmTop.color = LOKI_DARK_BROWN;
   rightArmTop.matrix.set(g_identityM);
-  rightArmTop.matrix.translate(-0.16, -0.2, 0.3)
+  rightArmTop.matrix.translate(-0.16, -0.2, 0.35)
   rightArmTop.matrix.rotate(-g_armTopAngle, 1, 0, 0);
   let rightArmTopCoords = new Matrix4().set(rightArmTop.matrix);
-  rightArmTop.matrix.scale(0.15,0.2,0.3);
+  rightArmTop.matrix.scale(0.15,0.2,0.2);
   rightArmTop.render();
 
   rightArmMiddle.color = LOKI_WHITE;

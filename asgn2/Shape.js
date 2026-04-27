@@ -19,6 +19,7 @@ class Shape {
     this.MAGENTA = [1.0, 0.0, 1.0, 1.0];
     this.CYAN = [0.0, 1.0, 1.0];
     this.WHITE = [1.0, 1.0, 1.0, 1.0];
+    this.BLACK = [0.0, 0.0, 0.0, 1.0];
     this.GRAY = [0.5, 0.5, 0.5, 1.0];
     this.PINK = [1.0, 0.5, 0.5, 1.0];
     this.INDIGO = [0.5, 0.5, 1.0, 1.0];

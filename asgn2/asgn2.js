@@ -176,7 +176,7 @@ function click(event) {
 }
 
 let g_shapesList = {};  // make it an object so it's dict-like
-//TODO: unfortunately I think all we can really move here is the object construction;
+// unfortunately I think all we can really move here is the object construction;
 //      their matrices really do need to be reset and recalculated every frame
 function setUpScene() {
   // g_shapesList["testcube"] = new Cube();
@@ -212,7 +212,8 @@ function setUpScene() {
 }
 
 
-let g_tailBaseAngle = 0;
+// let g_tailXAngle = 0;
+let g_tailZAngle = 0;
 let g_jawAngle = 0;
 let g_armTopAngle = 0;
 let g_armMiddleAngle = 0;
@@ -233,7 +234,7 @@ let LOKI_LIGHT_BROWN = [0.4, 0.2, 0, 1];
 //      on time rather than current position plus any kind of time...
 function updateAnimatedTransforms() {
   if (g_autoAnim === "on") {
-    g_tailBaseAngle = Math.sin(g_elapsedTime) * 30;
+    g_tailZAngle = Math.sin(g_elapsedTime) * 20;
     g_jawAngle = -Math.abs(Math.sin(g_elapsedTime) * 30);
     g_bodyBobHeight = Math.sin(10 * g_elapsedTime) * 0.01;
 
@@ -258,6 +259,7 @@ function renderScene() {
   globalRotMtx.rotate(g_cameraXAngle, 0, 1, 0);
   globalRotMtx.rotate(g_cameraYAngle, 1, 0, 0);
   globalRotMtx.scale(g_cameraZoom/5, g_cameraZoom/5, g_cameraZoom/5);
+  globalRotMtx.translate(0,-0.15,0);  // center her
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
   // set up local refs
@@ -328,7 +330,8 @@ function renderScene() {
   tail1.matrix.set(g_identityM);
   tail1.matrix.translate(0, 0, g_bodyBobHeight);
   tail1.matrix.translate(0, 0.75, 0.1);
-  tail1.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
+  tail1.matrix.rotate(g_tailZAngle, 0,0,1); // animated rotate
+  tail1.matrix.rotate(25,1,0,0);  // position rotation separate from animation
   let tail1Coords = new Matrix4().set(tail1.matrix);  // set ref after rotating
   tail1.matrix.scale(0.1, 0.25, 0.1);
   tail1.matrix.translate(0,0.25,0); // offset first so that it pivots around origin
@@ -336,8 +339,9 @@ function renderScene() {
 
   tail2.color = tail1.color;
   tail2.matrix.set(tail1Coords);
-  tail2.matrix.translate(0, 0.3, 0);
-  tail2.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
+  tail2.matrix.translate(0, 0.2, 0.05);
+  tail2.matrix.rotate(g_tailZAngle, 0,0,1);
+  tail2.matrix.rotate(25,1,0,0); 
   let tail2Coords = new Matrix4().set(tail2.matrix);
   tail2.matrix.scale(0.1, 0.25, 0.1);
   tail1.matrix.translate(0,0.25,0);
@@ -345,8 +349,9 @@ function renderScene() {
 
   tail3.color = tail1.color;
   tail3.matrix.set(tail2Coords);
-  tail3.matrix.translate(0, 0.2, 0);
-  tail3.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
+  tail3.matrix.translate(0, 0.2, -0.05);
+  tail3.matrix.rotate(g_tailZAngle, 0,0,1);
+  tail3.matrix.rotate(-40,1,0,0); 
   let tail3Coords = new Matrix4().set(tail3.matrix);
   tail3.matrix.scale(0.1, 0.25, 0.1);
   tail1.matrix.translate(0,0.25,0);
@@ -354,8 +359,9 @@ function renderScene() {
 
   tail4.color = tail1.color;
   tail4.matrix.set(tail3Coords);
-  tail4.matrix.translate(0, 0.2, 0);
-  tail4.matrix.rotate(g_tailBaseAngle, 1, 0, 0);
+  tail4.matrix.translate(0, 0.2, -0.05);
+  tail4.matrix.rotate(g_tailZAngle, 0,0,1);
+  tail4.matrix.rotate(-25,1,0,0); 
   tail4.matrix.scale(0.1, 0.25, 0.1);
   tail1.matrix.translate(0,0.25,0);
   tail4.render();

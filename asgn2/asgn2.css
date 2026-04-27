@@ -1,0 +1,12 @@
+body {
+    /* display: flex; */
+    justify-content: space-evenly;
+    margin: 1em;
+    text-align: center;
+    background-color: antiquewhite;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.canvAndImg {
+    display: flex;
+}

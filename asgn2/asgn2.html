@@ -6,77 +6,80 @@
   <head>
     <meta charset="utf-8"/>
     <title>Asgn2: 3D Blocky Animal</title>
+    <link rel="stylesheet" href="asgn2.css">
   </head>
 
   <body onload="main()">
-    <div>
+    <div id="canvAndImg">
+      <img src="img/loki1.png" title="A brown and white cat with a mischevious glance.">
       <canvas id="webgl" width="400" height="400">
         Please use a browser that supports "canvas"
       </canvas>
+      <img src="img/loki2.png" title="A brown and white cat stretching and yawning.">
     </div>
+    <p>FPS: <span id="fpsCounter"></span></p>
 
-    <div>
-      <p>FPS: <span id="fpsCounter"></span></p>
-    </div>
-    <div>
-      <label><strong>Camera horizontal: </strong></label>
-      <input type="range" min="0" max="360" value="45" class="slider" id="cameraXSlider">
-      <label><strong>Camera vertical: </strong></label>
-      <input type="range" min="0" max="180" value="90" class="slider" id="cameraYSlider">
-    </div>
-    <span>(or click and drag on canvas)</span>
-    <p></p>
-    <div>
-      <label><strong>Camera zoom: </strong></label>
-      <input type="range" min="2" max="5" value="4" class="slider" id="cameraZoomSlider">
-    </div>
-    <p></p>
-    <div>
-      <label><strong>Auto animate: </strong></label>
-      <input type="radio" id="animOn" name="autoAnimToggle" value="on" checked/>
-      <label for="bobOn">On</label>
-      <input type="radio" id="animOff" name="autoAnimToggle" value="off"/>
-      <label for="bobOff">Off</label>
-    </div>
-    <p></p>
-    <div>
-      <button id="pokeButton">Poke!</button>
-      <label>(or shift click model)</label>
-    </div>
-    <hr></hr>
-    <div>
-      <label><strong>Rotate jaw: </strong></label>
-      <input type="range" min="-30" max="0" value="0" class="slider" id="jawSlider">
-    </div>
-    <p></p>
-    <div>
-      <label><strong>Rotate arm tops: </strong></label>
-      <input type="range" min="-25" max="25" value="0" class="slider" id="armTopSlider">
-      <label><strong>Rotate arm mids: </strong></label>
-      <input type="range" min="-25" max="25" value="0" class="slider" id="armMidSlider">
-      <label><strong>Rotate arm paws: </strong></label>
-      <input type="range" min="-20" max="20" value="0" class="slider" id="armPawSlider">
-    </div>
-    <p></p>
-    <div>
-      <label><strong>Rotate leg tops: </strong></label>
-      <input type="range" min="-25" max="25" value="0" class="slider" id="legTopSlider">
-      <label><strong>Rotate leg mids: </strong></label>
-      <input type="range" min="-25" max="25" value="0" class="slider" id="legMidSlider">
-      <label><strong>Rotate leg paws: </strong></label>
-      <input type="range" min="-20" max="20" value="0" class="slider" id="legPawSlider">
-    </div>
-    <p></p>
-    <div>
-      <label><strong>Rotate tail1 (base): </strong></label>
-      <input type="range" min="-20" max="20" value="0" class="slider" id="tail1Slider">
-      <label><strong>Rotate tail2: </strong></label>
-      <input type="range" min="-20" max="20" value="0" class="slider" id="tail2Slider">
-      <label><strong>Rotate tail3: </strong></label>
-      <input type="range" min="-20" max="20" value="0" class="slider" id="tail3Slider">
-      <label><strong>Rotate tail4 (end): </strong></label>
-      <input type="range" min="-20" max="20" value="0" class="slider" id="tail4Slider">
-    </div>
+    <!-- <div id="controls"> -->
+      <div>
+        <label><strong>Camera horizontal: </strong></label>
+        <input type="range" min="0" max="360" value="45" class="slider" id="cameraXSlider">
+        <label><strong>Camera vertical: </strong></label>
+        <input type="range" min="0" max="180" value="90" class="slider" id="cameraYSlider">
+      </div>
+      <span>(or click and drag on canvas)</span>
+      <p></p>
+      <div>
+        <label><strong>Camera zoom: </strong></label>
+        <input type="range" min="2" max="5" value="4" class="slider" id="cameraZoomSlider">
+      </div>
+      <p></p>
+      <div>
+        <label><strong>Auto animate: </strong></label>
+        <input type="radio" id="animOn" name="autoAnimToggle" value="on" checked/>
+        <label for="bobOn">On</label>
+        <input type="radio" id="animOff" name="autoAnimToggle" value="off"/>
+        <label for="bobOff">Off</label>
+      </div>
+      <p></p>
+      <div>
+        <button id="pokeButton">Poke!</button>
+        <label>(or shift click model)</label>
+      </div>
+      <hr></hr>
+      <div>
+        <label><strong>Rotate jaw: </strong></label>
+        <input type="range" min="-30" max="0" value="0" class="slider" id="jawSlider">
+      </div>
+      <p></p>
+      <div>
+        <label><strong>Rotate arm tops: </strong></label>
+        <input type="range" min="-25" max="25" value="0" class="slider" id="armTopSlider">
+        <label><strong>Rotate arm mids: </strong></label>
+        <input type="range" min="-25" max="25" value="0" class="slider" id="armMidSlider">
+        <label><strong>Rotate arm paws: </strong></label>
+        <input type="range" min="-20" max="20" value="0" class="slider" id="armPawSlider">
+      </div>
+      <p></p>
+      <div>
+        <label><strong>Rotate leg tops: </strong></label>
+        <input type="range" min="-25" max="25" value="0" class="slider" id="legTopSlider">
+        <label><strong>Rotate leg mids: </strong></label>
+        <input type="range" min="-25" max="25" value="0" class="slider" id="legMidSlider">
+        <label><strong>Rotate leg paws: </strong></label>
+        <input type="range" min="-20" max="20" value="0" class="slider" id="legPawSlider">
+      </div>
+      <p></p>
+      <div>
+        <label><strong>Rotate tail1 (base): </strong></label>
+        <input type="range" min="-20" max="20" value="0" class="slider" id="tail1Slider">
+        <label><strong>Rotate tail2: </strong></label>
+        <input type="range" min="-20" max="20" value="0" class="slider" id="tail2Slider">
+        <label><strong>Rotate tail3: </strong></label>
+        <input type="range" min="-20" max="20" value="0" class="slider" id="tail3Slider">
+        <label><strong>Rotate tail4 (end): </strong></label>
+        <input type="range" min="-20" max="20" value="0" class="slider" id="tail4Slider">
+      </div>
+    <!-- </div> -->
 
 
     <script src="lib/webgl-utils.js"></script>

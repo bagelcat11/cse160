@@ -4,73 +4,67 @@ class Head extends Shape {
     }
 
     render() {
-        var rgba = this.color.slice();
+        let rgba = LOKI_WHITE;
 
         // draw bottom
         this.drawRectangle3D([0,0,0, 1,0,0, 0,1,0, 1,1,0,], rgba);
 
         // back
-        rgba = [1, 1, 0, 1];
+        rgba = LOKI_DARK_BROWN;
         this.drawRectangle3D([0,1,0, 0,1,-1, 1,1,0, 1,1,-1,], rgba);
 
-        // its right
-        rgba = [1, 0, 0, 1];
+        // right
         this.drawRectangle3D([0,0,0, 0,1,0, 0,0,-1, 0,1,-1], rgba);
 
-        // its left
-        rgba = [0, 1, 0, 1];
+        // left
         this.drawRectangle3D([1,0,0, 1,0,-1, 1,1,0, 1,1,-1,], rgba);
 
-        // front
-        rgba = [0, 0, 1, 1];
-        this.drawRectangle3D([0,0,0, 0,0,-1, 1,0,0, 1,0,-1,], rgba);
-
         // top
-        rgba = [1, 1, 1, 1];
         this.drawRectangle3D([0,0,-1, 1,0,-1, 0,1,-1, 1,1,-1,], rgba);
 
+        // front
+        this.drawRectangle3D([0,0,0, 0,0,-1, 1,0,0, 1,0,-1,], rgba);
+
         // nose top
+        rgba = LOKI_MED_BROWN;
         this.drawRectangle3D([0.35,-0.3,-0.3, 0.65,-0.3,-0.3, 0.35,0,-0.7, 0.65,0,-0.7], rgba);
 
         // nose front
-        rgba = [0.7, 0.7, 0.7, 1.0];
         this.drawRectangle3D([0.35,-0.3,-0.3, 0.65,-0.3,-0.3, 0.35,-0.2,0, 0.65,-0.2,0], rgba);
 
-        // mouth left
-        rgba = [1.0, 0.9, 0.9, 1.0];
+        // mouth left, right
+        // rgba = LOKI_MED_BROWN;
+        rgba = LOKI_LIGHT_BROWN;
         this.drawTriangles3D([0.65,-0.3,-0.3, 0.65,-0.2,0, 1,0,0], rgba, gl.TRIANGLES);
-
-        // mouth right
-        rgba = [1.0, 0.9, 0.9, 1.0];
         this.drawTriangles3D([0.35,-0.3,-0.3, 0.35,-0.2,0, 0,0,0], rgba, gl.TRIANGLES);
 
-        // cheek left, right
-        rgba = [1.0, 0.7, 0.7, 1.0];
-        this.drawTriangles3D([0.65,-0.3,-0.3, 1,0,-0.5, 1,0,0], rgba, gl.TRIANGLES);
-        this.drawTriangles3D([0.35,-0.3,-0.3, 0,0,-0.5, 0,0,0], rgba, gl.TRIANGLES);
-
         // eye left, right
-        rgba = [1.0, 0.9, 0.9, 1.0];
+        rgba = LOKI_LIGHT_BROWN;
         this.drawTriangles3D([0.65,-0.3,-0.3, 1,0,-0.5, 0.65,0,-0.7], rgba, gl.TRIANGLES);
         this.drawTriangles3D([0.35,-0.3,-0.3, 0,0,-0.5, 0.35,0,-0.7], rgba, gl.TRIANGLES);
 
+        // cheek left, right
+        this.drawTriangles3D([0.65,-0.3,-0.3, 1,0,-0.5, 1,0,0], rgba, gl.TRIANGLES);
+        this.drawTriangles3D([0.35,-0.3,-0.3, 0,0,-0.5, 0,0,0], rgba, gl.TRIANGLES);
+
         // side cheek left, right
-        rgba = [1.0, 0.5, 0.5, 1.0];
         this.drawTriangles3D([1.2,0.3,-0.25, 1,0,-0.5, 1,0,0], rgba, gl.TRIANGLES);
         this.drawTriangles3D([-0.2,0.3,-0.25, 0,0,-0.5, 0,0,0], rgba, gl.TRIANGLES);
 
         // side cheek left under, over, back
-        this.drawTriangles3D([1.2,0.3,-0.25, 1,0,0, 1,0.7,0], this.MAGENTA, gl.TRIANGLES);
-        this.drawTriangles3D([1.2,0.3,-0.25, 1,0,-0.5, 1,0.7,-0.5], this.MAGENTA, gl.TRIANGLES);
-        this.drawTriangles3D([1.2,0.3,-0.25, 1,0.7,0, 1,0.7,-0.5], this.PINK, gl.TRIANGLES);
+        rgba = LOKI_MED_BROWN;
+        this.drawTriangles3D([1.2,0.3,-0.25, 1,0,0, 1,0.7,0], rgba, gl.TRIANGLES);
+        this.drawTriangles3D([1.2,0.3,-0.25, 1,0,-0.5, 1,0.7,-0.5], rgba, gl.TRIANGLES);
+        this.drawTriangles3D([1.2,0.3,-0.25, 1,0.7,0, 1,0.7,-0.5], rgba, gl.TRIANGLES);
 
         // side cheek right under, over, back
-        this.drawTriangles3D([-0.2,0.3,-0.25, 0,0,0, 0,0.7,0], this.MAGENTA, gl.TRIANGLES);
-        this.drawTriangles3D([-0.2,0.3,-0.25, 0,0,-0.5, 0,0.7,-0.5], this.MAGENTA, gl.TRIANGLES);
-        this.drawTriangles3D([-0.2,0.3,-0.25, 0,0.7,0, 0,0.7,-0.5], this.PINK, gl.TRIANGLES);
+        this.drawTriangles3D([-0.2,0.3,-0.25, 0,0,0, 0,0.7,0], rgba, gl.TRIANGLES);
+        this.drawTriangles3D([-0.2,0.3,-0.25, 0,0,-0.5, 0,0.7,-0.5], rgba, gl.TRIANGLES);
+        this.drawTriangles3D([-0.2,0.3,-0.25, 0,0.7,0, 0,0.7,-0.5], rgba, gl.TRIANGLES);
 
         // roof of mouth
         this.drawRectangle3D([0,0,0, 0.35,-0.2,0, 1,0,0, 0.65,-0.2,0,], this.RED, gl.TRIANGLE_STRIP);
+        this.drawRectangle3D([0.2,0,0.01, 0.35,0.5,0.01, 0.8,0,0.01, 0.65,0.5,0.01,], this.RED, gl.TRIANGLE_STRIP);
 
         // top teeth!!!
         this.drawTriangles3D([0.3,-0.1,0.1, 0.4,-0.05,0, 0.3,-0.15,0, 0.2,-0.05,0,], this.WHITE, gl.TRIANGLE_FAN);

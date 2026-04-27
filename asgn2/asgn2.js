@@ -118,7 +118,7 @@ function main() {
   addActionsForHtmlUI();
 
   // Specify the color for clearing <canvas>
-  gl.clearColor(0.0, 0.2, 0.0, 1.0);
+  gl.clearColor(0.9, 0.7, 0.9, 1.0);
 
   // click if mouse held and dragged
   canvas.onmousemove = (event) => { if (event.buttons == 1) click(event);};
@@ -222,6 +222,12 @@ let g_legMiddleAngle = 0;
 let g_legPawAngle = 0;
 let g_bodyBobHeight = 0;
 
+// some colors
+let LOKI_WHITE = [1,0.97,0.97,1];
+let LOKI_DARK_BROWN = [0.2, 0.1, 0.0, 1.0];
+let LOKI_MED_BROWN = [0.3, 0.15, 0, 1];
+let LOKI_LIGHT_BROWN = [0.4, 0.2, 0, 1];
+
 // if animation is on, update things here rather than in render function
 //TODO: when turning these on they may snap because the animation is just based
 //      on time rather than current position plus any kind of time...
@@ -277,7 +283,7 @@ function renderScene() {
   let rightLegTop = g_shapesList["rightLegTop"];
   let rightLegMiddle = g_shapesList["rightLegMiddle"];
   let rightLegPaw = g_shapesList["rightLegPaw"];
-  
+
   
   // HEAD
   head.color = [0.8, 0.4, 0.0, 1.0];
@@ -303,7 +309,7 @@ function renderScene() {
   jaw.matrix.translate(0, -0.5, 0);
   jaw.render();
 
-  neck.color = [0, 0.5, 0, 1];
+  neck.color = LOKI_WHITE;
   neck.matrix.set(g_identityM);
   neck.matrix.translate(0, 0, g_bodyBobHeight);
   neck.matrix.translate(0, -0.25, 0.2);
@@ -318,7 +324,7 @@ function renderScene() {
   body.render();
 
   // TAIL
-  tail1.color = [0.5, 0.1, 0.0, 1.0];
+  tail1.color = LOKI_DARK_BROWN;
   tail1.matrix.set(g_identityM);
   tail1.matrix.translate(0, 0, g_bodyBobHeight);
   tail1.matrix.translate(0, 0.75, 0.1);
@@ -355,7 +361,7 @@ function renderScene() {
   tail4.render();
 
   // ARMS
-  leftArmTop.color = [0,1,1,1]
+  leftArmTop.color = LOKI_WHITE;
   leftArmTop.matrix.set(g_identityM);
   leftArmTop.matrix.translate(0.16, -0.2, 0.3)
   leftArmTop.matrix.rotate(g_armTopAngle, 1, 0, 0);
@@ -363,7 +369,7 @@ function renderScene() {
   leftArmTop.matrix.scale(0.15,0.2,0.3);
   leftArmTop.render();
 
-  leftArmMiddle.color = [0,0.5,1,1]
+  leftArmMiddle.color = LOKI_DARK_BROWN;
   leftArmMiddle.matrix.set(leftArmTopCoords);
   leftArmMiddle.matrix.translate(-0.01, 0.0, 0.2);
   leftArmMiddle.matrix.rotate(g_armMiddleAngle, 1, 0, 0);
@@ -372,14 +378,14 @@ function renderScene() {
   leftArmMiddle.matrix.translate(0, 0, 0.2); // offset
   leftArmMiddle.render();
 
-  leftArmPaw.color = [0,0.5,0.5,1]
+  leftArmPaw.color = LOKI_WHITE;
   leftArmPaw.matrix.set(leftMidCoords);
   leftArmPaw.matrix.translate(0, -0.05, 0.18);
   leftArmPaw.matrix.rotate(g_armPawAngle, 1, 0, 0);
   leftArmPaw.matrix.scale(0.15, 0.15, 0.07);
   leftArmPaw.render();
 
-  rightArmTop.color = [0,1,1,1]
+  rightArmTop.color = LOKI_DARK_BROWN;
   rightArmTop.matrix.set(g_identityM);
   rightArmTop.matrix.translate(-0.16, -0.2, 0.3)
   rightArmTop.matrix.rotate(-g_armTopAngle, 1, 0, 0);
@@ -387,7 +393,7 @@ function renderScene() {
   rightArmTop.matrix.scale(0.15,0.2,0.3);
   rightArmTop.render();
 
-  rightArmMiddle.color = [0,0.5,1,1]
+  rightArmMiddle.color = LOKI_WHITE;
   rightArmMiddle.matrix.set(rightArmTopCoords);
   rightArmMiddle.matrix.translate(0.01, 0.0, 0.2);
   rightArmMiddle.matrix.rotate(-g_armMiddleAngle, 1, 0, 0);
@@ -396,7 +402,7 @@ function renderScene() {
   rightArmMiddle.matrix.translate(0, 0, 0.2); // offset
   rightArmMiddle.render();
 
-  rightArmPaw.color = [0,0.5,0.5,1]
+  rightArmPaw.color = LOKI_WHITE;
   rightArmPaw.matrix.set(rightMidCoords);
   rightArmPaw.matrix.translate(0, -0.05, 0.18);
   rightArmPaw.matrix.rotate(-g_armPawAngle, 1, 0, 0);
@@ -404,7 +410,7 @@ function renderScene() {
   rightArmPaw.render();
 
   // LEGS
-  leftLegTop.color = [0,1,1,1]
+  leftLegTop.color = LOKI_DARK_BROWN;
   leftLegTop.matrix.set(g_identityM);
   leftLegTop.matrix.translate(0.16, 0.65, 0.3)
   leftLegTop.matrix.rotate(g_legTopAngle, 1, 0, 0);
@@ -412,7 +418,7 @@ function renderScene() {
   leftLegTop.matrix.scale(0.15,0.3,0.3);
   leftLegTop.render();
 
-  leftLegMiddle.color = [0,0.5,1,1]
+  leftLegMiddle.color = LOKI_DARK_BROWN;
   leftLegMiddle.matrix.set(leftLegTopCoords);
   leftLegMiddle.matrix.translate(-0.01, 0.0, 0.2);
   leftLegMiddle.matrix.rotate(g_legMiddleAngle, 1, 0, 0);
@@ -421,14 +427,14 @@ function renderScene() {
   leftLegMiddle.matrix.translate(0, 0, 0.2); // offset
   leftLegMiddle.render();
 
-  leftLegPaw.color = [0,0.5,0.5,1]
+  leftLegPaw.color = LOKI_WHITE;
   leftLegPaw.matrix.set(leftLegMidCoords);
   leftLegPaw.matrix.translate(0, -0.05, 0.18);
   leftLegPaw.matrix.rotate(g_legPawAngle, 1, 0, 0);
   leftLegPaw.matrix.scale(0.15, 0.15, 0.07);
   leftLegPaw.render();
 
-  rightLegTop.color = [0,1,1,1]
+  rightLegTop.color = leftLegTop.color;
   rightLegTop.matrix.set(g_identityM);
   rightLegTop.matrix.translate(-0.16, 0.65, 0.3)
   rightLegTop.matrix.rotate(-g_legTopAngle, 1, 0, 0);
@@ -436,7 +442,7 @@ function renderScene() {
   rightLegTop.matrix.scale(0.15,0.3,0.3);
   rightLegTop.render();
 
-  rightLegMiddle.color = [0,0.5,1,1]
+  rightLegMiddle.color = leftLegMiddle.color;
   rightLegMiddle.matrix.set(rightLegTopCoords);
   rightLegMiddle.matrix.translate(0.01, 0.0, 0.2);
   rightLegMiddle.matrix.rotate(-g_legMiddleAngle, 1, 0, 0);
@@ -445,7 +451,7 @@ function renderScene() {
   rightLegMiddle.matrix.translate(0, 0, 0.2); // offset
   rightLegMiddle.render();
 
-  rightLegPaw.color = [0,0.5,0.5,1]
+  rightLegPaw.color = leftLegPaw.color;
   rightLegPaw.matrix.set(rightLegMidCoords);
   rightLegPaw.matrix.translate(0, -0.05, 0.18);
   rightLegPaw.matrix.rotate(-g_legPawAngle, 1, 0, 0);

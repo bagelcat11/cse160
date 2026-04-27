@@ -4,7 +4,7 @@ class Jaw extends Shape {
     }
 
     render() {
-        let rgba = this.BLUE;
+        let rgba = LOKI_WHITE;
         // front
         this.drawRectangle3D([0.35,-0.1,0.1, 0.65,-0.1,0.1, 0.35,-0.2,0, 0.65,-0.2,0], rgba);
 
@@ -19,7 +19,7 @@ class Jaw extends Shape {
         this.drawRectangle3D([0.35,-0.1,0.1, 0.65,-0.1,0.1, 0.35,0.5,0, 0.65,0.5,0], rgba);
 
         // bottom sides
-        rgba = this.BLUE;
+        rgba = LOKI_WHITE;
         this.drawTriangles3D([0.8,0,0, 0.65,-0.1,0.1, 0.65,0.5,0,], rgba, gl.TRIANGLES);
         this.drawTriangles3D([0.2,0,0, 0.35,-0.1,0.1, 0.35,0.5,0,], rgba, gl.TRIANGLES);
 
@@ -29,12 +29,12 @@ class Jaw extends Shape {
         this.drawTriangles3D([0.6,-0.1,-0.1, 0.55,-0.05,0, 0.6,-0.15,0, 0.7,-0.05,0,], this.WHITE, gl.TRIANGLE_FAN);
 
         // cheeks
-        rgba = this.RED;
+        rgba = LOKI_LIGHT_BROWN;
         this.drawTriangles3D([0.8,0,0, 0.65,0.5,0, 0.8,0.3,-0.5], rgba, gl.TRIANGLES);
         this.drawTriangles3D([0.2,0,0, 0.35,0.5,0, 0.2,0.3,-0.5], rgba, gl.TRIANGLES);
 
         // other things
-        rgba = this.PINK;
+        rgba = LOKI_LIGHT_BROWN;
         this.drawTriangles3D([0.8,0,0, 1,0.3,-0.5, 0.65,-0.1,0.1,], rgba, gl.TRIANGLES);
         this.drawTriangles3D([0.2,0,0, 0,0.3,-0.5, 0.35,-0.1,0.1,], rgba, gl.TRIANGLES);
 

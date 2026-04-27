@@ -23,6 +23,7 @@ class Head extends Shape {
         this.drawRectangle3D([0,0,-1, 1,0,-1, 0,1,-1, 1,1,-1,], rgba);
 
         // front
+        // rgba = LOKI_MED_BROWN;
         this.drawRectangle3D([0,0,0, 0,0,-1, 1,0,0, 1,0,-1,], rgba);
 
         // nose top

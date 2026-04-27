@@ -186,6 +186,10 @@ function setUpScene() {
   g_shapesList["earLeft"] = new Ear();
   g_shapesList["earRight"] = new Ear();
   g_shapesList["body"] = new Body();
+  g_shapesList["eyeLeft"] = new Cube();
+  g_shapesList["eyeRight"] = new Cube();
+  g_shapesList["pupilLeft"] = new Cube();
+  g_shapesList["pupilRight"] = new Cube();
 
   // tail is just going to be many segments
   g_shapesList["tail1"] = new Cube();
@@ -226,8 +230,9 @@ let g_bodyBobHeight = 0;
 // some colors
 let LOKI_WHITE = [1,0.97,0.97,1];
 let LOKI_DARK_BROWN = [0.2, 0.1, 0.0, 1.0];
-let LOKI_MED_BROWN = [0.3, 0.15, 0, 1];
-let LOKI_LIGHT_BROWN = [0.4, 0.2, 0, 1];
+let LOKI_MED_BROWN = [0.4, 0.3, 0, 1];
+let LOKI_LIGHT_BROWN = [0.7, 0.5, 0.3, 1];
+let LOKI_YELLOW = [1,0.9,0.3,1];
 
 // if animation is on, update things here rather than in render function
 //TODO: when turning these on they may snap because the animation is just based
@@ -266,13 +271,19 @@ function renderScene() {
   let head = g_shapesList["head"];
   let earLeft = g_shapesList["earLeft"];
   let earRight = g_shapesList["earRight"];
+  let neck = g_shapesList["neck"];
+  let jaw = g_shapesList["jaw"];
+  let eyeLeft = g_shapesList["eyeLeft"];
+  let eyeRight = g_shapesList["eyeRight"];
+  let pupilLeft = g_shapesList["pupilLeft"];
+  let pupilRight = g_shapesList["pupilRight"];
+
   let body = g_shapesList["body"];
   let tail1 = g_shapesList["tail1"];
   let tail2 = g_shapesList["tail2"];
   let tail3 = g_shapesList["tail3"];
   let tail4 = g_shapesList["tail4"];
-  let neck = g_shapesList["neck"];
-  let jaw = g_shapesList["jaw"];
+
   let leftArmTop = g_shapesList["leftArmTop"];
   let leftArmMiddle = g_shapesList["leftArmMiddle"];
   let leftArmPaw = g_shapesList["leftArmPaw"];
@@ -318,6 +329,34 @@ function renderScene() {
   neck.matrix.rotate(60, 1, 0, 0);
   neck.matrix.scale(0.35, 0.35, 0.25);
   neck.render();
+
+  eyeLeft.color = LOKI_YELLOW;
+  eyeLeft.matrix.set(head.matrix);
+  eyeLeft.matrix.translate(0.8, 0, -0.6);
+  let eyeLeftCoords = new Matrix4().set(eyeLeft.matrix);
+  // eyeLeft.matrix.rotate(45, 0,1,0);
+  eyeLeft.matrix.scale(0.25, 0.25, 0.25);
+  eyeLeft.render();
+
+  pupilLeft.color = [0,0,0,1];
+  pupilLeft.matrix.set(eyeLeftCoords);
+  pupilLeft.matrix.translate(0,-0.01,0)
+  pupilLeft.matrix.scale(0.1, 0.25, 0.24)
+  pupilLeft.render();
+
+  eyeRight.color = LOKI_YELLOW;
+  eyeRight.matrix.set(head.matrix);
+  eyeRight.matrix.translate(0.2, 0, -0.6);
+  let eyeRightCoords = new Matrix4().set(eyeRight.matrix);
+  // eyeRight.matrix.rotate(45, 0,1,0);
+  eyeRight.matrix.scale(0.25, 0.25, 0.25);
+  eyeRight.render();
+
+  pupilRight.color = [0,0,0,1];
+  pupilRight.matrix.set(eyeRightCoords);
+  pupilRight.matrix.translate(0,-0.01,0)
+  pupilRight.matrix.scale(0.1, 0.25, 0.24)
+  pupilRight.render();
 
   // BODY
   body.matrix.set(g_identityM);

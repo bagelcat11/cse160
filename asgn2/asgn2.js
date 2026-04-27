@@ -92,22 +92,75 @@ function addActionsForHtmlUI() {
     g_cameraZoom = cameraZoomSlider.value;
   });
 
-  // let blueSlider = document.getElementById("blueSlider");
-  // blueSlider.addEventListener("input", () => {
-  //   g_blueAngle = blueSlider.value;
-  // });
-
-  // let greenSlider = document.getElementById("greenSlider");
-  // greenSlider.addEventListener("input", () => {
-  //   g_greenAngle = greenSlider.value;
-  // });
-
   let autoAnimToggles = document.getElementsByName("autoAnimToggle");
   autoAnimToggles.forEach(s => {
     s.addEventListener("click", () => {
       g_autoAnim = s.value;
     });
   });
+
+  let jawSlider = document.getElementById("jawSlider");
+  jawSlider.addEventListener("input", () => {
+    g_jawAngle = jawSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let armTopSlider = document.getElementById("armTopSlider");
+  armTopSlider.addEventListener("input", () => {
+    g_armTopAngle = armTopSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let armMidSlider = document.getElementById("armMidSlider");
+  armMidSlider.addEventListener("input", () => {
+    g_armMidAngle = armMidSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let armPawSlider = document.getElementById("armPawSlider");
+  armPawSlider.addEventListener("input", () => {
+    g_armPawAngle = armPawSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let legTopSlider = document.getElementById("legTopSlider");
+  legTopSlider.addEventListener("input", () => {
+    g_legTopAngle = legTopSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let legMidSlider = document.getElementById("legMidSlider");
+  legMidSlider.addEventListener("input", () => {
+    g_legMidAngle = legMidSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let legPawSlider = document.getElementById("legPawSlider");
+  legPawSlider.addEventListener("input", () => {
+    g_legPawAngle = legPawSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let tail1Slider = document.getElementById("tail1Slider");
+  tail1Slider.addEventListener("input", () => {
+    g_tail1Angle = tail1Slider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let tail2Slider = document.getElementById("tail2Slider");
+  tail2Slider.addEventListener("input", () => {
+    g_tail2Angle = tail2Slider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let tail3Slider = document.getElementById("tail3Slider");
+  tail3Slider.addEventListener("input", () => {
+    g_tail3Angle = tail3Slider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let tail4Slider = document.getElementById("tail4Slider");
+  tail4Slider.addEventListener("input", () => {
+    g_tail4Angle = tail4Slider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+}
+
+// quick helper
+function disableAutoAnimWhenDoingSlider() {
+  let off = document.getElementById("animOff");
+  off.checked = true;
+  g_autoAnim = off.value;
 }
 
 
@@ -216,14 +269,16 @@ function setUpScene() {
 }
 
 
-// let g_tailXAngle = 0;
-let g_tailZAngle = 0;
+let g_tail1Angle = 0;
+let g_tail2Angle = 0;
+let g_tail3Angle = 0;
+let g_tail4Angle = 0;
 let g_jawAngle = 0;
 let g_armTopAngle = 0;
-let g_armMiddleAngle = 0;
+let g_armMidAngle = 0;
 let g_armPawAngle = 0;
 let g_legTopAngle = 0;
-let g_legMiddleAngle = 0;
+let g_legMidAngle = 0;
 let g_legPawAngle = 0;
 let g_bodyBobHeight = 0;
 
@@ -239,18 +294,19 @@ let LOKI_YELLOW = [1,0.9,0.3,1];
 //      on time rather than current position plus any kind of time...
 function updateAnimatedTransforms() {
   if (g_autoAnim === "on") {
-    g_tailZAngle = Math.sin(g_elapsedTime) * 20;
-    g_jawAngle = -Math.abs(Math.sin(g_elapsedTime) * 30);
+    g_tail1Angle = Math.sin(g_elapsedTime) * 20;
+    g_tail2Angle = g_tail3Angle = g_tail4Angle = g_tail1Angle;
+    // g_jawAngle = -Math.abs(Math.sin(g_elapsedTime) * 30);
     g_bodyBobHeight = Math.sin(10 * g_elapsedTime) * 0.01;
 
     // sin(2x) = 2x frequency
     // sin(x) * y = y amplitude (degree output)
     g_armTopAngle = Math.sin(5 * g_elapsedTime) * 25;
-    g_armMiddleAngle = Math.cos(5 * g_elapsedTime) * 25;
+    g_armMidAngle = Math.cos(5 * g_elapsedTime) * 25;
     g_armPawAngle = -Math.cos(5 * g_elapsedTime) * 20;
 
     g_legTopAngle = Math.cos(5 * g_elapsedTime) * 25;
-    g_legMiddleAngle = Math.sin(5 * g_elapsedTime) * 25;
+    g_legMidAngle = Math.sin(5 * g_elapsedTime) * 25;
     g_legPawAngle = -Math.sin(5 * g_elapsedTime) * 20;
   }
 }
@@ -369,7 +425,7 @@ function renderScene() {
   tail1.matrix.set(g_identityM);
   tail1.matrix.translate(0, 0, g_bodyBobHeight);
   tail1.matrix.translate(0, 0.75, 0.1);
-  tail1.matrix.rotate(g_tailZAngle, 0,0,1); // animated rotate
+  tail1.matrix.rotate(g_tail1Angle, 0,0,1); // animated rotate
   tail1.matrix.rotate(25,1,0,0);  // position rotation separate from animation
   let tail1Coords = new Matrix4().set(tail1.matrix);  // set ref after rotating
   tail1.matrix.scale(0.1, 0.25, 0.1);
@@ -379,7 +435,7 @@ function renderScene() {
   tail2.color = tail1.color;
   tail2.matrix.set(tail1Coords);
   tail2.matrix.translate(0, 0.2, 0.05);
-  tail2.matrix.rotate(g_tailZAngle, 0,0,1);
+  tail2.matrix.rotate(g_tail2Angle, 0,0,1);
   tail2.matrix.rotate(25,1,0,0); 
   let tail2Coords = new Matrix4().set(tail2.matrix);
   tail2.matrix.scale(0.1, 0.25, 0.1);
@@ -389,7 +445,7 @@ function renderScene() {
   tail3.color = tail1.color;
   tail3.matrix.set(tail2Coords);
   tail3.matrix.translate(0, 0.2, -0.05);
-  tail3.matrix.rotate(g_tailZAngle, 0,0,1);
+  tail3.matrix.rotate(g_tail3Angle, 0,0,1);
   tail3.matrix.rotate(-40,1,0,0); 
   let tail3Coords = new Matrix4().set(tail3.matrix);
   tail3.matrix.scale(0.1, 0.25, 0.1);
@@ -399,7 +455,7 @@ function renderScene() {
   tail4.color = tail1.color;
   tail4.matrix.set(tail3Coords);
   tail4.matrix.translate(0, 0.2, -0.05);
-  tail4.matrix.rotate(g_tailZAngle, 0,0,1);
+  tail4.matrix.rotate(g_tail4Angle, 0,0,1);
   tail4.matrix.rotate(-25,1,0,0); 
   tail4.matrix.scale(0.1, 0.25, 0.1);
   tail1.matrix.translate(0,0.25,0);
@@ -417,7 +473,7 @@ function renderScene() {
   leftArmMiddle.color = LOKI_DARK_BROWN;
   leftArmMiddle.matrix.set(leftArmTopCoords);
   leftArmMiddle.matrix.translate(-0.01, 0.0, 0.2);
-  leftArmMiddle.matrix.rotate(g_armMiddleAngle, 1, 0, 0);
+  leftArmMiddle.matrix.rotate(g_armMidAngle, 1, 0, 0);
   let leftMidCoords = new Matrix4().set(leftArmMiddle.matrix)
   leftArmMiddle.matrix.scale(0.12, 0.12, 0.3)
   leftArmMiddle.matrix.translate(0, 0, 0.2); // offset
@@ -441,7 +497,7 @@ function renderScene() {
   rightArmMiddle.color = LOKI_WHITE;
   rightArmMiddle.matrix.set(rightArmTopCoords);
   rightArmMiddle.matrix.translate(0.01, 0.0, 0.2);
-  rightArmMiddle.matrix.rotate(-g_armMiddleAngle, 1, 0, 0);
+  rightArmMiddle.matrix.rotate(-g_armMidAngle, 1, 0, 0);
   let rightMidCoords = new Matrix4().set(rightArmMiddle.matrix)
   rightArmMiddle.matrix.scale(0.12, 0.12, 0.3)
   rightArmMiddle.matrix.translate(0, 0, 0.2); // offset
@@ -466,7 +522,7 @@ function renderScene() {
   leftLegMiddle.color = LOKI_DARK_BROWN;
   leftLegMiddle.matrix.set(leftLegTopCoords);
   leftLegMiddle.matrix.translate(-0.01, 0.0, 0.2);
-  leftLegMiddle.matrix.rotate(g_legMiddleAngle, 1, 0, 0);
+  leftLegMiddle.matrix.rotate(g_legMidAngle, 1, 0, 0);
   let leftLegMidCoords = new Matrix4().set(leftLegMiddle.matrix)
   leftLegMiddle.matrix.scale(0.12, 0.15, 0.3)
   leftLegMiddle.matrix.translate(0, 0, 0.2); // offset
@@ -490,7 +546,7 @@ function renderScene() {
   rightLegMiddle.color = leftLegMiddle.color;
   rightLegMiddle.matrix.set(rightLegTopCoords);
   rightLegMiddle.matrix.translate(0.01, 0.0, 0.2);
-  rightLegMiddle.matrix.rotate(-g_legMiddleAngle, 1, 0, 0);
+  rightLegMiddle.matrix.rotate(-g_legMidAngle, 1, 0, 0);
   let rightLegMidCoords = new Matrix4().set(rightLegMiddle.matrix)
   rightLegMiddle.matrix.scale(0.12, 0.15, 0.3)
   rightLegMiddle.matrix.translate(0, 0, 0.2); // offset

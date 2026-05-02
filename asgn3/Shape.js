@@ -5,11 +5,7 @@ class Shape {
     this.color = [1.0, 1.0, 1.0, 1.0];
     this.matrix = new Matrix4();
 
-    // set up buffer in the constructor so we don't remake it!
-    this.vertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-    gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(a_Position);
+    this.setUpBuffer();
 
     // handy colors
     this.RED = [1.0, 0.0, 0.0, 1.0];
@@ -24,6 +20,14 @@ class Shape {
     this.PINK = [1.0, 0.5, 0.5, 1.0];
     this.INDIGO = [0.5, 0.5, 1.0, 1.0];
     this.LIME = [0.5, 1.0, 0.5, 1.0];
+  }
+
+  setUpBuffer() {
+    // set up buffer in the constructor so we don't remake it!
+    this.vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(a_Position);
   }
 
   render() {

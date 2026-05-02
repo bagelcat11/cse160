@@ -4,18 +4,24 @@ var VSHADER_SOURCE =
   'attribute vec4 a_Position;\n' +  // attributes: external vars that can vary for each vertex
   'uniform mat4 u_ModelMatrix;\n'+  // for rotating parts of the model
   'uniform mat4 u_GlobalRotateMatrix;\n' +  // for the camera
+  'attribute vec2 a_UVCoords;\n' +  // for textures!
+  'varying vec2 v_UVCoords;\n'+
   '\n' +
   'void main() {\n' +
-  '  gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' + // now transformable with mtx!
+  '   gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' + // now transformable with mtx!
+  '   v_UVCoords = a_UVCoords;\n' + // set varying to attrib
   '}\n';
 
 // -- Fragment shader program --
 var FSHADER_SOURCE =
   'precision mediump float;\n' +
   'uniform vec4 u_FragColor;\n' + // uniform var: external var that is the same for all fragments
+  'uniform sampler2D u_Sampler;\n' +  // for textures!
+  'varying vec2 v_UVCoords;\n' +      // read the varying var!
   '\n' +
   'void main() {\n' +
-  '  gl_FragColor = u_FragColor;\n' + // Set the point color
+  // '  gl_FragColor = u_FragColor;\n' + // Set the point color
+  'gl_FragColor = texture2D(u_Sampler, v_UVCoords);\n' +  // set color with texture!
   '}\n';
 
 // -- GLOBALS --
@@ -24,6 +30,8 @@ let gl;
 let a_Position;
 let u_FragColor;
 let u_ModelMatrix;
+let a_UVCoords;
+let u_Sampler;
 let u_GlobalRotateMatrix;
 let g_identityM = new Matrix4();
 let g_cameraXAngle = 45;
@@ -64,6 +72,8 @@ function connectVariablesToGLSL() {
   u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
   u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
   u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotateMatrix");
+  a_UVCoords = gl.getAttribLocation(gl.program, "a_UVCoords");
+  u_Sampler = gl.getUniformLocation(gl.program, "u_Sampler");
   
   gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
 }
@@ -177,9 +187,12 @@ function renderScene() {
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
   // set up local refs
-  let tail2 = g_shapesList["tail2"];
+  // let tail2 = g_shapesList["tail2"];
 
-  tail2.color = [1,0,0,1];
-  tail2.matrix.set(g_identityM);
-  tail2.render();
+  // tail2.color = [1,0,0,1];
+  // tail2.matrix.set(g_identityM);
+  // tail2.render();
+
+  let test = new TexturedCube("img/test_texture.png");
+  test.render();
 }

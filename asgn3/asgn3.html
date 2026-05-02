@@ -1,0 +1,45 @@
+<!-- Name: Lynn Gen -->
+<!-- Email: lygen@ucsc.edu -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Asgn3: BLocky World</title>
+    <!-- <link rel="stylesheet" href="asgn3.css"> -->
+  </head>
+
+  <body onload="main()">
+    <div id="canvAndImg">
+      <canvas id="webgl" width="400" height="400">
+        Please use a browser that supports "canvas"
+      </canvas>
+    </div>
+    <p>FPS: <span id="fpsCounter"></span></p>
+
+    <div>
+      <label><strong>Camera horizontal: </strong></label>
+      <input type="range" min="0" max="360" value="45" class="slider" id="cameraXSlider">
+      <label><strong>Camera vertical: </strong></label>
+      <input type="range" min="0" max="180" value="90" class="slider" id="cameraYSlider">
+    </div>
+    <span>(or click and drag on canvas)</span>
+    <p></p>
+    <div>
+      <label><strong>Camera zoom: </strong></label>
+      <input type="range" min="2" max="5" value="4" class="slider" id="cameraZoomSlider">
+    </div>
+    <p></p>
+      
+
+
+    <script src="lib/webgl-utils.js"></script>
+    <script src="lib/webgl-debug.js"></script>
+    <script src="lib/cuon-utils.js"></script>
+    <script src="lib/cuon-matrix-cse160.js"></script>
+    <script src="Shape.js"></script>
+    <script src="Cube.js"></script>
+    <script src="asgn3.js"></script>
+
+  </body>
+</html>

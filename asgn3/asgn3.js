@@ -6,9 +6,11 @@ var VSHADER_SOURCE =
   'uniform mat4 u_GlobalRotateMatrix;\n' +  // for the camera
   'attribute vec2 a_UVCoords;\n' +  // for textures!
   'varying vec2 v_UVCoords;\n'+
+  'uniform mat4 u_ProjectionMatrix;\n' + // for camera (look at)!
+  'uniform mat4 u_ViewMatrix;\n' +       // (perspective)
   '\n' +
   'void main() {\n' +
-  '   gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' + // now transformable with mtx!
+  '   gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' + // now transformable with mtx!
   '   v_UVCoords = a_UVCoords;\n' + // set varying to attrib
   '}\n';
 
@@ -32,6 +34,8 @@ let a_Position;
 let u_BaseColor;
 let u_TexColorWeight;
 let u_ModelMatrix;
+let u_ProjectionMatrix;
+let u_ViewMatrix;
 let a_UVCoords;
 let u_Sampler;
 let u_GlobalRotateMatrix;
@@ -74,6 +78,8 @@ function connectVariablesToGLSL() {
   u_BaseColor = gl.getUniformLocation(gl.program, "u_BaseColor");
   u_TexColorWeight = gl.getUniformLocation(gl.program, "u_TexColorWeight");
   u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
+  u_ProjectionMatrix = gl.getUniformLocation(gl.program, "u_ProjectionMatrix");
+  u_ViewMatrix = gl.getUniformLocation(gl.program, "u_ViewMatrix");
   u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotateMatrix");
   a_UVCoords = gl.getAttribLocation(gl.program, "a_UVCoords");
   u_Sampler = gl.getUniformLocation(gl.program, "u_Sampler");
@@ -176,10 +182,27 @@ let LOKI_DARK_BROWN = [0.2, 0.1, 0.0, 1.0];
 let LOKI_MED_BROWN = [0.35, 0.25, 0, 1];
 let LOKI_LIGHT_BROWN = [0.75, 0.6, 0.5, 1];
 let LOKI_YELLOW = [0.9,0.8,0.3,1.0];
+
+// camera globals
+let g_eye = [0,0,2];
+let g_at = [0,0,-10];
+let g_up = [0,1,0];
   
 function renderScene() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  // projection and view matrices for camera
+  let projMtx = new Matrix4();
+  // fov, aspect ratio, near plane dist, far plane dist
+  //    plane dist: how close/far you have to be before things clip
+  projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 50);
+  gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMtx.elements);
+
+  let viewMtx = new Matrix4();
+  // eye position, pos to look at (conventionally, -z), up direction
+  viewMtx.setLookAt(g_eye[0],g_eye[1],g_eye[2], g_at[0],g_at[1],g_at[2], g_up[0],g_up[1],g_up[2]);
+  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMtx.elements);
 
   // global transform for camera angle
   let globalRotMtx = new Matrix4();

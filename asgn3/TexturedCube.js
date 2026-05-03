@@ -1,7 +1,9 @@
 class TexturedCube extends Shape {
-  constructor(texturePath) {
+  constructor(texturePath, baseColor, texColorWeight) {
     super();
     this.texturePath = texturePath;
+    this.baseColor = baseColor;
+    this.texColorWeight = texColorWeight;
     this.matrix = new Matrix4();
 
     this.setUpBuffer();
@@ -41,13 +43,13 @@ class TexturedCube extends Shape {
     //top
     this.drawTexturedRect([-0.5,-0.5,-0.5,0,0, 0.5,-0.5,-0.5,1,0, -0.5,0.5,-0.5,0,1, 0.5,0.5,-0.5,1,1,], this.texturePath);
     // right
-    this.drawTexturedRect([0.5,-0.5,-0.5,0,0, 0.5,0.5,-0.5,1,0, 0.5,-0.5,0.5,0,1, 0.5,0.5,0.5,1,1,], this.texturePath);
+    this.drawTexturedRect([0.5,-0.5,-0.5,1,1, 0.5,0.5,-0.5,1,0, 0.5,-0.5,0.5,0,1, 0.5,0.5,0.5,0,0,], this.texturePath);
     // left
-    this.drawTexturedRect([-0.5,-0.5,-0.5,0,0, -0.5,0.5,-0.5,1,0, -0.5,-0.5,0.5,0,1, -0.5,0.5,0.5,1,1,], this.texturePath);
+    this.drawTexturedRect([-0.5,-0.5,-0.5,1,1, -0.5,0.5,-0.5,1,0, -0.5,-0.5,0.5,0,1, -0.5,0.5,0.5,0,0,], this.texturePath);
     // front
-    this.drawTexturedRect([-0.5,-0.5,0.5,0,0, 0.5,-0.5,0.5,1,0, -0.5,-0.5,-0.5,0,1, 0.5,-0.5,-0.5,1,1,], this.texturePath);
+    this.drawTexturedRect([-0.5,-0.5,0.5,0,1, 0.5,-0.5,0.5,0,0, -0.5,-0.5,-0.5,1,1, 0.5,-0.5,-0.5,1,0,], this.texturePath);
     // back
-    this.drawTexturedRect([-0.5,0.5,0.5,0,0, 0.5,0.5,0.5,1,0, -0.5,0.5,-0.5,0,1, 0.5,0.5,-0.5,1,1,], this.texturePath);
+    this.drawTexturedRect([-0.5,0.5,0.5,0,1, 0.5,0.5,0.5,0,0, -0.5,0.5,-0.5,1,1, 0.5,0.5,-0.5,1,0,], this.texturePath);
     // bottom
     this.drawTexturedRect([-0.5,-0.5,0.5,0,0, 0.5,-0.5,0.5,1,0, -0.5,0.5,0.5,0,1, 0.5,0.5,0.5,1,1,], this.texturePath);
   }
@@ -64,6 +66,10 @@ class TexturedCube extends Shape {
     gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FSIZE * 5, FSIZE * 0);
     // UV is 2 comps out of 5, and they start at index 3
     gl.vertexAttribPointer(a_UVCoords, 2, gl.FLOAT, false, FSIZE * 5, FSIZE * 3);
+
+    // set up base color filter
+    gl.uniform4f(u_BaseColor, this.baseColor[0], this.baseColor[1], this.baseColor[2], this.baseColor[3]);
+    gl.uniform1f(u_TexColorWeight, this.texColorWeight);
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 

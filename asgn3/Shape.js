@@ -38,7 +38,7 @@ class Shape {
     let n = vertices.length / 3;  // num tris = vertices / 3 comps per vertex
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
-    gl.uniform4f(u_FragColor, color[0], color[1], color[2], color[3]);
+    gl.uniform4f(u_BaseColor, color[0], color[1], color[2], color[3]);
     // matrix transform!!
     gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 
@@ -47,7 +47,7 @@ class Shape {
 
   drawRectangle3D(corners, color) {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), gl.DYNAMIC_DRAW);
-    gl.uniform4f(u_FragColor, color[0], color[1], color[2], color[3]);
+    gl.uniform4f(u_BaseColor, color[0], color[1], color[2], color[3]);
     gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 
     // using a strip means the last 2 vertices of the prev tri are used for the next tri

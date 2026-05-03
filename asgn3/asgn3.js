@@ -15,20 +15,22 @@ var VSHADER_SOURCE =
 // -- Fragment shader program --
 var FSHADER_SOURCE =
   'precision mediump float;\n' +
-  'uniform vec4 u_FragColor;\n' + // uniform var: external var that is the same for all fragments
+  'uniform vec4 u_BaseColor;\n' + // color filter for texture
+  'uniform float u_TexColorWeight;\n' + // 0 = all base color, 1 = all texture color
   'uniform sampler2D u_Sampler;\n' +  // for textures!
   'varying vec2 v_UVCoords;\n' +      // read the varying var!
   '\n' +
   'void main() {\n' +
-  // '  gl_FragColor = u_FragColor;\n' + // Set the point color
-  'gl_FragColor = texture2D(u_Sampler, v_UVCoords);\n' +  // set color with texture!
+      'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
+      'gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor;\n' +  // set color with texture!
   '}\n';
 
 // -- GLOBALS --
 let canvas;
 let gl;
 let a_Position;
-let u_FragColor;
+let u_BaseColor;
+let u_TexColorWeight;
 let u_ModelMatrix;
 let a_UVCoords;
 let u_Sampler;
@@ -69,7 +71,8 @@ function connectVariablesToGLSL() {
   // only be referenced after initShaders is called
   a_Position = gl.getAttribLocation(gl.program, "a_Position");
   // get location of uniform var
-  u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
+  u_BaseColor = gl.getUniformLocation(gl.program, "u_BaseColor");
+  u_TexColorWeight = gl.getUniformLocation(gl.program, "u_TexColorWeight");
   u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
   u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotateMatrix");
   a_UVCoords = gl.getAttribLocation(gl.program, "a_UVCoords");
@@ -172,7 +175,7 @@ let LOKI_WHITE = [1,0.97,0.97,1];
 let LOKI_DARK_BROWN = [0.2, 0.1, 0.0, 1.0];
 let LOKI_MED_BROWN = [0.35, 0.25, 0, 1];
 let LOKI_LIGHT_BROWN = [0.75, 0.6, 0.5, 1];
-let LOKI_YELLOW = [0.9,0.8,0.3,1];
+let LOKI_YELLOW = [0.9,0.8,0.3,1.0];
   
 function renderScene() {
   // clear canvas
@@ -186,13 +189,13 @@ function renderScene() {
   globalRotMtx.translate(0,-0.15,0);  // center her
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
-  // set up local refs
+  // set up local refs  
   // let tail2 = g_shapesList["tail2"];
 
   // tail2.color = [1,0,0,1];
   // tail2.matrix.set(g_identityM);
   // tail2.render();
 
-  let test = new TexturedCube("img/test_texture.png");
+  let test = new TexturedCube("img/test_texture.png", LOKI_WHITE, 0.75);
   test.render();
 }

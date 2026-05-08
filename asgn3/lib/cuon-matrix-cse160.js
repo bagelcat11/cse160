@@ -17,9 +17,9 @@ class Vector3 {
         this.elements = v;
 
         // add convenient shorthands
-        this.x = this.elements[0];
-        this.y = this.elements[1];
-        this.z = this.elements[2];
+        // this.x = this.elements[0];
+        // this.y = this.elements[1];
+        // this.z = this.elements[2];
     }
 
     /**

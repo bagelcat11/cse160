@@ -24,38 +24,38 @@ class Camera {
     cameraTick() {  // every frame
         let viewMtx = new Matrix4();
         // eye position, pos to look at (conventionally, -z), up direction
-        viewMtx.setLookAt(this.eye.x,this.eye.y,this.eye.z,
-            this.at.x,this.at.y,this.at.z,
-            this.up.x,this.up.y,this.up.z);
+        // viewMtx.setLookAt(this.eye.x,this.eye.y,this.eye.z,
+        //     this.at.x,this.at.y,this.at.z,
+        //     this.up.x,this.up.y,this.up.z);
+
+        //TODO: it would be really nice if i could change the vector library
+        //      to have vec.x = vec.elements[0], etc. but setting that in the
+        //      constructor makes it by value and not reference...
+        viewMtx.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],
+            this.at.elements[0],this.at.elements[1],this.at.elements[2],
+            this.up.elements[0],this.up.elements[1],this.up.elements[2]);
         gl.uniformMatrix4fv(u_ViewMatrix, false, viewMtx.elements);
     }
 
     handleKeyboardMovement(event) {
         switch (event.key) {
-            // move both eye and at so that they are always the same distance away
             case "w":
-                this.eye.z -= this.moveSpeed;
-                this.at.z -= this.moveSpeed;
+                this.changePositionForwardBack(this.moveSpeed);
                 break;
             case "a":
-                this.eye.x -= this.moveSpeed;
-                this.at.x -= this.moveSpeed;
                 break;
             case "s":
-                this.eye.z += this.moveSpeed;
-                this.at.z += this.moveSpeed;
+                this.changePositionForwardBack(-this.moveSpeed);
                 break;
             case "d":
-                this.eye.x += this.moveSpeed;
-                this.at.x += this.moveSpeed;
                 break;
 
             // can look with keyboard also for now
             case "q":
-                this.updateLookDirection(true);
+                this.changeHorizontalLook(-this.lookSpeed);
                 break;
             case "e":
-                this.updateLookDirection(false);
+                this.changeHorizontalLook(this.lookSpeed);
                 break;
 
             default:
@@ -63,21 +63,34 @@ class Camera {
         }
     }
 
-    updateLookDirection(isTurningLeft) {
-        // get direction from eye to at
-        let dir = this.at.sub(this.eye);
-        // r = distance: only use x and z for 2D
-        let r = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
-        // get angle from eye to at
-        let theta = Math.atan2(dir.z, dir.x);
-        // update angle based on Q or E
-        theta += (isTurningLeft) ? -this.lookSpeed : this.lookSpeed;
-        // calculate new coords for at with updated angle
-        let newX = r * Math.cos(theta);
-        let newZ = r * Math.sin(theta);
-        dir.x = newX;
-        dir.z = newZ;
+    changePositionForwardBack(deltaPos) {
+        // get direction vector with length moveSpeed
+        // MAKE COPY SINCE DIRECTLY CALCULATING this.at - this.eye WOULD AFFECT this.at
+        let dir = new Vector3(this.at.elements);
+        dir.sub(this.eye);
+        dir.normalize();
+        dir.mul(deltaPos);
+        // add to both eye and at so they are same distance away
+        this.eye.add(dir);
+        this.at.add(dir);
+    }
 
-        this.at = this.at.add(dir);
+    changeHorizontalLook(deltaLook) {
+        // get direction from eye to at
+        let dir = new Vector3(this.at.elements);
+        dir.sub(this.eye);
+        // r = distance
+        let r = dir.magnitude();
+        // get angle from eye to at (z, x)
+        let theta = Math.atan2(dir.elements[2], dir.elements[0]);
+        // update angle based on Q or E
+        theta += deltaLook;
+        // calculate new coords for at with updated angle
+        dir.elements[0] = r * Math.cos(theta);
+        dir.elements[2] = r * Math.sin(theta);
+
+        // new at is eye + direction we calculated
+        this.at.set(this.eye);
+        this.at.add(dir);
     }
 }

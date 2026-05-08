@@ -18,7 +18,7 @@ class TexturedCube extends Shape {
     gl.enableVertexAttribArray(a_UVCoords);
   }
 
-  initTexture() {
+  initTexture() { //TODO: pass in a texture so cubes of the same texture don't have to remake?
     this.texture = gl.createTexture();
     this.img = new Image();
     // setup callback to load texture once browser loads image

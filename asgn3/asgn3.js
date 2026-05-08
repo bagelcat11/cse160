@@ -34,12 +34,17 @@ let a_Position;
 let u_BaseColor;
 let u_TexColorWeight;
 let u_ModelMatrix;
-let u_ProjectionMatrix;
+
+let u_ProjectionMatrix; // this and viewmtx get handled by Camera class 
 let u_ViewMatrix;
+
 let a_UVCoords;
 let u_Sampler;
 let u_GlobalRotateMatrix;
 let g_identityM = new Matrix4();
+
+let g_camera; // this will be the Camera class
+// these ones are actually rotating world
 let g_cameraXAngle = 45;
 let g_cameraYAngle = 90;
 let g_cameraZoom = 4;
@@ -134,6 +139,8 @@ function tick() {
   let fpsCounter = document.getElementById("fpsCounter");
   let start = performance.now();
   
+  // update camera, then render
+  g_camera.cameraTick();
   renderScene();
 
   // update performance
@@ -173,6 +180,7 @@ let g_shapesList = {};  // make it an object so it's dict-like
 // unfortunately I think all we can really move here is the object construction;
 //      their matrices really do need to be reset and recalculated every frame
 function setUpScene() {
+  g_camera = new Camera();
   g_shapesList["tail2"] = new Cube();
 }
 
@@ -182,29 +190,12 @@ let LOKI_DARK_BROWN = [0.2, 0.1, 0.0, 1.0];
 let LOKI_MED_BROWN = [0.35, 0.25, 0, 1];
 let LOKI_LIGHT_BROWN = [0.75, 0.6, 0.5, 1];
 let LOKI_YELLOW = [0.9,0.8,0.3,1.0];
-
-// camera globals
-let g_eye = [0,0,2];
-let g_at = [0,0,-10];
-let g_up = [0,1,0];
   
 function renderScene() {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // projection and view matrices for camera
-  let projMtx = new Matrix4();
-  // fov, aspect ratio, near plane dist, far plane dist
-  //    plane dist: how close/far you have to be before things clip
-  projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 50);
-  gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMtx.elements);
-
-  let viewMtx = new Matrix4();
-  // eye position, pos to look at (conventionally, -z), up direction
-  viewMtx.setLookAt(g_eye[0],g_eye[1],g_eye[2], g_at[0],g_at[1],g_at[2], g_up[0],g_up[1],g_up[2]);
-  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMtx.elements);
-
-  // global transform for camera angle
+  // global transform for objs
   let globalRotMtx = new Matrix4();
   globalRotMtx.rotate(g_cameraXAngle, 0, 1, 0);
   globalRotMtx.rotate(g_cameraYAngle, 1, 0, 0);

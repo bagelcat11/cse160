@@ -15,6 +15,11 @@ class Vector3 {
           v[2] = opt_src[2];
         }
         this.elements = v;
+
+        // add convenient shorthands
+        this.x = this.elements[0];
+        this.y = this.elements[1];
+        this.z = this.elements[2];
     }
 
     /**

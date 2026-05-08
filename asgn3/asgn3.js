@@ -45,8 +45,8 @@ let g_identityM = new Matrix4();
 
 let g_camera; // this will be the Camera class
 // these ones are actually rotating world
-let g_cameraXAngle = 45;
-let g_cameraYAngle = 90;
+let g_cameraXAngle = 0;
+let g_cameraYAngle = 0;
 let g_cameraZoom = 4;
 
 let g_startTime = performance.now() / 1000;
@@ -93,23 +93,7 @@ function connectVariablesToGLSL() {
 }
 
 function addActionsForHtmlUI() {
-  let cameraXSlider = document.getElementById("cameraXSlider");
-  // use "input" event rather than mouseover!
-  cameraXSlider.addEventListener("input", () => {
-    g_cameraXAngle = cameraXSlider.value;
-    [prevX, prevY] = [0, 0];
-  });
-
-  let cameraYSlider = document.getElementById("cameraYSlider");
-  cameraYSlider.addEventListener("input", () => {
-    g_cameraYAngle = cameraYSlider.value;
-    [prevX, prevY] = [0, 0];
-  });
-
-  let cameraZoomSlider = document.getElementById("cameraZoomSlider");
-  cameraZoomSlider.addEventListener("input", () => {
-    g_cameraZoom = cameraZoomSlider.value;
-  });
+  
 }
 
 
@@ -209,7 +193,17 @@ function renderScene() {
   // tail2.color = [1,0,0,1];
   // tail2.matrix.set(g_identityM);
   // tail2.render();
+  let lokiTex = "img/test_texture.png";
 
-  let test = new TexturedCube("img/test_texture.png", LOKI_WHITE, 0.75);
+  let test = new TexturedCube(lokiTex, LOKI_WHITE, 0.75);
   test.render();
+
+  let floor = new TexturedCube(lokiTex, [1,0,0,1], 0.5);
+  floor.matrix.translate(0, -0.5, 0);
+  floor.matrix.scale(32, 0.01, 32);
+  floor.render();
+
+  let sky = new TexturedCube(lokiTex, [0,1,1,1], 0.5);
+  sky.matrix.scale(100, 100, 100);
+  sky.render();
 }

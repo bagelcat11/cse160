@@ -11,7 +11,7 @@ class Camera {
         let projMtx = new Matrix4();
         // fov, aspect ratio, near plane dist, far plane dist
         //    plane dist: how close/far you have to be before things clip
-        projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 32);
+        projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 128);
         gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMtx.elements);
 
         this.moveSpeed = 0.1;   // generic webgl units
@@ -72,7 +72,7 @@ class Camera {
         dir.sub(this.eye);
         dir.normalize();
         dir.mul(deltaPos);
-        
+
         // add to both eye and at so they are same distance away
         this.eye.add(dir);
         this.at.add(dir);

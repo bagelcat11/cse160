@@ -43,11 +43,13 @@ class Camera {
                 this.changePositionForwardBack(this.moveSpeed);
                 break;
             case "a":
+                this.changePositionLeftRight(-this.moveSpeed);
                 break;
             case "s":
                 this.changePositionForwardBack(-this.moveSpeed);
                 break;
             case "d":
+                this.changePositionLeftRight(this.moveSpeed);
                 break;
 
             // can look with keyboard also for now
@@ -70,9 +72,23 @@ class Camera {
         dir.sub(this.eye);
         dir.normalize();
         dir.mul(deltaPos);
+        
         // add to both eye and at so they are same distance away
         this.eye.add(dir);
         this.at.add(dir);
+    }
+
+    changePositionLeftRight(deltaPos) {
+        let dir = new Vector3(this.at.elements);
+        dir.sub(this.eye);
+        // vector perpendicular to direction = direction x up
+        let sideways = Vector3.cross(dir, this.up);
+        // scale the cross product to moveSpeed
+        sideways.normalize();
+        sideways.mul(deltaPos);
+
+        this.eye.add(sideways);
+        this.at.add(sideways);
     }
 
     changeHorizontalLook(deltaLook) {

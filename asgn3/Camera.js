@@ -3,8 +3,8 @@
 class Camera {
     constructor() {
         // vectors for setLookAt (actual Vec3s since we wanna do math)
-        this.eye = new Vector3([0,0,2]);
-        this.at = new Vector3([0,0,-10]);
+        this.eye = new Vector3([0,0.5,2]);
+        this.at = new Vector3([0,0.5,-10]);
         this.up = new Vector3([0,1,0]);
 
         // perspective won't change, so do that here

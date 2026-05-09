@@ -52,8 +52,6 @@ let g_cameraZoom = 4;
 let g_startTime = performance.now() / 1000;
 let g_elapsedTime = performance.now() / 1000 - g_startTime;
 
-let g_tex0_loki;
-
 // -- Setup helpers --
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -98,14 +96,20 @@ function addActionsForHtmlUI() {
   
 }
 
+async function setupAllTextures() {
+  let tex0Success = await initTexture("img/test_loki.png", 0);
+  console.log("tex0success:", tex0Success);
+  let tex1Success = await initTexture("img/cover.png", 1);
+  console.log("tex1success:", tex1Success);
+}
+
 
 // -- MAIN --
 function main() {
   setupWebGL();
   connectVariablesToGLSL();
   addActionsForHtmlUI();
-  // set up textures
-  g_tex0_loki = initTexture("img/test_texture.png", 0);
+  setupAllTextures();
 
   // Specify the color for clearing <canvas>
   gl.clearColor(0,0,0, 1.0);
@@ -172,37 +176,47 @@ function setUpScene() {
   // g_shapesList["tail2"] = new Cube();
 }
 
-function initTexture(texturePath, textureNum) { //TODO: pass in a texture so cubes of the same texture don't have to remake?
-  let texture = gl.createTexture();
-  let img = new Image();
-  // setup callback to load texture once browser loads image
-  img.onload = () => {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // flip y axis
-    switch (textureNum) {
-      case 0:
-        gl.activeTexture(gl.TEXTURE0);  // set texture unit number
-        break;
-      case 1:
-        gl.activeTexture(gl.TEXTURE1);
-        break;
-      case 2:
-        gl.activeTexture(gl.TEXTURE2);
-        break;
-      default:
-        break;
-    }
-    gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    // set texture params
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    // target, mipmap level, internalformat, texelformat, texel type, img
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+//TODO: better explain https://javascript.info/async-await
+function initTexture(texturePath, textureNum) {
+  console.log("starting", textureNum);
+  return new Promise((resolve, reject) => {
+    console.log("making texture", textureNum, "from", texturePath);
+    let texture = gl.createTexture();
+    let img = new Image();
+    // setup callback to load texture once browser loads image
+    img.onload = () => {
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // flip y axis
+      switch (textureNum) {
+        case 0:
+          gl.activeTexture(gl.TEXTURE0);  // set texture unit number
+          console.log("active texture", gl.TEXTURE0)
+          break;
+        case 1:
+          gl.activeTexture(gl.TEXTURE1);
+          console.log("active texture", gl.TEXTURE1)
+          break;
+        case 2:
+          gl.activeTexture(gl.TEXTURE2);
+          break;
+        default:
+          break;
+      }
+      gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    return texture;
-  };
-  // have browser load image
-  img.src = texturePath;
+      // set texture params
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      // target, mipmap level, internalformat, texelformat, texel type, img
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+      console.log(img)
+
+      // finish promise
+      resolve(true);
+    };
+    // have browser load image
+    img.src = texturePath;
+  });
 }
 
 // some colors
@@ -234,7 +248,7 @@ function renderScene() {
   // let test = new TexturedCube(lokiTex, LOKI_WHITE, 0.75);
   // test.render();
 
-  let floor = new TexturedCube(0, [1,0,0,1], 0.5);
+  let floor = new TexturedCube(1, [1,0,0,1], 1);
   floor.matrix.translate(0, -0.5, 0);
   floor.matrix.scale(32, 0.01, 32);
   floor.render();

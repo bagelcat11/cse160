@@ -96,11 +96,9 @@ function addActionsForHtmlUI() {
   
 }
 
-async function setupAllTextures() {
-  let tex0Success = await initTexture("img/test_loki.png", 0);
-  console.log("tex0success:", tex0Success);
-  let tex1Success = await initTexture("img/cover.png", 1);
-  console.log("tex1success:", tex1Success);
+function setupAllTextures() {
+  initTexture("img/test_loki.png", gl.TEXTURE0);
+  initTexture("img/test_uv.jpg", gl.TEXTURE1);
 }
 
 
@@ -176,47 +174,27 @@ function setUpScene() {
   // g_shapesList["tail2"] = new Cube();
 }
 
-
-//TODO: better explain https://javascript.info/async-await
-function initTexture(texturePath, textureNum) {
-  console.log("starting", textureNum);
-  return new Promise((resolve, reject) => {
-    console.log("making texture", textureNum, "from", texturePath);
+function initTexture(texturePath, glTextureNum) {
     let texture = gl.createTexture();
     let img = new Image();
     // setup callback to load texture once browser loads image
     img.onload = () => {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // flip y axis
-      switch (textureNum) {
-        case 0:
-          gl.activeTexture(gl.TEXTURE0);  // set texture unit number
-          console.log("active texture", gl.TEXTURE0)
-          break;
-        case 1:
-          gl.activeTexture(gl.TEXTURE1);
-          console.log("active texture", gl.TEXTURE1)
-          break;
-        case 2:
-          gl.activeTexture(gl.TEXTURE2);
-          break;
-        default:
-          break;
-      }
+      gl.activeTexture(glTextureNum);  // set texture unit number
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
-      // set texture params
+      // set texture params for filter type
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      // needed to use any size img!!!
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
       // target, mipmap level, internalformat, texelformat, texel type, img
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
-      console.log(img)
-
-      // finish promise
-      resolve(true);
     };
     // have browser load image
     img.src = texturePath;
-  });
 }
 
 // some colors

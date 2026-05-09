@@ -52,6 +52,8 @@ let g_cameraZoom = 4;
 let g_startTime = performance.now() / 1000;
 let g_elapsedTime = performance.now() / 1000 - g_startTime;
 
+let g_tex0_loki;
+
 // -- Setup helpers --
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -102,6 +104,8 @@ function main() {
   setupWebGL();
   connectVariablesToGLSL();
   addActionsForHtmlUI();
+  // set up textures
+  g_tex0_loki = initTexture("img/test_texture.png", 0);
 
   // Specify the color for clearing <canvas>
   gl.clearColor(0,0,0, 1.0);
@@ -165,7 +169,40 @@ let g_shapesList = {};  // make it an object so it's dict-like
 //      their matrices really do need to be reset and recalculated every frame
 function setUpScene() {
   g_camera = new Camera();
-  g_shapesList["tail2"] = new Cube();
+  // g_shapesList["tail2"] = new Cube();
+}
+
+function initTexture(texturePath, textureNum) { //TODO: pass in a texture so cubes of the same texture don't have to remake?
+  let texture = gl.createTexture();
+  let img = new Image();
+  // setup callback to load texture once browser loads image
+  img.onload = () => {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // flip y axis
+    switch (textureNum) {
+      case 0:
+        gl.activeTexture(gl.TEXTURE0);  // set texture unit number
+        break;
+      case 1:
+        gl.activeTexture(gl.TEXTURE1);
+        break;
+      case 2:
+        gl.activeTexture(gl.TEXTURE2);
+        break;
+      default:
+        break;
+    }
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    // set texture params
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    // target, mipmap level, internalformat, texelformat, texel type, img
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+
+    return texture;
+  };
+  // have browser load image
+  img.src = texturePath;
 }
 
 // some colors
@@ -193,17 +230,16 @@ function renderScene() {
   // tail2.color = [1,0,0,1];
   // tail2.matrix.set(g_identityM);
   // tail2.render();
-  let lokiTex = "img/test_texture.png";
 
-  let test = new TexturedCube(lokiTex, LOKI_WHITE, 0.75);
-  test.render();
+  // let test = new TexturedCube(lokiTex, LOKI_WHITE, 0.75);
+  // test.render();
 
-  let floor = new TexturedCube(lokiTex, [1,0,0,1], 0.5);
+  let floor = new TexturedCube(0, [1,0,0,1], 0.5);
   floor.matrix.translate(0, -0.5, 0);
   floor.matrix.scale(32, 0.01, 32);
   floor.render();
 
-  let sky = new TexturedCube(lokiTex, [0,1,1,1], 0.5);
+  let sky = new TexturedCube(0, [0,1,1,1], 0.1);
   sky.matrix.scale(100, 100, 100);
   sky.render();
 
@@ -226,11 +262,11 @@ function renderScene() {
     [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
     [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
     [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-    [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+    [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
 
-    [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-    [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-    [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+    [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+    [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+    [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
     [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
 
     [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
@@ -253,7 +289,7 @@ function renderScene() {
   for (let z = 0; z < map.length; z++) {
     for (let x = 0; x < map[z].length; x++) {
       for (let y = 0; y < map[z][x]; y++) {
-        let c = new TexturedCube(lokiTex, [1,1,1,1], 0.5);
+        let c = new TexturedCube(0, [1,1,1,1], 0.5);
         mapCubes.push(c);
         let offset = map[z].length / 2;
         c.matrix.translate(x-offset, y, z-offset); // go from [0-32] to [-16, 16]

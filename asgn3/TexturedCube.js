@@ -1,13 +1,12 @@
 class TexturedCube extends Shape {
-  constructor(texturePath, baseColor, texColorWeight) {
+  constructor(textureNum, baseColor, texColorWeight) {
     super();
-    this.texturePath = texturePath;
+    this.textureNum = textureNum;
     this.baseColor = baseColor;
     this.texColorWeight = texColorWeight;
     this.matrix = new Matrix4();
 
     this.setUpBuffer();
-    this.initTexture();
   }
 
   setUpBuffer() {
@@ -18,44 +17,25 @@ class TexturedCube extends Shape {
     gl.enableVertexAttribArray(a_UVCoords);
   }
 
-  initTexture() { //TODO: pass in a texture so cubes of the same texture don't have to remake?
-    this.texture = gl.createTexture();
-    this.img = new Image();
-    // setup callback to load texture once browser loads image
-    this.img.onload = () => {
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // flip y axis
-      gl.activeTexture(gl.TEXTURE0);  // set texture unit number
-      gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-      // set texture params
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      // target, mipmap level, internalformat, texelformat, texel type, img
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this.img);
-
-      gl.uniform1i(u_Sampler, 0); // give unit 0 to the texture sampler
-    };
-    // have browser load image
-    this.img.src = this.texturePath;
-  }
+  
 
   render() {
     //top
-    this.drawTexturedRect([-0.5,-0.5,-0.5,0,0, 0.5,-0.5,-0.5,1,0, -0.5,0.5,-0.5,0,1, 0.5,0.5,-0.5,1,1,], this.texturePath);
+    this.drawTexturedRect([-0.5,-0.5,-0.5,0,0, 0.5,-0.5,-0.5,1,0, -0.5,0.5,-0.5,0,1, 0.5,0.5,-0.5,1,1,], this.textureNum);
     // right
-    this.drawTexturedRect([0.5,-0.5,-0.5,1,1, 0.5,0.5,-0.5,1,0, 0.5,-0.5,0.5,0,1, 0.5,0.5,0.5,0,0,], this.texturePath);
+    this.drawTexturedRect([0.5,-0.5,-0.5,1,1, 0.5,0.5,-0.5,1,0, 0.5,-0.5,0.5,0,1, 0.5,0.5,0.5,0,0,], this.textureNum);
     // left
-    this.drawTexturedRect([-0.5,-0.5,-0.5,1,1, -0.5,0.5,-0.5,1,0, -0.5,-0.5,0.5,0,1, -0.5,0.5,0.5,0,0,], this.texturePath);
+    this.drawTexturedRect([-0.5,-0.5,-0.5,1,1, -0.5,0.5,-0.5,1,0, -0.5,-0.5,0.5,0,1, -0.5,0.5,0.5,0,0,], this.textureNum);
     // front
-    this.drawTexturedRect([-0.5,-0.5,0.5,0,1, 0.5,-0.5,0.5,0,0, -0.5,-0.5,-0.5,1,1, 0.5,-0.5,-0.5,1,0,], this.texturePath);
+    this.drawTexturedRect([-0.5,-0.5,0.5,0,1, 0.5,-0.5,0.5,0,0, -0.5,-0.5,-0.5,1,1, 0.5,-0.5,-0.5,1,0,], this.textureNum);
     // back
-    this.drawTexturedRect([-0.5,0.5,0.5,0,1, 0.5,0.5,0.5,0,0, -0.5,0.5,-0.5,1,1, 0.5,0.5,-0.5,1,0,], this.texturePath);
+    this.drawTexturedRect([-0.5,0.5,0.5,0,1, 0.5,0.5,0.5,0,0, -0.5,0.5,-0.5,1,1, 0.5,0.5,-0.5,1,0,], this.textureNum);
     // bottom
-    this.drawTexturedRect([-0.5,-0.5,0.5,0,0, 0.5,-0.5,0.5,1,0, -0.5,0.5,0.5,0,1, 0.5,0.5,0.5,1,1,], this.texturePath);
+    this.drawTexturedRect([-0.5,-0.5,0.5,0,0, 0.5,-0.5,0.5,1,0, -0.5,0.5,0.5,0,1, 0.5,0.5,0.5,1,1,], this.textureNum);
   }
 
-  drawTexturedRect(cornersAndUVs, texturePath) {
-    cornersAndUVs = new Float32Array(cornersAndUVs);  //TODO: don't remake this every frame?
+  drawTexturedRect(cornersAndUVs, textureNum) {
+    cornersAndUVs = new Float32Array(cornersAndUVs);
     gl.bufferData(gl.ARRAY_BUFFER, cornersAndUVs, gl.DYNAMIC_DRAW);
     let FSIZE = cornersAndUVs.BYTES_PER_ELEMENT;
 
@@ -66,6 +46,9 @@ class TexturedCube extends Shape {
     gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FSIZE * 5, FSIZE * 0);
     // UV is 2 comps out of 5, and they start at index 3
     gl.vertexAttribPointer(a_UVCoords, 2, gl.FLOAT, false, FSIZE * 5, FSIZE * 3);
+
+    // give texture unit number to sampler
+    gl.uniform1i(u_Sampler, textureNum);
 
     // set up base color filter
     gl.uniform4f(u_BaseColor, this.baseColor[0], this.baseColor[1], this.baseColor[2], this.baseColor[3]);

@@ -112,9 +112,18 @@ function main() {
   // Specify the color for clearing <canvas>
   gl.clearColor(0,0,0, 1.0);
 
-  // click if mouse held and dragged
-  canvas.onmousedown = click;
-  canvas.onmousemove = (event) => { if (event.buttons == 1) click(event);};
+  // set up click handler to enter mouse capture mode
+  canvas.onmousedown = handleMouseClick;
+  // register and unregister mousemove listener depending on if locked
+  //TODO: https://github.com/mdn/dom-examples/blob/main/pointer-lock/app.js
+  document.addEventListener("pointerlockchange", () => {
+    if (document.pointerLockElement) {
+      // register mouse move listener
+      document.addEventListener("mousemove", handleMouseMove);
+    } else {
+      document.removeEventListener("mousemove", handleMouseMove);
+    }
+  });
 
   setUpScene();
   // start update function
@@ -143,27 +152,40 @@ function tick() {
 
 // -- Extra helper funcs/things --
 
-function convertCoordinatesEventToGL(event) {
-  // transform browser coords -> canvas coords -> webgl coords
-  var x = event.clientX;
-  var y = event.clientY;
-  var rect = event.target.getBoundingClientRect();
-  x = ((x - rect.left) - canvas.height / 2) / (canvas.height / 2);
-  y = (canvas.width / 2 - (y - rect.top)) / (canvas.width / 2);
+// function convertCoordinatesEventToGL(event) {
+//   // transform browser coords -> canvas coords -> webgl coords
+//   var x = event.movementX;
+//   var y = event.movementY;
+//   // var rect = event.target.getBoundingClientRect();
+//   // x = ((x - rect.left) - canvas.height / 2) / (canvas.height / 2);
+//   // y = (canvas.width / 2 - (y - rect.top)) / (canvas.width / 2);
 
-  return [x, y];
+//   return [x, y];
+// }
+
+// let prevX = 0, prevY = 0;
+async function handleMouseClick(event) {
+  //TODO: https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
+
+  // enter pointer lock mode and disable mouse accel
+  if (!document.pointerLockElement) {
+    await canvas.requestPointerLock({unadjustedMovement: true});
+  }
 }
 
-let prevX = 0, prevY = 0;
-function click(event) {
+function handleMouseMove(event) {
+  //TODO: https://github.com/mdn/dom-examples/blob/main/pointer-lock/app.js
+
   // use a delta to keep track of which direction the mouse moves in
   // turns out unpacking with [] is BAD and can lead to random string concatenation
-  let [x, y] = convertCoordinatesEventToGL(event);
-  [x, y] = [(x * -200) % 360, (y * 200) % 360];
-  g_cameraXAngle = parseFloat(g_cameraXAngle) + (x - prevX);
-  g_cameraYAngle = parseFloat(g_cameraYAngle) + (y - prevY);
-
-  prevX = x, prevY = y;
+  // let [x, y] = convertCoordinatesEventToGL(event);
+  let [x, y] = [event.movementX, event.movementY];
+  let sens = 0.1;
+  // [x, y] = [(x * -200) % 360, (y * 200) % 360];
+  // g_cameraXAngle = parseFloat(g_cameraXAngle) + (x - prevX);
+  // g_cameraYAngle = parseFloat(g_cameraYAngle) + (y - prevY);
+  g_camera.at.add(new Vector3([x * sens, -y * sens, 0]));
+  // prevX = x, prevY = y;
 }
 
 let g_shapesList = {};  // make it an object so it's dict-like

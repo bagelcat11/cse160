@@ -5,6 +5,7 @@ class Camera {
         // vectors for setLookAt (actual Vec3s since we wanna do math)
         this.eye = new Vector3([0,0.5,2]);
         this.at = new Vector3([0,0.5,-10]);
+        this.atDist = 10;
         this.up = new Vector3([0,1,0]);
 
         // perspective won't change, so do that here
@@ -16,6 +17,7 @@ class Camera {
 
         this.moveSpeed = 0.1;   // generic webgl units
         this.lookSpeed = 5 * (Math.PI / 180);   // convert deg to rad
+        this.verticalLookPadding = 15 * (Math.PI / 180);   // stay x degrees away from looking straight up/down
 
         // set up listener for keyboard
         document.addEventListener("keydown", (event) => this.handleKeyboardMovement(event));
@@ -40,24 +42,24 @@ class Camera {
     handleKeyboardMovement(event) {
         switch (event.key) {
             case "w":
-                this.changePositionForwardBack(this.moveSpeed);
+                this.changePosition(this.moveSpeed, 0);
                 break;
             case "a":
-                this.changePositionLeftRight(-this.moveSpeed);
+                this.changePosition(0, -this.moveSpeed);
                 break;
             case "s":
-                this.changePositionForwardBack(-this.moveSpeed);
+                this.changePosition(-this.moveSpeed, 0);
                 break;
             case "d":
-                this.changePositionLeftRight(this.moveSpeed);
+                this.changePosition(0, this.moveSpeed);
                 break;
 
-            // can look with keyboard also for now
+            // can look with keyboard horizontally only
             case "q":
-                this.changeHorizontalLook(-this.lookSpeed);
+                this.changeLook(-this.lookSpeed, 0);
                 break;
             case "e":
-                this.changeHorizontalLook(this.lookSpeed);
+                this.changeLook(this.lookSpeed, 0);
                 break;
 
             default:
@@ -65,48 +67,56 @@ class Camera {
         }
     }
 
-    changePositionForwardBack(deltaPos) {
+    changePosition(deltaForwardPos, deltaRightPos) {
         // get direction vector with length moveSpeed
         // MAKE COPY SINCE DIRECTLY CALCULATING this.at - this.eye WOULD AFFECT this.at
         let dir = new Vector3(this.at.elements);
         dir.sub(this.eye);
         dir.normalize();
-        dir.mul(deltaPos);
+        dir.mul(deltaForwardPos);
 
         // add to both eye and at so they are same distance away
         this.eye.add(dir);
         this.at.add(dir);
-    }
 
-    changePositionLeftRight(deltaPos) {
-        let dir = new Vector3(this.at.elements);
+        dir = new Vector3(this.at.elements);
         dir.sub(this.eye);
         // vector perpendicular to direction = direction x up
         let sideways = Vector3.cross(dir, this.up);
         // scale the cross product to moveSpeed
         sideways.normalize();
-        sideways.mul(deltaPos);
+        sideways.mul(deltaRightPos);
 
         this.eye.add(sideways);
         this.at.add(sideways);
     }
 
-    changeHorizontalLook(deltaLook) {
-        // get direction from eye to at
+    changeLook(deltaHorizontalLook, deltaVerticalLook) {
         let dir = new Vector3(this.at.elements);
         dir.sub(this.eye);
-        // r = distance
         let r = dir.magnitude();
-        // get angle from eye to at (z, x)
-        let theta = Math.atan2(dir.elements[2], dir.elements[0]);
-        // update angle based on Q or E
-        theta += deltaLook;
-        // calculate new coords for at with updated angle
-        dir.elements[0] = r * Math.cos(theta);
-        dir.elements[2] = r * Math.sin(theta);
+        let x = dir.elements[0], y = dir.elements[1], z = dir.elements[2];
 
-        // new at is eye + direction we calculated
+        // get angles for spherical coordinates so we can change the look angle
+        let theta = Math.atan2(z, x);   // horizontal
+        theta += deltaHorizontalLook;
+
+        let phi = Math.acos(y / r);     // vertical
+        // keep from looking straight up/down since that causes hypersensitivity to horizontal rotation
+        if (phi + deltaVerticalLook > this.verticalLookPadding
+            && phi + deltaVerticalLook < Math.PI - this.verticalLookPadding) {
+            phi += deltaVerticalLook;
+        }
+
+        // convert new angles back to cartesian
+        x = r * Math.sin(phi) * Math.cos(theta);
+        y = r * Math.cos(phi);
+        z = r * Math.sin(phi) * Math.sin(theta);
+
+        // make sure new at vector has consistent length
         this.at.set(this.eye);
-        this.at.add(dir);
+        this.at.add(new Vector3([x, y, z]));
+        this.at.normalize();
+        this.at.mul(this.atDist);
     }
 }

@@ -176,16 +176,12 @@ async function handleMouseClick(event) {
 function handleMouseMove(event) {
   //TODO: https://github.com/mdn/dom-examples/blob/main/pointer-lock/app.js
 
-  // use a delta to keep track of which direction the mouse moves in
-  // turns out unpacking with [] is BAD and can lead to random string concatenation
-  // let [x, y] = convertCoordinatesEventToGL(event);
   let [x, y] = [event.movementX, event.movementY];
-  let sens = 0.1;
-  // [x, y] = [(x * -200) % 360, (y * 200) % 360];
-  // g_cameraXAngle = parseFloat(g_cameraXAngle) + (x - prevX);
-  // g_cameraYAngle = parseFloat(g_cameraYAngle) + (y - prevY);
-  g_camera.at.add(new Vector3([x * sens, -y * sens, 0]));
-  // prevX = x, prevY = y;
+  let sens = 0.005;
+  // g_camera.at.add(new Vector3([x * sens, -y * sens, 0]));
+  g_camera.changeLook(x * sens, y * sens);
+  // g_camera.changeHorizontalLook(g_camera.lookSpeed * x * sens);
+  // g_camera.changeVerticalLook(g_camera.lookSpeed * -y * sens);
 }
 
 function initTexture(texturePath, glTextureNum) {
@@ -210,13 +206,6 @@ function initTexture(texturePath, glTextureNum) {
     // have browser load image
     img.src = texturePath;
 }
-
-// some colors
-let LOKI_WHITE = [1,0.97,0.97,1];
-let LOKI_DARK_BROWN = [0.2, 0.1, 0.0, 1.0];
-let LOKI_MED_BROWN = [0.35, 0.25, 0, 1];
-let LOKI_LIGHT_BROWN = [0.75, 0.6, 0.5, 1];
-let LOKI_YELLOW = [0.9,0.8,0.3,1.0];
 
 let map = [
   [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],

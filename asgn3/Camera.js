@@ -15,12 +15,17 @@ class Camera {
         projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 128);
         gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMtx.elements);
 
-        this.moveSpeed = 0.1;   // generic webgl units
+        this.maxSpeed = 0.1;   // generic webgl units
         this.lookSpeed = 5 * (Math.PI / 180);   // convert deg to rad
         this.verticalLookPadding = 15 * (Math.PI / 180);   // stay x degrees away from looking straight up/down
 
         // set up listener for keyboard
         document.addEventListener("keydown", (event) => this.handleKeyboardMovement(event));
+
+        // things for smoother movement
+        this.currentMovement = [0.0, 0.0];  // forward/back, right/left
+        this.accel = 0.01;
+        this.friction = 0.95;
     }
 
     cameraTick() {  // every frame
@@ -37,21 +42,36 @@ class Camera {
             this.at.elements[0],this.at.elements[1],this.at.elements[2],
             this.up.elements[0],this.up.elements[1],this.up.elements[2]);
         gl.uniformMatrix4fv(u_ViewMatrix, false, viewMtx.elements);
+
+        // acceleration!!
+        // this.moveSmoothly();
     }
 
     handleKeyboardMovement(event) {
         switch (event.key) {
             case "w":
-                this.changePosition(this.moveSpeed, 0);
+                this.changePosition(this.maxSpeed, 0);
+                // if (this.currentMovement[0] < this.maxSpeed) {
+                //     this.currentMovement[0] += this.accel;
+                // }
                 break;
             case "a":
-                this.changePosition(0, -this.moveSpeed);
+                this.changePosition(0, -this.maxSpeed);
+                // if (this.currentMovement[1] > -this.maxSpeed) {
+                    // this.currentMovement[1] -= this.accel;
+                // }
                 break;
             case "s":
-                this.changePosition(-this.moveSpeed, 0);
+                this.changePosition(-this.maxSpeed, 0);
+                // if (this.currentMovement[0] > -this.maxSpeed) {
+                    // this.currentMovement[0] -= this.accel;
+                // }
                 break;
             case "d":
-                this.changePosition(0, this.moveSpeed);
+                this.changePosition(0, this.maxSpeed);
+                // if (this.currentMovement[1] < this.maxSpeed) {
+                    // this.currentMovement[1] += this.accel;
+                // }
                 break;
 
             // can look with keyboard horizontally only
@@ -65,6 +85,17 @@ class Camera {
             default:
                 break;    
         }
+    }
+
+    moveSmoothly() {
+        this.changePosition(this.currentMovement[0], this.currentMovement[1]);
+        // console.log("moving", this.currentMovement);
+
+        this.currentMovement[0] *= this.friction;
+        //TODO: can't clamp to 0 because that happens every frame while keypresses do not?
+        // if (Math.abs(this.currentMovement[0]) < 0.001) { this.currentMovement[0] = 0; console.log("clamped")} else {console.log("not clamped")}
+        this.currentMovement[1] *= this.friction;
+        // if (Math.abs(this.currentMovement[1] < 0.001)) { this.currentMovement[0] = 0; }
     }
 
     changePosition(deltaForwardPos, deltaRightPos) {

@@ -32,22 +32,8 @@ class TexturedCube extends Shape {
     gl.enableVertexAttribArray(a_UVCoords);
   }
 
-  
-
   render() {
     this.drawTexturedRect(this.verticesAndUVs, this.textureNum);
-    // //top
-    // this.drawTexturedRect([-0.5,-0.5,-0.5,0,0, 0.5,-0.5,-0.5,1,0, -0.5,0.5,-0.5,0,1, 0.5,0.5,-0.5,1,1,], this.textureNum);
-    // // right
-    // this.drawTexturedRect([0.5,-0.5,-0.5,1,1, 0.5,0.5,-0.5,1,0, 0.5,-0.5,0.5,0,1, 0.5,0.5,0.5,0,0,], this.textureNum);
-    // // left
-    // this.drawTexturedRect([-0.5,-0.5,-0.5,1,1, -0.5,0.5,-0.5,1,0, -0.5,-0.5,0.5,0,1, -0.5,0.5,0.5,0,0,], this.textureNum);
-    // // front
-    // this.drawTexturedRect([-0.5,-0.5,0.5,0,1, 0.5,-0.5,0.5,0,0, -0.5,-0.5,-0.5,1,1, 0.5,-0.5,-0.5,1,0,], this.textureNum);
-    // // back
-    // this.drawTexturedRect([-0.5,0.5,0.5,0,1, 0.5,0.5,0.5,0,0, -0.5,0.5,-0.5,1,1, 0.5,0.5,-0.5,1,0,], this.textureNum);
-    // // bottom
-    // this.drawTexturedRect([-0.5,-0.5,0.5,0,0, 0.5,-0.5,0.5,1,0, -0.5,0.5,0.5,0,1, 0.5,0.5,0.5,1,1,], this.textureNum);
   }
 
   drawTexturedRect(cornersAndUVs, textureNum) {

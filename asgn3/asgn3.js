@@ -67,6 +67,7 @@ function setupWebGL() {
 
   // for 3D
   gl.enable(gl.DEPTH_TEST);
+  // gl.enable(gl.CULL_FACE);
 }
 
 function connectVariablesToGLSL() {
@@ -115,7 +116,7 @@ function main() {
   // set up click handler to enter mouse capture mode
   canvas.onmousedown = handleMouseClick;
   // register and unregister mousemove listener depending on if locked
-  //TODO: https://github.com/mdn/dom-examples/blob/main/pointer-lock/app.js
+  // https://github.com/mdn/dom-examples/blob/main/pointer-lock/app.js
   document.addEventListener("pointerlockchange", () => {
     if (document.pointerLockElement) {
       // register mouse move listener
@@ -152,21 +153,8 @@ function tick() {
 
 // -- Extra helper funcs/things --
 
-// function convertCoordinatesEventToGL(event) {
-//   // transform browser coords -> canvas coords -> webgl coords
-//   var x = event.movementX;
-//   var y = event.movementY;
-//   // var rect = event.target.getBoundingClientRect();
-//   // x = ((x - rect.left) - canvas.height / 2) / (canvas.height / 2);
-//   // y = (canvas.width / 2 - (y - rect.top)) / (canvas.width / 2);
-
-//   return [x, y];
-// }
-
 // let prevX = 0, prevY = 0;
 async function handleMouseClick(event) {
-  //TODO: https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
-
   // enter pointer lock mode and disable mouse accel
   if (!document.pointerLockElement) {
     await canvas.requestPointerLock({unadjustedMovement: true});
@@ -174,14 +162,9 @@ async function handleMouseClick(event) {
 }
 
 function handleMouseMove(event) {
-  //TODO: https://github.com/mdn/dom-examples/blob/main/pointer-lock/app.js
-
   let [x, y] = [event.movementX, event.movementY];
   let sens = 0.005;
-  // g_camera.at.add(new Vector3([x * sens, -y * sens, 0]));
   g_camera.changeLook(x * sens, y * sens);
-  // g_camera.changeHorizontalLook(g_camera.lookSpeed * x * sens);
-  // g_camera.changeVerticalLook(g_camera.lookSpeed * -y * sens);
 }
 
 function initTexture(texturePath, glTextureNum) {
@@ -260,7 +243,6 @@ function setUpScene() {
     let c = new TexturedCube(0, [1,1,1,1], 0.5);
     g_mapCubes.push(c);
   }
-  // g_shapesList["tail2"] = new Cube();
 }
 
 function renderScene() {
@@ -274,16 +256,6 @@ function renderScene() {
   globalRotMtx.scale(g_cameraZoom/5, g_cameraZoom/5, g_cameraZoom/5);
   globalRotMtx.translate(0,-0.15,0);  // center her
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
-
-  // set up local refs  
-  // let tail2 = g_shapesList["tail2"];
-
-  // tail2.color = [1,0,0,1];
-  // tail2.matrix.set(g_identityM);
-  // tail2.render();
-
-  // let test = new TexturedCube(lokiTex, LOKI_WHITE, 0.75);
-  // test.render();
 
   let floor = new TexturedCube(1, [1,0,0,1], 1);
   floor.matrix.translate(0, -0.5, 0);

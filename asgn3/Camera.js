@@ -82,6 +82,14 @@ class Camera {
                 this.changeLook(this.lookSpeed, 0);
                 break;
 
+            // place/delete blocks!
+            case "c":
+                this.placeBlock();
+                break;
+            case "x":
+                this.deleteBlock();
+                break;
+
             default:
                 break;    
         }
@@ -158,6 +166,42 @@ class Camera {
         this.up.set(new Vector3([x, y, z]));
         this.up.normalize();
 
-        console.log(Math.acos(Vector3.dot(this.at, this.up) / this.at.magnitude() / this.up.magnitude()) * 180 / Math.PI);
+        // console.log(Math.acos(Vector3.dot(this.at, this.up) / this.at.magnitude() / this.up.magnitude()) * 180 / Math.PI);
+    }
+
+    placeBlock() {
+        let x = this.eye.elements[0], y = this.eye.elements[1], z = this.eye.elements[2];
+        // convert worldspace xyz into array indices, rounding in your look direction
+        x = (this.at.elements[0] < x) ? Math.floor(x + g_mapSize / 2) : Math.ceil(x + g_mapSize / 2);
+        y = (this.at.elements[1] < y) ? Math.floor(y) : Math.ceil(y);
+        z = (this.at.elements[2] < z) ? Math.floor(z + g_mapSize / 2) : Math.ceil(z + g_mapSize / 2);
+
+        // clamp to within map array bounds
+        x = Math.min(Math.max(x, 0), g_mapSize);
+        y = Math.min(Math.max(y, 0), g_mapSize);
+        z = Math.min(Math.max(z, 0), g_mapSize);
+
+        console.log("placing",x,y,z);
+
+        let c = g_map[x][y][z];
+        if (!c &&
+            0 <= x && x < g_mapSize &&  // only place inbounds
+            0 <= y && y < g_mapSize &&
+            0 <= z && y < g_mapSize) {
+            g_map[x][y][z] = new TexturedCube(0, [1,1,1,1], 0.75);
+        }
+    }
+
+    deleteBlock() {
+        let x = Math.floor(this.eye.elements[0] + g_mapSize / 2),
+            y = Math.floor(this.eye.elements[1]),
+            z = Math.floor(this.eye.elements[2] + g_mapSize / 2);
+        
+        console.log("deleting",x,y,z);
+
+        let c = g_map[x][y][z];
+        if (c) {
+            g_map[x][y][z] = null;
+        }
     }
 }

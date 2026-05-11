@@ -4,8 +4,8 @@ class Camera {
     constructor() {
         // vectors for setLookAt (actual Vec3s since we wanna do math)
         this.eye = new Vector3([0,0.5,2]);
-        this.at = new Vector3([0,0.5,-10]);
-        this.atDist = 10;
+        this.at = new Vector3([0,0.5,-1000]);
+        this.atDist = 1000;
         this.up = new Vector3([0,1,0]);
 
         // perspective won't change, so do that here
@@ -149,5 +149,15 @@ class Camera {
         this.at.add(new Vector3([x, y, z]));
         this.at.normalize();
         this.at.mul(this.atDist);
+
+        // make sure up vector is always perpendicular to at
+        phi -= Math.PI / 2;
+        x = r * Math.sin(phi) * Math.cos(theta);
+        y = r * Math.cos(phi);
+        z = r * Math.sin(phi) * Math.sin(theta);
+        this.up.set(new Vector3([x, y, z]));
+        this.up.normalize();
+
+        console.log(Math.acos(Vector3.dot(this.at, this.up) / this.at.magnitude() / this.up.magnitude()) * 180 / Math.PI);
     }
 }

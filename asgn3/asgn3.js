@@ -168,82 +168,98 @@ function handleMouseMove(event) {
 }
 
 function initTexture(texturePath, glTextureNum) {
-    let texture = gl.createTexture();
-    let img = new Image();
-    // setup callback to load texture once browser loads image
-    img.onload = () => {
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // flip y axis
-      gl.activeTexture(glTextureNum);  // set texture unit number
-      gl.bindTexture(gl.TEXTURE_2D, texture);
+  let texture = gl.createTexture();
+  let img = new Image();
+  // setup callback to load texture once browser loads image
+  img.onload = () => {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); // flip y axis
+    gl.activeTexture(glTextureNum);  // set texture unit number
+    gl.bindTexture(gl.TEXTURE_2D, texture);
 
-      // set texture params for filter type
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      // needed to use any size img!!!
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    // set texture params for filter type
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    // needed to use any size img!!!
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-      // target, mipmap level, internalformat, texelformat, texel type, img
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
-    };
-    // have browser load image
-    img.src = texturePath;
+    // target, mipmap level, internalformat, texelformat, texel type, img
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+  };
+  // have browser load image
+  img.src = texturePath;
 }
 
-let map = [
-  [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-  [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,9,1, 0,0,0,1,],
-  [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+// let map = [
+//   [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+//   [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,9,1, 0,0,0,1,],
+//   [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
 
-  [0,0,0,2, 2,2,0,1, 0,9,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-  [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 9,0,0,1, 0,0,0,1,],
+//   [0,0,0,2, 2,2,0,1, 0,9,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+//   [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 9,0,0,1, 0,0,0,1,],
 
-  [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-  [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+//   [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
 
-  [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-  [1,0,0,0, 0,0,0,1, 0,9,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,1, 9,0,0,1,],
+//   [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+//   [1,0,0,0, 0,0,0,1, 0,9,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,1, 9,0,0,1,],
 
-  [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-  [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+//   [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
 
-  [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-  [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,9,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+//   [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,9,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
 
-  [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-  [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 9,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+//   [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 9,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
 
-  [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
-  [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-  [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
-];
-let mapSize = map.length * map[0].length;
+//   [0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,2, 2,2,0,1, 0,0,0,1, 0,0,0,1,],
+//   [1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 1,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+//   [0,0,1,0, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,0, 0,0,0,1, 0,0,0,1, 0,0,0,1,],
+// ];
+let g_mapSize = 32;
+let g_map = new Array(g_mapSize);
+for (let x = 0; x < g_mapSize; x++) {
+  g_map[x] = new Array(g_mapSize);
+  for (let y = 0; y < g_mapSize; y++) {
+    g_map[x][y] = new Array(g_mapSize);
+    for (let z = 0; z < g_mapSize; z++) {
+      g_map[x][y][z] = null; // null = no block, otherwise there will be a Cube
+    }
+  }
+}
+
+let g_mapCubes = [];
+
+function setUpScene() {
+  g_camera = new Camera();
+
+  g_map[0][0][0] = new TexturedCube(0, [1,1,1,1], 0.75);
+  g_map[16][1][16] = new TexturedCube(0, [1,1,1,1], 0.75);
+  g_map[15][0][16] = new TexturedCube(0, [1,1,1,1], 0.75);
+  // for (let i = 0; i < mapSize; i++) {
+  //   let c = new TexturedCube(0, [1,1,1,1], 0.5);
+  //   g_mapCubes.push(c);
+  // }
+}
 
 let g_shapesList = {};  // make it an object so it's dict-like
 // unfortunately I think all we can really move here is the object construction;
 //      their matrices really do need to be reset and recalculated every frame
-let g_mapCubes = [];
-function setUpScene() {
-  g_camera = new Camera();
-  for (let i = 0; i < mapSize; i++) {
-    let c = new TexturedCube(0, [1,1,1,1], 0.5);
-    g_mapCubes.push(c);
-  }
-}
 
 function renderScene() {
   // clear canvas
@@ -266,18 +282,34 @@ function renderScene() {
   sky.matrix.scale(100, 100, 100);
   sky.render();
 
-  let mapCubesIndex = 0;
-  for (let z = 0; z < map.length; z++) {
-    for (let x = 0; x < map[z].length; x++) {
-      for (let y = 0; y < map[z][x]; y++) {
-        let offset = map[z].length / 2;
-        let c = g_mapCubes[mapCubesIndex];
-        c.matrix.set(g_identityM);  // reset mtx every frame
-        c.matrix.translate(x-offset, y, z-offset); // go from [0-32] to [-16, 16]
-        c.matrix.translate(0.5,0,0.5);  // put into [0-1]
-        c.render();
-        mapCubesIndex++;
+  for (let x = 0; x < g_mapSize; x++) {
+    for (let y = 0; y < g_mapSize; y++) {
+      for (let z = 0; z < g_mapSize; z++) {
+        let c = g_map[x][y][z];
+        if (c) {
+          c.matrix.set(g_identityM);  // reset mtx every frame
+          let offset = g_mapSize / 2;
+          c.matrix.translate(x-offset, y, z-offset); // go from [0-32] to [-16, 16]
+          c.matrix.translate(0.5,0,0.5);  // put into [0-1]
+          c.render();
+        }
       }
     }
   }
+
+
+  // let mapCubesIndex = 0;
+  // for (let z = 0; z < g_map.length; z++) {
+  //   for (let x = 0; x < g_map[z].length; x++) {
+  //     for (let y = 0; y < g_map[z][x]; y++) {
+  //       let offset = g_map[z].length / 2;
+  //       let c = g_mapCubes[mapCubesIndex];
+  //       c.matrix.set(g_identityM);  // reset mtx every frame
+  //       c.matrix.translate(x-offset, y, z-offset); // go from [0-32] to [-16, 16]
+  //       c.matrix.translate(0.5,0,0.5);  // put into [0-1]
+  //       c.render();
+  //       mapCubesIndex++;
+  //     }
+  //   }
+  // }
 }

@@ -5,10 +5,10 @@ class Camera {
         // vectors for setLookAt (actual Vec3s since we wanna do math)
         //TODO: TODO: TODO:
         // maybe the issue is with eye?? since on the map edges it says it's at 12 and not 16??
-        this.eye = new Vector3([0,0.5,0]);
-        this.at = new Vector3([0,0.5,-200]);
+        this.eye = new Vector3([0,1.5,0]);
+        this.at = new Vector3([0,1.5,-200]);
         this.atDist = 200;
-        this.up = new Vector3([0,1.5,0]);
+        this.up = new Vector3([0,5.5,0]);
 
         this.cursorDist = 2;
         this.cursorAt = new Vector3([0,0,-2]);
@@ -17,12 +17,12 @@ class Camera {
         let projMtx = new Matrix4();
         // fov, aspect ratio, near plane dist, far plane dist
         //    plane dist: how close/far you have to be before things clip
-        projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 128);
+        projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 256);
         gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMtx.elements);
 
         this.maxSpeed = 1;   // generic webgl units
         this.lookSpeed = 5 * (Math.PI / 180);   // convert deg to rad
-        this.verticalLookPadding = 15 * (Math.PI / 180);   // stay x degrees away from looking straight up/down
+        this.verticalLookPadding = 5 * (Math.PI / 180);   // stay x degrees away from looking straight up/down
 
         // set up listener for keyboard
         document.addEventListener("keydown", (event) => this.handleKeyboardMovement(event));
@@ -158,10 +158,10 @@ class Camera {
 
         let phi = Math.acos(y / r);     // vertical
         // keep from looking straight up/down since that causes hypersensitivity to horizontal rotation
-        // if (phi + deltaVerticalLook > this.verticalLookPadding
-        //     && phi + deltaVerticalLook < Math.PI - this.verticalLookPadding) {
+        if (phi + deltaVerticalLook > this.verticalLookPadding
+            && phi + deltaVerticalLook < Math.PI - this.verticalLookPadding) {
             phi += deltaVerticalLook;
-        // }
+        }
 
         // convert new angles back to cartesian
         // these are the endpoint coordinates of the direction vector from eye to new at
@@ -215,7 +215,7 @@ class Camera {
         // clamp to grid
         x = this.cursorAt.elements[0], y = this.cursorAt.elements[1], z = this.cursorAt.elements[2];
         x = Math.min(Math.max(Math.floor(x), -g_mapSize / 2), g_mapSize / 2);
-        y = Math.min(Math.max(Math.floor(y), 0), g_mapSize);
+        y = Math.min(Math.max(Math.floor(y), 0), g_mapHeight);
         z = Math.min(Math.max(Math.floor(z), -g_mapSize / 2), g_mapSize / 2);
         this.cursorAt.set(new Vector3([x, y, z]));
     }

@@ -31,7 +31,7 @@ function calcNumNeighbors(board, x, y, z) {
 
 function clearBoard(board) {
     for (let x = 0; x < board.length; x++) {
-        for (let y = 0; y < board.length; y++) {
+        for (let y = 0; y < board[0].length; y++) {
             for (let z = 0; z < board.length; z++) {
                 board[x][y][z] = null;
             }
@@ -41,25 +41,221 @@ function clearBoard(board) {
 
 function loadPattern(board, patternNum) {
     clearBoard(board);
+    let c = board.length / 2;   // center
     switch (patternNum) {  
         case 1:
             // r-pentomino
-            board[16][0][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[17][0][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[18][0][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[16][0][17] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[17][0][15] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c][0][c] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+1][0][c] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+2][0][c] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c][0][c+1] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+1][0][c-1] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
             break;
         case 2:
-            // glider
-            board[16][0][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[17][0][15] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[17][0][14] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[16][0][14] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[15][0][14] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            // gliders
+            board[c][0][c] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+1][0][c-1] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+1][0][c-2] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c][0][c-2] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c-1][0][c-2] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+
+            let offset = 5;
+            board[c-offset][0][c-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+1-offset][0][c-1-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+1-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c-1-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+
+            board[c+offset][0][c+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+1+offset][0][c-1+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+1+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c-1+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
             break;
 
+        case 3:
+            parseCellsPlaintext(gosperGliderGun, board);
+            break;
+
+        case 4:
+            parseCellsPlaintext(puffer2, board);
+            break;
+
+        case 5:
+            parseCellsPlaintext(snark, board);
+            break;
+
+        case 6:
+            parseCellsPlaintext(max, board);
+            break;
+
+        case 7:
+            parseCellsPlaintext(piOrbital, board);
+            break;
+
+        case 8:
+            //TODO: custom soup density?
+            makeSoup(0.5, board);
+            break;
+
+        case 9:
+            break;
+        
         default:
             break;
     }
 }
+
+function parseCellsPlaintext(cells, board) {
+    let rows = cells.split("\n");
+    let longestRowLen = Math.max(...rows.map((r) => r.length));
+    for (let x = 0; x < rows.length; x++) {
+        for (let z = 0; z < rows[x].length; z++) {
+            if (rows[x][z] == "O") {
+                // offset x and z to center it kinda
+                board[x+board.length/2 - Math.floor(rows.length/2)]
+                [0]
+                [z+board.length/2 - Math.floor(longestRowLen/2)]
+                    = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            }
+        }
+    }
+}
+
+function makeSoup(density, board) {
+    for (let x = 0; x < board.length; x++) {
+        for (let z = 0; z < board.length; z++) {
+            if (Math.random() < density) {
+                board[x][0][z] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            }
+        }
+    }
+}
+
+let max = '..................O\n\
+.................OOO\n\
+............OOO....OO\n\
+...........O..OOO..O.OO\n\
+..........O...O.O..O.O\n\
+..........O....O.O.O.O.OO\n\
+............O....O.O...OO\n\
+OOOO.....O.O....O...O.OOO\n\
+O...OO.O.OOO.OO.........OO\n\
+O.....OO.....O\n\
+.O..OO.O..O..O.OO\n\
+.......O.O.O.O.O.O.....OOOO\n\
+.O..OO.O..O..O..OO.O.OO...O\n\
+O.....OO...O.O.O...OO.....O\n\
+O...OO.O.OO..O..O..O.OO..O\n\
+OOOO.....O.O.O.O.O.O\n\
+..........OO.O..O..O.OO..O\n\
+.............O.....OO.....O\n\
+.OO.........OO.OOO.O.OO...O\n\
+..OOO.O...O....O.O.....OOOO\n\
+..OO...O.O....O\n\
+..OO.O.O.O.O....O\n\
+.....O.O..O.O...O\n\
+....OO.O..OOO..O\n\
+......OO....OOO\n\
+.......OOO\n\
+........O';
+
+let gosperGliderGun = '........................O...........\n\
+......................O.O...........\n\
+............OO......OO............OO\n\
+...........O...O....OO............OO\n\
+OO........O.....O...OO..............\n\
+OO........O...O.OO....O.O...........\n\
+..........O.....O.......O...........\n\
+...........O...O....................\n\
+............OO......................';
+
+let puffer2 = '.OOO...........OOO\n\
+O..O..........O..O\n\
+...O....OOO......O\n\
+...O....O..O.....O\n\
+..O....O........O'
+
+let snark = '......OO...OO....\n\
+......OO..O.OOO..\n\
+..........O....O.\n\
+......OOOO.OO..O.\n\
+......O..O.O.O.OO\n\
+.........O.O.O.O.\n\
+..........OO.O.O.\n\
+..............O..\n\
+.................\n\
+OO...............\n\
+.O.......OO......\n\
+.O.O.....OO......\n\
+..OO.............\n\
+.................\n\
+.................\n\
+.................\n\
+.................\n\
+.................\n\
+.................\n\
+............OO...\n\
+...OO.......O....\n\
+..O.O........OOO.\n\
+....O..........O.'
+
+let piOrbital = '..............OO..........OO\n\
+.............O..O........O..O\n\
+.............OOO..OOOOOO..OOO\n\
+................OO......OO\n\
+...............O..........O\n\
+...............OO.O....O.OO\n\
+....................OO\n\
+............O.........................OO..........O\n\
+.......OOOO...O....O......O...........OO..........O\n\
+..........O...O..OOOOO..O...OOOO..................O\n\
+..............O..OOOOO..O...O....................OO\n\
+...........O......OOO...O......................O\n\
+............OO.....O.......O..................O....O\n\
+.........................OO...................O.........OO\n\
+................................................OOO.....O.O\n\
+.....................................................OO.O.O\n\
+.....................................................O.O.O\n\
+.......................................................O\n\
+...................................OO...........O.....O..O\n\
+.......OO..........................O.O..........OO....O\n\
+.......OO............................OO.........O.....O...O\n\
+...................................O.O................O...O\n\
+....................OO.............OO.................O\n\
+.......................O.O............................O..O\n\
+.........................O.....................OOO.....O\n\
+.......................O.....................O.......O.O.O\n\
+...................O.........................O....O..OO.O.O\n\
+.........O..........OO........................O.........O.O\n\
+.........O......................................OO......OO\n\
+.........O.......................................O\n\
+.OO......OO......................................O\n\
+O.O.........O....................................O\n\
+O.O.OO..O....O\n\
+.O.O.O.......O\n\
+...O.....OOO\n\
+.O..O\n\
+....O\n\
+O...O\n\
+O...O.....O.......................................OO\n\
+....O....OO.......................................OO\n\
+.O..O.....O\n\
+...O\n\
+.O.O.O\n\
+O.O.OO\n\
+O.O.....OOO\n\
+.OO.........O...................OO\n\
+.......O....O..................O.......O.....OO\n\
+...........O......................O...OOO......O\n\
+........OO....................O...O..OOOOO..O\n\
+........O..................OOOO...O..OOOOO..O...O\n\
+........O..........OO...........O......O....O...OOOO\n\
+........O..........OO.........................O\n\
+.....................................OO\n\
+................................OO.O....O.OO\n\
+................................O..........O\n\
+.................................OO......OO\n\
+..............................OOO..OOOOOO..OOO\n\
+..............................O..O........O..O\n\
+...............................OO..........OO';

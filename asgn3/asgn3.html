@@ -12,7 +12,7 @@
   <body onload="main()">
     <div id="canvasUI">
       <div><strong>Cell life: </strong><span id="conwayActive"></span></div>
-      <div><strong>Game speed: </strong><span id="conwaySlowdown"></span> / 4</div>
+      <div><strong>Game speed: </strong><span id="conwaySlowdown"></span> / 10</div>
     </div>
     <div id="canvAndImg">
       <canvas id="webgl" width="400" height="400">
@@ -26,7 +26,7 @@
       <table>
         <tr>
           <th>WASD</th>
-          <th>Mouse or Q/E</th>
+          <th>Mouse, Q/E</th>
           <th>C</th>
           <th>X</th>
         </tr>
@@ -59,17 +59,19 @@
     <p></p>
 
     <div>
-      <label><strong>Movement speed: </strong></label>
-      <input type="range" min="1" max="10" value="1" class="slider" id="moveSpeedSlider">
-    </div>
-    <p></p>
-
-    <div>
       Conway presets:
       <ol>
         <li>R-pentomino</li>
-        <li>Glider</li>
+        <li>Gliders</li>
+        <li>Gosper glider gun</li>
+        <li>Puffer 2</li>
+        <li>Snark (glider reflector)</li>
+        <li>Max (spacefiller)</li>
+        <li>Pi orbital (oscillator)</li>
+        <li>Soup (random world)</li>
+        <li>Lynn's board! (default)</li>
       </ol>
+      Check out <a href="https://conwaylife.com/wiki/">LifeWiki</a> to learn about these patterns!
     </div>
 
 

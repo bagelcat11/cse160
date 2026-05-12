@@ -54,7 +54,7 @@ let g_startTime = performance.now() / 1000;
 let g_elapsedTime = performance.now() / 1000 - g_startTime;
 
 let g_conwayActive = false;
-let g_conwaySlowdown = 20;
+let g_conwaySlowdown = 10;
 let g_cursorVisible = true;
 
 // -- Setup helpers --
@@ -106,15 +106,10 @@ function connectVariablesToGLSL() {
 let uiLifeStatus;
 let uiGameSpeed;
 function addActionsForHtmlUI() {
-  let moveSpeedSlider = document.getElementById("moveSpeedSlider");
-  moveSpeedSlider.addEventListener("input", () => {
-    g_camera.maxSpeed = moveSpeedSlider.value / 10;
-  });
-
   uiLifeStatus = document.getElementById("conwayActive");
   uiLifeStatus.textContent = "paused";
   uiGameSpeed = document.getElementById("conwaySlowdown");
-  uiGameSpeed.textContent = 5 - g_conwaySlowdown / 5;
+  uiGameSpeed.textContent = 11 - g_conwaySlowdown / 2;
 }
 
 let g_texture_loki;
@@ -220,15 +215,15 @@ function handleKeyboard(event) {
       break;
     case "=":
       // increase conway speed
-      if (g_conwaySlowdown > 5) {
-        g_conwaySlowdown -= 5;
-        uiGameSpeed.textContent = 5 - g_conwaySlowdown / 5;
+      if (g_conwaySlowdown > 2) {
+        g_conwaySlowdown -= 2;
+        uiGameSpeed.textContent = 11 - g_conwaySlowdown / 2;
       }
       break;
     case "-":
-      if (g_conwaySlowdown <= 15) {
-        g_conwaySlowdown += 5;
-        uiGameSpeed.textContent = 5 - g_conwaySlowdown / 5;
+      if (g_conwaySlowdown <= 18) {
+        g_conwaySlowdown += 2;
+        uiGameSpeed.textContent = 11 - g_conwaySlowdown / 2;
       }
       break;
 
@@ -238,6 +233,27 @@ function handleKeyboard(event) {
       break;
     case "2":
       loadPattern(g_map, 2);
+      break;
+    case "3":
+      loadPattern(g_map, 3);
+      break;
+    case "4":
+      loadPattern(g_map, 4);
+      break;
+    case "5":
+      loadPattern(g_map, 5);
+      break;
+    case "6":
+      loadPattern(g_map, 6);
+      break;
+    case "7":
+      loadPattern(g_map, 7);
+      break;
+    case "8":
+      loadPattern(g_map, 8);
+      break;
+    case "9":
+      loadPattern(g_map, 9);
       break;
 
     default:
@@ -270,7 +286,8 @@ function initTexture(texturePath, glTextureNum) {
   img.src = texturePath;
 }
 
-let g_mapSize = 32;
+let g_mapSize = 64;
+let g_mapHeight = 5;
 let g_map = new Array(g_mapSize);
 for (let x = 0; x < g_mapSize; x++) {
   g_map[x] = new Array(g_mapSize);
@@ -285,10 +302,7 @@ for (let x = 0; x < g_mapSize; x++) {
 function setUpScene() {
   g_camera = new Camera();
 
-  g_map[0][0][0] = new TexturedCube(0, [1,1,1,1], 0.75);
-  g_map[16][1][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-  g_map[15][0][15] = new TexturedCube(0, [1,1,1,1], 0.75);
-
+  loadPattern(g_map, 9);
 }
 
 let g_shapesList = {};  // make it an object so it's dict-like
@@ -309,17 +323,17 @@ function renderScene() {
 
   let floor = new TexturedCube(g_texture_floor, [1,0,0,1], 1);
   floor.matrix.translate(0, -0.5, 0);
-  floor.matrix.scale(32, 0.01, 32);
+  floor.matrix.scale(g_mapSize, 0.01, g_mapSize);
   floor.render();
 
   let sky = new TexturedCube(0, [0,1,1,1], 0.1);
-  sky.matrix.scale(96, 96, 96);
+  sky.matrix.scale(g_mapSize * 3, g_mapSize * 3, g_mapSize * 3);
   sky.render();
 
   let cellFlipList = [];
 
   for (let x = 0; x < g_mapSize; x++) {
-    for (let y = 0; y < g_mapSize; y++) {
+    for (let y = 0; y < g_mapHeight; y++) {
       for (let z = 0; z < g_mapSize; z++) {
         let c = g_map[x][y][z];
 

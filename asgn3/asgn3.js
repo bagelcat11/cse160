@@ -214,7 +214,7 @@ function setUpScene() {
 
   g_map[0][0][0] = new TexturedCube(0, [1,1,1,1], 0.75);
   g_map[16][1][16] = new TexturedCube(0, [1,1,1,1], 0.75);
-  g_map[15][0][16] = new TexturedCube(0, [1,1,1,1], 0.75);
+  g_map[15][0][15] = new TexturedCube(0, [1,1,1,1], 0.75);
 }
 
 let g_shapesList = {};  // make it an object so it's dict-like
@@ -259,7 +259,8 @@ function renderScene() {
 
   let cursor = new TexturedCube(2, [0.5,0.5,0.5,0.5], 1);
   // cursor.matrix.translate(g_camera[])
-  cursor.matrix.translate(g_camera.cursorAt.elements[0], g_camera.cursorAt.elements[1], g_camera.cursorAt.elements[2]);
+  let cursX = g_camera.cursorAt.elements[0], cursY = g_camera.cursorAt.elements[1], cursZ = g_camera.cursorAt.elements[2];
+  cursor.matrix.translate(cursX, cursY, cursZ);
   cursor.matrix.translate(0.5,0,0.5);  // put into [0-1]
   cursor.matrix.scale(1.1,1.1,1.1);
   cursor.render();

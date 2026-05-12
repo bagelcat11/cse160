@@ -174,6 +174,7 @@ class Camera {
         }
 
         // convert new angles back to cartesian
+        // these are the endpoint coordinates of the direction vector from eye to new at
         x = r * Math.sin(phi) * Math.cos(theta);
         y = r * Math.cos(phi);
         z = r * Math.sin(phi) * Math.sin(theta);
@@ -242,39 +243,25 @@ class Camera {
     }
 
     placeBlock() {
-        // let dir = new Vector3(this.at.elements);
-        // dir.sub(this.eye);
-        // let handDist = 1.5;
-        // dir.mul(handDist);
+        let x = this.cursorAt.elements[0], y = this.cursorAt.elements[1], z = this.cursorAt.elements[2];
+        // convert [-16,-16] to [0,32]
+        x += g_mapSize / 2;
+        z += g_mapSize / 2;
 
-        // let x = dir.elements[0], y = dir.elements[1], z = dir.elements[2];
-        // x = Math.floor(x + g_mapSize / 2);
-        // y = Math.floor(y);
-        // z = Math.floor(z + g_mapSize / 2);
-
-        // let x = this.eye.elements[0], y = this.eye.elements[1], z = this.eye.elements[2];
-        // // convert worldspace xyz into array indices, rounding in your look direction
-        // x = (this.at.elements[0] < x) ? Math.floor(x + g_mapSize / 2) : Math.ceil(x + g_mapSize / 2);
-        // y = (this.at.elements[1] < y) ? Math.floor(y) : Math.ceil(y);
-        // z = (this.at.elements[2] < z) ? Math.floor(z + g_mapSize / 2) : Math.ceil(z + g_mapSize / 2);
-
-        // // clamp to within map array bounds
-        // x = Math.min(Math.max(x, 0), g_mapSize);
-        // y = Math.min(Math.max(y, 0), g_mapSize);
-        // z = Math.min(Math.max(z, 0), g_mapSize);
-
-        // console.log("placing",x,y,z);
-
-        // let c = g_map[x][y][z];
-        // if (!c &&
-        //     0 <= x && x < g_mapSize &&  // only place inbounds
-        //     0 <= y && y < g_mapSize &&
-        //     0 <= z && y < g_mapSize) {
-        //     g_map[x][y][z] = new TexturedCube(0, [1,1,1,1], 0.75);
-        // }
+        let c = g_map[x][y][z];
+        if (c == null) {
+            g_map[x][y][z] = new TexturedCube(0, [1,1,1,1], 1);
+        }
     }
 
     deleteBlock() {
+        let x = this.cursorAt.elements[0], y = this.cursorAt.elements[1], z = this.cursorAt.elements[2];
+        x += g_mapSize / 2;
+        z += g_mapSize / 2;
 
+        let c = g_map[x][y][z];
+        if (c != null) {
+            g_map[x][y][z] = null;
+        }
     }
 }

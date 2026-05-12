@@ -246,7 +246,7 @@ function renderScene() {
     for (let y = 0; y < g_mapSize; y++) {
       for (let z = 0; z < g_mapSize; z++) {
         let c = g_map[x][y][z];
-        if (c) {
+        if (c != null) {
           c.matrix.set(g_identityM);  // reset mtx every frame
           let offset = g_mapSize / 2;
           c.matrix.translate(x-offset, y, z-offset); // go from [0-32] to [-16, 16]

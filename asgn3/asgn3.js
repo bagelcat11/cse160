@@ -53,6 +53,9 @@ let g_cameraZoom = 4;
 let g_startTime = performance.now() / 1000;
 let g_elapsedTime = performance.now() / 1000 - g_startTime;
 
+let g_conwayActive = false;
+let g_conwaySlowdown = 20;
+
 // -- Setup helpers --
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -133,6 +136,9 @@ function main() {
     }
   });
 
+  // key bindings for non-camera things
+  document.addEventListener("keydown", (event) => handleKeyboard(event));
+
   setUpScene();
   // start update function
   requestAnimationFrame(tick);
@@ -174,6 +180,18 @@ function handleMouseMove(event) {
   g_camera.changeLook(x * sens, y * sens);
 }
 
+function handleKeyboard(event) {
+  switch (event.key) {
+    case "p":
+      // toggle conway
+      g_conwayActive = !g_conwayActive;
+      break;
+
+    default:
+      break;
+  }
+}
+
 function initTexture(texturePath, glTextureNum) {
   let texture = gl.createTexture();
   let img = new Image();
@@ -213,8 +231,23 @@ function setUpScene() {
   g_camera = new Camera();
 
   g_map[0][0][0] = new TexturedCube(0, [1,1,1,1], 0.75);
-  g_map[16][1][16] = new TexturedCube(0, [1,1,1,1], 0.75);
-  g_map[15][0][15] = new TexturedCube(0, [1,1,1,1], 0.75);
+  // g_map[16][1][16] = new TexturedCube(0, [1,1,1,1], 0.75);
+  // g_map[15][0][15] = new TexturedCube(0, [1,1,1,1], 0.75);
+
+  // r-pentomino
+  // g_map[16][0][16] = new TexturedCube(0, [1,1,1,1], 1);
+  // g_map[17][0][16] = new TexturedCube(0, [1,1,1,1], 1);
+  // g_map[18][0][16] = new TexturedCube(0, [1,1,1,1], 1);
+  // g_map[16][0][17] = new TexturedCube(0, [1,1,1,1], 1);
+  // g_map[17][0][15] = new TexturedCube(0, [1,1,1,1], 1);
+
+  // glider
+  g_map[16][0][16] = new TexturedCube(0, [1,1,1,1], 1);
+  g_map[17][0][15] = new TexturedCube(0, [1,1,1,1], 1);
+  g_map[17][0][14] = new TexturedCube(0, [1,1,1,1], 1);
+  g_map[16][0][14] = new TexturedCube(0, [1,1,1,1], 1);
+  g_map[15][0][14] = new TexturedCube(0, [1,1,1,1], 1);
+
 }
 
 let g_shapesList = {};  // make it an object so it's dict-like
@@ -242,10 +275,24 @@ function renderScene() {
   sky.matrix.scale(100, 100, 100);
   sky.render();
 
+  let cellFlipList = [];
+
   for (let x = 0; x < g_mapSize; x++) {
     for (let y = 0; y < g_mapSize; y++) {
       for (let z = 0; z < g_mapSize; z++) {
         let c = g_map[x][y][z];
+
+        // play conway on floor
+        if (y == 0 && g_conwayActive && Math.floor(g_elapsedTime * 60) % g_conwaySlowdown == 0) {
+          let n = calcNumNeighbors(x, y, z);
+          // if cell is alive and has less than 2 or more than 3 neighbors, die;
+          // if dead and has 3 neighbors, be born
+          if (c != null && n != 2 && n != 3 ||
+              c == null && n == 3) {
+            cellFlipList.push([x, y, z]);
+          }
+        }
+
         if (c != null) {
           c.matrix.set(g_identityM);  // reset mtx every frame
           let offset = g_mapSize / 2;
@@ -255,6 +302,12 @@ function renderScene() {
         }
       }
     }
+  }
+
+  // update the cell grid
+  for (let i = 0; i < cellFlipList.length; i++) {
+    let x = cellFlipList[i][0], y = cellFlipList[i][1], z = cellFlipList[i][2];
+    g_map[x][y][z] = (g_map[x][y][z] == null) ? new TexturedCube(0, [1,1,1,1], 1) : null;
   }
 
   let cursor = new TexturedCube(2, [0.5,0.5,0.5,0.5], 1);

@@ -24,6 +24,7 @@ var FSHADER_SOURCE =
   '\n' +
   'void main() {\n' +
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
+      // 'if (texColor[3] < 0.3) discard; \n' + // don't render transparent things!
       'gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor;\n' +  // set color with texture!
   '}\n';
 
@@ -59,7 +60,9 @@ function setupWebGL() {
 
   // Get the rendering context for WebGL
   // gl = getWebGLContext(canvas);
-  gl = canvas.getContext("webgl", {preserveDrawingBuffer: true});
+  gl = canvas.getContext("webgl", {
+    preserveDrawingBuffer: true,
+  });
   if (!gl) {
     console.log("Failed to get the rendering context for WebGL");
     return;
@@ -67,6 +70,9 @@ function setupWebGL() {
 
   // for 3D
   gl.enable(gl.DEPTH_TEST);
+  // transparency!
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   // gl.enable(gl.CULL_FACE);
 }
 
@@ -100,6 +106,7 @@ function addActionsForHtmlUI() {
 function setupAllTextures() {
   initTexture("img/test_loki.png", gl.TEXTURE0);
   initTexture("img/test_uv.jpg", gl.TEXTURE1);
+  initTexture("img/cursor_texture.png", gl.TEXTURE2);
 }
 
 
@@ -184,7 +191,7 @@ function initTexture(texturePath, glTextureNum) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
     // target, mipmap level, internalformat, texelformat, texel type, img
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
   };
   // have browser load image
   img.src = texturePath;
@@ -249,4 +256,11 @@ function renderScene() {
       }
     }
   }
+
+  let cursor = new TexturedCube(2, [0.5,0.5,0.5,0.5], 1);
+  // cursor.matrix.translate(g_camera[])
+  cursor.matrix.translate(g_camera.cursorAt.elements[0], g_camera.cursorAt.elements[1], g_camera.cursorAt.elements[2]);
+  cursor.matrix.translate(0.5,0,0.5);  // put into [0-1]
+  cursor.matrix.scale(1.1,1.1,1.1);
+  cursor.render();
 }

@@ -44,19 +44,19 @@ function loadPattern(board, patternNum) {
     switch (patternNum) {  
         case 1:
             // r-pentomino
-            board[16][0][16] = new TexturedCube(0, [1,1,1,1], 1);
-            board[17][0][16] = new TexturedCube(0, [1,1,1,1], 1);
-            board[18][0][16] = new TexturedCube(0, [1,1,1,1], 1);
-            board[16][0][17] = new TexturedCube(0, [1,1,1,1], 1);
-            board[17][0][15] = new TexturedCube(0, [1,1,1,1], 1);
+            board[16][0][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[17][0][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[18][0][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[16][0][17] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[17][0][15] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
             break;
         case 2:
             // glider
-            board[16][0][16] = new TexturedCube(0, [1,1,1,1], 1);
-            board[17][0][15] = new TexturedCube(0, [1,1,1,1], 1);
-            board[17][0][14] = new TexturedCube(0, [1,1,1,1], 1);
-            board[16][0][14] = new TexturedCube(0, [1,1,1,1], 1);
-            board[15][0][14] = new TexturedCube(0, [1,1,1,1], 1);
+            board[16][0][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[17][0][15] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[17][0][14] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[16][0][14] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[15][0][14] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
             break;
 
         default:

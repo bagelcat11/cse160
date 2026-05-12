@@ -117,6 +117,7 @@ function addActionsForHtmlUI() {
 let g_texture_loki;
 let g_texture_uv;
 let g_texture_cursor;
+let g_texture_cell;
 function setupAllTextures() {
   initTexture("img/test_loki.png", gl.TEXTURE0);
   g_texture_loki = 0;
@@ -124,6 +125,8 @@ function setupAllTextures() {
   g_texture_uv = 1;
   initTexture("img/cursor_texture.png", gl.TEXTURE2);
   g_texture_cursor = 2;
+  initTexture("img/cell.png", gl.TEXTURE3);
+  g_texture_cell = 3;
 }
 
 
@@ -261,7 +264,7 @@ function setUpScene() {
   g_camera = new Camera();
 
   g_map[0][0][0] = new TexturedCube(0, [1,1,1,1], 0.75);
-  g_map[16][1][16] = new TexturedCube(0, [1,1,1,1], 0.75);
+  g_map[16][1][16] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
   g_map[15][0][15] = new TexturedCube(0, [1,1,1,1], 0.75);
 
 }
@@ -282,7 +285,7 @@ function renderScene() {
   globalRotMtx.translate(0,-0.15,0);  // center her
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
-  let floor = new TexturedCube(1, [1,0,0,1], 1);
+  let floor = new TexturedCube(g_texture_uv, [1,0,0,1], 1);
   floor.matrix.translate(0, -0.5, 0);
   floor.matrix.scale(32, 0.01, 32);
   floor.render();
@@ -323,7 +326,7 @@ function renderScene() {
   // update the cell grid
   for (let i = 0; i < cellFlipList.length; i++) {
     let x = cellFlipList[i][0], y = cellFlipList[i][1], z = cellFlipList[i][2];
-    g_map[x][y][z] = (g_map[x][y][z] == null) ? new TexturedCube(0, [1,1,1,1], 1) : null;
+    g_map[x][y][z] = (g_map[x][y][z] == null) ? new TexturedCube(g_texture_cell, [1,1,1,1], 1) : null;
   }
 
   if (g_cursorVisible) {

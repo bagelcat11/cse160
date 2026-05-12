@@ -103,26 +103,29 @@ function connectVariablesToGLSL() {
   gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
 }
 
+let uiLifeStatus;
+let uiGameSpeed;
 function addActionsForHtmlUI() {
   let moveSpeedSlider = document.getElementById("moveSpeedSlider");
   moveSpeedSlider.addEventListener("input", () => {
     g_camera.maxSpeed = moveSpeedSlider.value / 10;
   });
-  let conwaySpeedSlider = document.getElementById("conwaySpeedSlider");
-  conwaySpeedSlider.addEventListener("input", () => {
-    g_conwaySlowdown = conwaySpeedSlider.value;
-  });
+
+  uiLifeStatus = document.getElementById("conwayActive");
+  uiLifeStatus.textContent = "paused";
+  uiGameSpeed = document.getElementById("conwaySlowdown");
+  uiGameSpeed.textContent = 5 - g_conwaySlowdown / 5;
 }
 
 let g_texture_loki;
-let g_texture_uv;
+let g_texture_floor;
 let g_texture_cursor;
 let g_texture_cell;
 function setupAllTextures() {
   initTexture("img/test_loki.png", gl.TEXTURE0);
   g_texture_loki = 0;
-  initTexture("img/test_uv.jpg", gl.TEXTURE1);
-  g_texture_uv = 1;
+  initTexture("img/floor.png", gl.TEXTURE1);
+  g_texture_floor = 1;
   initTexture("img/cursor_texture.png", gl.TEXTURE2);
   g_texture_cursor = 2;
   initTexture("img/cell.png", gl.TEXTURE3);
@@ -177,6 +180,9 @@ function tick() {
   let msElapsed = performance.now() - start; 
   fpsCounter.textContent = (1000 / msElapsed).toFixed(0);
 
+  // update UI
+
+
   // repeat as soon as browser can
   requestAnimationFrame(tick);
 }
@@ -202,14 +208,28 @@ function handleKeyboard(event) {
     case "p":
       // toggle conway
       g_conwayActive = !g_conwayActive;
+      uiLifeStatus.textContent = (g_conwayActive) ? "playing" : "paused";
       break;
     case "r":
       // clear world
       clearBoard(g_map);
       break;
-    case "o":
+    case "v":
       // toggle cursor
       g_cursorVisible = !g_cursorVisible;
+      break;
+    case "=":
+      // increase conway speed
+      if (g_conwaySlowdown > 5) {
+        g_conwaySlowdown -= 5;
+        uiGameSpeed.textContent = 5 - g_conwaySlowdown / 5;
+      }
+      break;
+    case "-":
+      if (g_conwaySlowdown <= 15) {
+        g_conwaySlowdown += 5;
+        uiGameSpeed.textContent = 5 - g_conwaySlowdown / 5;
+      }
       break;
 
     // conway presets
@@ -235,7 +255,7 @@ function initTexture(texturePath, glTextureNum) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     // set texture params for filter type
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     // needed to use any size img!!!
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -243,6 +263,8 @@ function initTexture(texturePath, glTextureNum) {
 
     // target, mipmap level, internalformat, texelformat, texel type, img
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+
+    gl.generateMipmap(gl.TEXTURE_2D); // mipmapping to get rid of moire 
   };
   // have browser load image
   img.src = texturePath;
@@ -285,13 +307,13 @@ function renderScene() {
   globalRotMtx.translate(0,-0.15,0);  // center her
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
-  let floor = new TexturedCube(g_texture_uv, [1,0,0,1], 1);
+  let floor = new TexturedCube(g_texture_floor, [1,0,0,1], 1);
   floor.matrix.translate(0, -0.5, 0);
   floor.matrix.scale(32, 0.01, 32);
   floor.render();
 
   let sky = new TexturedCube(0, [0,1,1,1], 0.1);
-  sky.matrix.scale(100, 100, 100);
+  sky.matrix.scale(96, 96, 96);
   sky.render();
 
   let cellFlipList = [];

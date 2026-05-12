@@ -6,8 +6,8 @@ class Camera {
         //TODO: TODO: TODO:
         // maybe the issue is with eye?? since on the map edges it says it's at 12 and not 16??
         this.eye = new Vector3([0,0.5,0]);
-        this.at = new Vector3([0,0.5,-100]);
-        this.atDist = 100;
+        this.at = new Vector3([0,0.5,-200]);
+        this.atDist = 200;
         this.up = new Vector3([0,1.5,0]);
 
         this.cursorDist = 2;
@@ -20,7 +20,7 @@ class Camera {
         projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 128);
         gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMtx.elements);
 
-        this.maxSpeed = 0.1;   // generic webgl units
+        this.maxSpeed = 1;   // generic webgl units
         this.lookSpeed = 5 * (Math.PI / 180);   // convert deg to rad
         this.verticalLookPadding = 15 * (Math.PI / 180);   // stay x degrees away from looking straight up/down
 
@@ -228,7 +228,7 @@ class Camera {
 
         let c = g_map[x][y][z];
         if (c == null) {
-            g_map[x][y][z] = new TexturedCube(0, [1,1,1,1], 1);
+            g_map[x][y][z] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
         }
     }
 

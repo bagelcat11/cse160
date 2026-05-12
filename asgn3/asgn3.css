@@ -1,5 +1,22 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+}
+
+th {
+    font-weight: bold;
+}
 th, td {
     border-style: outset;
     padding-left: 0.2em;
     padding-right: 0.2em;
+}
+
+#canvasUI {
+    padding: 0.2em;
+    background-color: rgba(0,0,0,0.5);
+    color: rgb(240,240,240);
+    position: absolute;
+    left: 8px;
+    top: 8px;
 }

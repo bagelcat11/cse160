@@ -10,6 +10,10 @@
   </head>
 
   <body onload="main()">
+    <div id="canvasUI">
+      <div><strong>Cell life: </strong><span id="conwayActive"></span></div>
+      <div><strong>Game speed: </strong><span id="conwaySlowdown"></span> / 4</div>
+    </div>
     <div id="canvAndImg">
       <canvas id="webgl" width="400" height="400">
         Please use a browser that supports "canvas"
@@ -18,26 +22,37 @@
     <p>FPS: <span id="fpsCounter"></span></p>
 
     <div>
+      <label>Movement controls:</label>
       <table>
         <tr>
           <th>WASD</th>
           <th>Mouse or Q/E</th>
           <th>C</th>
           <th>X</th>
-          <th>P</th>
-          <th>R</th>
-          <th>O</th>
-          <th>1-9</th>
         </tr>
         <tr>
           <td>Move</td>
           <td>Look</td>
           <td>Place block</td>
           <td>Delete block</td>
-          <td>Toggle Conway's Game of Life mode!</td>
+        </tr>
+      </table>
+      <p></p>
+      <label>Conway's Game of Life controls:</label>
+      <table>
+        <tr>
+          <th>P</th>
+          <th>R</th>
+          <th>V</th>
+          <th>1-9</th>
+          <th>+/-</th>
+        </tr>
+        <tr>
+          <td>Play/pause cell life!</td>
           <td>Clear world</td>
           <td>Toggle "cursor" visibility</td>
           <td>Load Conway presets</td>
+          <td>Change game speed</td>
         </tr>
       </table>
     </div>
@@ -46,10 +61,6 @@
     <div>
       <label><strong>Movement speed: </strong></label>
       <input type="range" min="1" max="10" value="1" class="slider" id="moveSpeedSlider">
-    </div>
-    <div>
-      <label><strong>Conway tick time: </strong></label>
-      <input type="range" min="1" max="20" value="20" class="slider" id="conwaySpeedSlider">
     </div>
     <p></p>
 

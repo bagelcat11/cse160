@@ -55,6 +55,7 @@ let g_elapsedTime = performance.now() / 1000 - g_startTime;
 
 let g_conwayActive = false;
 let g_conwaySlowdown = 20;
+let g_cursorVisible = true;
 
 // -- Setup helpers --
 function setupWebGL() {
@@ -103,13 +104,26 @@ function connectVariablesToGLSL() {
 }
 
 function addActionsForHtmlUI() {
-  
+  let moveSpeedSlider = document.getElementById("moveSpeedSlider");
+  moveSpeedSlider.addEventListener("input", () => {
+    g_camera.maxSpeed = moveSpeedSlider.value / 10;
+  });
+  let conwaySpeedSlider = document.getElementById("conwaySpeedSlider");
+  conwaySpeedSlider.addEventListener("input", () => {
+    g_conwaySlowdown = conwaySpeedSlider.value;
+  });
 }
 
+let g_texture_loki;
+let g_texture_uv;
+let g_texture_cursor;
 function setupAllTextures() {
   initTexture("img/test_loki.png", gl.TEXTURE0);
+  g_texture_loki = 0;
   initTexture("img/test_uv.jpg", gl.TEXTURE1);
+  g_texture_uv = 1;
   initTexture("img/cursor_texture.png", gl.TEXTURE2);
+  g_texture_cursor = 2;
 }
 
 
@@ -186,6 +200,22 @@ function handleKeyboard(event) {
       // toggle conway
       g_conwayActive = !g_conwayActive;
       break;
+    case "r":
+      // clear world
+      clearBoard(g_map);
+      break;
+    case "o":
+      // toggle cursor
+      g_cursorVisible = !g_cursorVisible;
+      break;
+
+    // conway presets
+    case "1":
+      loadPattern(g_map, 1);
+      break;
+    case "2":
+      loadPattern(g_map, 2);
+      break;
 
     default:
       break;
@@ -231,22 +261,8 @@ function setUpScene() {
   g_camera = new Camera();
 
   g_map[0][0][0] = new TexturedCube(0, [1,1,1,1], 0.75);
-  // g_map[16][1][16] = new TexturedCube(0, [1,1,1,1], 0.75);
-  // g_map[15][0][15] = new TexturedCube(0, [1,1,1,1], 0.75);
-
-  // r-pentomino
-  // g_map[16][0][16] = new TexturedCube(0, [1,1,1,1], 1);
-  // g_map[17][0][16] = new TexturedCube(0, [1,1,1,1], 1);
-  // g_map[18][0][16] = new TexturedCube(0, [1,1,1,1], 1);
-  // g_map[16][0][17] = new TexturedCube(0, [1,1,1,1], 1);
-  // g_map[17][0][15] = new TexturedCube(0, [1,1,1,1], 1);
-
-  // glider
-  g_map[16][0][16] = new TexturedCube(0, [1,1,1,1], 1);
-  g_map[17][0][15] = new TexturedCube(0, [1,1,1,1], 1);
-  g_map[17][0][14] = new TexturedCube(0, [1,1,1,1], 1);
-  g_map[16][0][14] = new TexturedCube(0, [1,1,1,1], 1);
-  g_map[15][0][14] = new TexturedCube(0, [1,1,1,1], 1);
+  g_map[16][1][16] = new TexturedCube(0, [1,1,1,1], 0.75);
+  g_map[15][0][15] = new TexturedCube(0, [1,1,1,1], 0.75);
 
 }
 
@@ -284,7 +300,7 @@ function renderScene() {
 
         // play conway on floor
         if (y == 0 && g_conwayActive && Math.floor(g_elapsedTime * 60) % g_conwaySlowdown == 0) {
-          let n = calcNumNeighbors(x, y, z);
+          let n = calcNumNeighbors(g_map, x, y, z);
           // if cell is alive and has less than 2 or more than 3 neighbors, die;
           // if dead and has 3 neighbors, be born
           if (c != null && n != 2 && n != 3 ||
@@ -310,11 +326,12 @@ function renderScene() {
     g_map[x][y][z] = (g_map[x][y][z] == null) ? new TexturedCube(0, [1,1,1,1], 1) : null;
   }
 
-  let cursor = new TexturedCube(2, [0.5,0.5,0.5,0.5], 1);
-  // cursor.matrix.translate(g_camera[])
-  let cursX = g_camera.cursorAt.elements[0], cursY = g_camera.cursorAt.elements[1], cursZ = g_camera.cursorAt.elements[2];
-  cursor.matrix.translate(cursX, cursY, cursZ);
-  cursor.matrix.translate(0.5,0,0.5);  // put into [0-1]
-  cursor.matrix.scale(1.1,1.1,1.1);
-  cursor.render();
+  if (g_cursorVisible) {
+    let cursor = new TexturedCube(2, [0.5,0.5,0.5,0.5], 1);
+    let cursX = g_camera.cursorAt.elements[0], cursY = g_camera.cursorAt.elements[1], cursZ = g_camera.cursorAt.elements[2];
+    cursor.matrix.translate(cursX, cursY, cursZ);
+    cursor.matrix.translate(0.5,0,0.5);  // put into [0-1]
+    cursor.matrix.scale(1.1,1.1,1.1);
+    cursor.render();
+  }
 }

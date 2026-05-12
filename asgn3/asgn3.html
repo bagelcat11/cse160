@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8"/>
     <title>Asgn3: Blocky World</title>
-    <!-- <link rel="stylesheet" href="asgn3.css"> -->
+    <link rel="stylesheet" href="asgn3.css">
   </head>
 
   <body onload="main()">
@@ -16,6 +16,50 @@
       </canvas>
     </div>
     <p>FPS: <span id="fpsCounter"></span></p>
+
+    <div>
+      <table>
+        <tr>
+          <th>WASD</th>
+          <th>Mouse or Q/E</th>
+          <th>C</th>
+          <th>X</th>
+          <th>P</th>
+          <th>R</th>
+          <th>O</th>
+          <th>1-9</th>
+        </tr>
+        <tr>
+          <td>Move</td>
+          <td>Look</td>
+          <td>Place block</td>
+          <td>Delete block</td>
+          <td>Toggle Conway's Game of Life mode!</td>
+          <td>Clear world</td>
+          <td>Toggle "cursor" visibility</td>
+          <td>Load Conway presets</td>
+        </tr>
+      </table>
+    </div>
+    <p></p>
+
+    <div>
+      <label><strong>Movement speed: </strong></label>
+      <input type="range" min="1" max="10" value="1" class="slider" id="moveSpeedSlider">
+    </div>
+    <div>
+      <label><strong>Conway tick time: </strong></label>
+      <input type="range" min="1" max="20" value="20" class="slider" id="conwaySpeedSlider">
+    </div>
+    <p></p>
+
+    <div>
+      Conway presets:
+      <ol>
+        <li>R-pentomino</li>
+        <li>Glider</li>
+      </ol>
+    </div>
 
 
     <script src="lib/webgl-utils.js"></script>

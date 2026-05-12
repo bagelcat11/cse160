@@ -5,13 +5,13 @@ class Camera {
         // vectors for setLookAt (actual Vec3s since we wanna do math)
         //TODO: TODO: TODO:
         // maybe the issue is with eye?? since on the map edges it says it's at 12 and not 16??
-        this.eye = new Vector3([0,0.5,2]);
+        this.eye = new Vector3([0,0.5,0]);
         this.at = new Vector3([0,0.5,-100]);
         this.atDist = 100;
-        this.up = new Vector3([0,1,0]);
+        this.up = new Vector3([0,1.5,0]);
 
         this.cursorDist = 2;
-        this.cursorAt = new Vector3([0, 0, 0]);
+        this.cursorAt = new Vector3([0,0,-2]);
 
         // perspective won't change, so do that here
         let projMtx = new Matrix4();
@@ -158,10 +158,10 @@ class Camera {
 
         let phi = Math.acos(y / r);     // vertical
         // keep from looking straight up/down since that causes hypersensitivity to horizontal rotation
-        if (phi + deltaVerticalLook > this.verticalLookPadding
-            && phi + deltaVerticalLook < Math.PI - this.verticalLookPadding) {
+        // if (phi + deltaVerticalLook > this.verticalLookPadding
+        //     && phi + deltaVerticalLook < Math.PI - this.verticalLookPadding) {
             phi += deltaVerticalLook;
-        }
+        // }
 
         // convert new angles back to cartesian
         // these are the endpoint coordinates of the direction vector from eye to new at

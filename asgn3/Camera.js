@@ -3,8 +3,10 @@
 class Camera {
     constructor() {
         // vectors for setLookAt (actual Vec3s since we wanna do math)
+        //TODO: TODO: TODO:
+        // maybe the issue is with eye?? since on the map edges it says it's at 12 and not 16??
         this.eye = new Vector3([0,0.5,2]);
-        this.at = new Vector3([0,0.5,-100]);   //TODO: i think something is fundamentally wrong with my at and it just got mitigated by making this a big distance
+        this.at = new Vector3([0,0.5,-100]);
         this.atDist = 100;
         this.up = new Vector3([0,1,0]);
 
@@ -33,10 +35,6 @@ class Camera {
 
     cameraTick() {  // every frame
         let viewMtx = new Matrix4();
-        // eye position, pos to look at (conventionally, -z), up direction
-        // viewMtx.setLookAt(this.eye.x,this.eye.y,this.eye.z,
-        //     this.at.x,this.at.y,this.at.z,
-        //     this.up.x,this.up.y,this.up.z);
 
         //TODO: it would be really nice if i could change the vector library
         //      to have vec.x = vec.elements[0], etc. but setting that in the
@@ -48,18 +46,6 @@ class Camera {
 
         // acceleration!!
         // this.moveSmoothly();
-
-        // console.log("position:", this.eye.elements[0].toFixed(3),
-        //     this.eye.elements[1].toFixed(3),
-        //     this.eye.elements[2].toFixed(3));
-
-        console.log("cursorat:", this.cursorAt.elements[0].toFixed(3),
-            this.cursorAt.elements[1].toFixed(3),
-            this.cursorAt.elements[2].toFixed(3));
-
-        // console.log("at:", this.at.elements[0].toFixed(3),
-        //     this.at.elements[1].toFixed(3),
-        //     this.at.elements[2].toFixed(3));
     }
 
     handleKeyboardMovement(event) {
@@ -105,6 +91,19 @@ class Camera {
                 this.deleteBlock();
                 break;
 
+            case "m":
+                console.log("position:", this.eye.elements[0].toFixed(3),
+                this.eye.elements[1].toFixed(3),
+                this.eye.elements[2].toFixed(3));
+
+                console.log("cursorat:", this.cursorAt.elements[0].toFixed(3),
+                this.cursorAt.elements[1].toFixed(3),
+                this.cursorAt.elements[2].toFixed(3));
+
+                console.log("at:", this.at.elements[0].toFixed(3),
+                this.at.elements[1].toFixed(3),
+                this.at.elements[2].toFixed(3));
+
             default:
                 break;    
         }
@@ -132,7 +131,6 @@ class Camera {
         // add to both eye and at so they are same distance away
         this.eye.add(dir);
         this.at.add(dir);
-        this.cursorAt.add(dir);
 
         dir = new Vector3(this.at.elements);
         dir.sub(this.eye);
@@ -144,16 +142,8 @@ class Camera {
 
         this.eye.add(sideways);
         this.at.add(sideways);
-        this.cursorAt.add(sideways);
 
-        // let x = this.cursorAt.elements[0], y = this.cursorAt.elements[1], z = this.cursorAt.elements[2];
-        // x = Math.min(Math.max(Math.floor(x), -g_mapSize / 2), g_mapSize / 2);
-        // y = Math.min(Math.max(Math.floor(y), 0), g_mapSize);
-        // z = Math.min(Math.max(Math.floor(z), -g_mapSize / 2), g_mapSize / 2);
-        // this.cursorAt.set(new Vector3([x, y, z]));
-
-        // dir = new Vector3(this.at.elements);
-        // console.log(dir.sub(this.eye).magnitude())
+        this.calcCursorAt();
     }
 
     changeLook(deltaHorizontalLook, deltaVerticalLook) {
@@ -185,12 +175,38 @@ class Camera {
         d.mul(this.atDist);
         this.at.set(this.eye);
         this.at.add(d);
-        // this.at.set(this.eye);
-        // this.at.add(new Vector3([x, y, z]));
-        // this.at.normalize();
-        // this.at.mul(this.atDist);
+
+        this.calcCursorAt();
+
+        // make sure up vector is always perpendicular to at
+        // phi -= Math.PI / 2;
+        x = r * Math.sin(phi - Math.PI / 2) * Math.cos(theta);
+        y = r * Math.cos(phi - Math.PI / 2);
+        z = r * Math.sin(phi - Math.PI / 2) * Math.sin(theta);
+        this.up.set(new Vector3([x, y, z]).normalize());
+        // this.up.normalize();
+
+        // console.log(Math.acos(Vector3.dot(this.at, this.up) / this.at.magnitude() / this.up.magnitude()) * 180 / Math.PI);
+    }
+
+    calcCursorAt() {
+        let d = new Vector3(this.at.elements);
+        d.sub(this.eye);
+        let r = d.magnitude();
+        let x = d.elements[0], y = d.elements[1], z = d.elements[2];
+
+        let theta = Math.atan2(z, x);   // horizontal
+        // let phi = Math.acos(y / r);     // vertical
+        let phi = Math.atan2(Math.sqrt(x * x + z * z), y);
+
+        // convert new angles back to cartesian
+        // these are the endpoint coordinates of the direction vector from eye to new at
+        x = Math.sin(phi) * Math.cos(theta);
+        y = Math.cos(phi);
+        z = Math.sin(phi) * Math.sin(theta);
 
         // we want the cursor to be a few units away on the vector from eye to at
+        d = new Vector3([x, y, z]);
         d.normalize();
         d.mul(this.cursorDist);
         this.cursorAt.set(this.eye);
@@ -202,44 +218,6 @@ class Camera {
         y = Math.min(Math.max(Math.floor(y), 0), g_mapSize);
         z = Math.min(Math.max(Math.floor(z), -g_mapSize / 2), g_mapSize / 2);
         this.cursorAt.set(new Vector3([x, y, z]));
-
-        // d.normalize();
-        // d.mul(this.cursorDist);
-        // this.cursorAt.set(this.eye);
-        // this.cursorAt.add(d);
-
-        
-
-        // this.cursorAt.set(this.eye);
-        // this.cursorAt.add(new Vector3([x, y, z]).normalize());
-        // this.cursorAt.normalize();
-        // this.cursorAt.mul(this.cursorDist);
-        // this.cursorAt.div(1000);
-
-        // make sure up vector is always perpendicular to at
-        // phi -= Math.PI / 2;
-        x = r * Math.sin(phi - Math.PI / 2) * Math.cos(theta);
-        y = r * Math.cos(phi - Math.PI / 2);
-        z = r * Math.sin(phi - Math.PI / 2) * Math.sin(theta);
-        this.up.set(new Vector3([x, y, z]));
-        this.up.normalize();
-
-        // console.log(Math.acos(Vector3.dot(this.at, this.up) / this.at.magnitude() / this.up.magnitude()) * 180 / Math.PI);
-
-        // move cursor block!
-        // dir = new Vector3(this.at.elements);
-        // dir.sub(this.eye);
-        // r = dir.magnitude();
-        // // dir.mul(this.cursorDist);
-
-        // // x = dir.elements[0], y = dir.elements[1], z = dir.elements[2];
-        // x = r * Math.sin(phi) * Math.cos(theta);
-        // y = r * Math.cos(phi);
-        // z = r * Math.sin(phi) * Math.sin(theta);
-        // x = Math.floor(x + g_mapSize / 2);
-        // y = Math.floor(y);
-        // z = Math.floor(z + g_mapSize / 2);
-        // console.log(x, y, z);
     }
 
     placeBlock() {

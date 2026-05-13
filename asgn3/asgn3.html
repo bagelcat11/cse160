@@ -10,16 +10,18 @@
   </head>
 
   <body onload="main()">
-    <div id="canvasUI">
-      <div><strong>Cell life: </strong><span id="conwayActive"></span></div>
-      <div><strong>Game speed: </strong><span id="conwaySlowdown"></span> / 10</div>
+    <div id="container">
+      <div id="canvasUI">
+        <div><strong>Cell life: </strong><span id="conwayActive"></span></div>
+        <div><strong>Game speed: </strong><span id="conwaySlowdown"></span> / 10</div>
+      </div>
+      <div id="canvAndImg">
+        <canvas id="webgl" width="400" height="400">
+          Please use a browser that supports "canvas"
+        </canvas>
+      </div>
+      <p>FPS: <span id="fpsCounter"></span></p>
     </div>
-    <div id="canvAndImg">
-      <canvas id="webgl" width="400" height="400">
-        Please use a browser that supports "canvas"
-      </canvas>
-    </div>
-    <p>FPS: <span id="fpsCounter"></span></p>
 
     <div>
       <label>Movement controls:</label>

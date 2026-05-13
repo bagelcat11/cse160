@@ -5,8 +5,8 @@ class Camera {
         // vectors for setLookAt (actual Vec3s since we wanna do math)
         //TODO: TODO: TODO:
         // maybe the issue is with eye?? since on the map edges it says it's at 12 and not 16??
-        this.eye = new Vector3([0,1.5,0]);
-        this.at = new Vector3([0,1.5,-200]);
+        this.eye = new Vector3([0,0.5,0]);
+        this.at = new Vector3([0,0.5,-200]);
         this.atDist = 200;
         this.up = new Vector3([0,5.5,0]);
 

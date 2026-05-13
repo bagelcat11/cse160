@@ -1,6 +1,9 @@
 body {
     font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
+    justify-content: space-evenly;
+    /* text-align: center; */
+    background-color: gainsboro;
 }
 
 th {
@@ -13,7 +16,8 @@ th, td {
 }
 
 label {
-    color: violet;
+    color: slateblue;
+    font-size: 15px;
     font-weight: bold;
 }
 

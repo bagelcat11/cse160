@@ -24,8 +24,8 @@ var FSHADER_SOURCE =
   '\n' +
   'void main() {\n' +
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
-      // 'if (texColor[3] < 0.3) discard; \n' + // don't render transparent things!
-      'gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor;\n' +  // set color with texture!
+      // 'gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor;\n' +  // set color with texture!
+      'gl_FragColor = u_BaseColor * texColor;\n' + // multiply colors!
   '}\n';
 
 // -- GLOBALS --
@@ -112,20 +112,27 @@ function addActionsForHtmlUI() {
   uiGameSpeed.textContent = 11 - g_conwaySlowdown / 2;
 }
 
-let g_texture_loki;
+let g_texture_sky;
 let g_texture_floor;
 let g_texture_cursor;
 let g_texture_cell;
+// let g_texture_cell_bnw;
 function setupAllTextures() {
-  initTexture("img/test_loki.png", gl.TEXTURE0);
-  g_texture_loki = 0;
+  initTexture("img/sky.png", gl.TEXTURE0);
+  g_texture_sky = 0;
   initTexture("img/floor.png", gl.TEXTURE1);
   g_texture_floor = 1;
   initTexture("img/cursor_texture.png", gl.TEXTURE2);
   g_texture_cursor = 2;
-  initTexture("img/cell.png", gl.TEXTURE3);
+  initTexture("img/cell_bnw.png", gl.TEXTURE3);
   g_texture_cell = 3;
 }
+
+let g_cell_colors = [[0.9,0.4,0.9,1],
+                      [0.2,0.8,1,1],
+                      [0,1,0,1],
+                      [1,0.7,0.1,1],
+                      [0.9,0.2,0.3,1]];
 
 
 // -- MAIN --
@@ -321,12 +328,12 @@ function renderScene() {
   globalRotMtx.translate(0,-0.15,0);  // center her
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
-  let floor = new TexturedCube(g_texture_floor, [1,0,0,1], 1);
+  let floor = new TexturedCube(g_texture_floor, [1,1,1,1], 1);
   floor.matrix.translate(0, -0.5, 0);
   floor.matrix.scale(g_mapSize, 0.01, g_mapSize);
   floor.render();
 
-  let sky = new TexturedCube(0, [0,1,1,1], 0.1);
+  let sky = new TexturedCube(g_texture_sky, [1,1,1,1], 1);
   sky.matrix.scale(g_mapSize * 3, g_mapSize * 3, g_mapSize * 3);
   sky.render();
 
@@ -338,7 +345,7 @@ function renderScene() {
         let c = g_map[x][y][z];
 
         // play conway on floor
-        if (y == 0 && g_conwayActive && Math.floor(g_elapsedTime * 60) % g_conwaySlowdown == 0) {
+        if (g_conwayActive && Math.floor(g_elapsedTime * 60) % g_conwaySlowdown == 0) {
           let n = calcNumNeighbors(g_map, x, y, z);
           // if cell is alive and has less than 2 or more than 3 neighbors, die;
           // if dead and has 3 neighbors, be born
@@ -362,11 +369,11 @@ function renderScene() {
   // update the cell grid
   for (let i = 0; i < cellFlipList.length; i++) {
     let x = cellFlipList[i][0], y = cellFlipList[i][1], z = cellFlipList[i][2];
-    g_map[x][y][z] = (g_map[x][y][z] == null) ? new TexturedCube(g_texture_cell, [1,1,1,1], 1) : null;
+    g_map[x][y][z] = (g_map[x][y][z] == null) ? new TexturedCube(g_texture_cell, g_cell_colors[y], 1) : null;
   }
 
   if (g_cursorVisible) {
-    let cursor = new TexturedCube(2, [0.5,0.5,0.5,0.5], 1);
+    let cursor = new TexturedCube(g_texture_cursor, [1,1,1,1], 1);
     let cursX = g_camera.cursorAt.elements[0], cursY = g_camera.cursorAt.elements[1], cursZ = g_camera.cursorAt.elements[2];
     cursor.matrix.translate(cursX, cursY, cursZ);
     cursor.matrix.translate(0.5,0,0.5);  // put into [0-1]

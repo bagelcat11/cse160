@@ -20,7 +20,7 @@ class Camera {
         projMtx.setPerspective(60, canvas.width / canvas.height, 0.1, 256);
         gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMtx.elements);
 
-        this.maxSpeed = 1;   // generic webgl units
+        this.maxSpeed = 0.5;   // generic webgl units
         this.lookSpeed = 5 * (Math.PI / 180);   // convert deg to rad
         this.verticalLookPadding = 5 * (Math.PI / 180);   // stay x degrees away from looking straight up/down
 
@@ -228,7 +228,7 @@ class Camera {
 
         let c = g_map[x][y][z];
         if (c == null) {
-            g_map[x][y][z] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            g_map[x][y][z] = new TexturedCube(g_texture_cell, g_cell_colors[y], 1);
         }
     }
 

@@ -45,32 +45,32 @@ function loadPattern(board, patternNum) {
     switch (patternNum) {  
         case 1:
             // r-pentomino
-            board[c][0][c] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+1][0][c] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+2][0][c] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c][0][c+1] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+1][0][c-1] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c][0][c] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+1][0][c] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+2][0][c] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c][0][c+1] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+1][0][c-1] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
             break;
         case 2:
             // gliders
-            board[c][0][c] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+1][0][c-1] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+1][0][c-2] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c][0][c-2] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c-1][0][c-2] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c][0][c] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+1][0][c-1] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+1][0][c-2] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c][0][c-2] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c-1][0][c-2] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
 
             let offset = 5;
-            board[c-offset][0][c-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+1-offset][0][c-1-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+1-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c-1-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c-offset][0][c-offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+1-offset][0][c-1-offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+1-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c-1-offset][0][c-2-offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
 
-            board[c+offset][0][c+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+1+offset][0][c-1+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+1+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
-            board[c-1+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+            board[c+offset][0][c+offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+1+offset][0][c-1+offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+1+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
+            board[c-1+offset][0][c-2+offset] = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
             break;
 
         case 3:
@@ -116,7 +116,7 @@ function parseCellsPlaintext(cells, board) {
                 board[x+board.length/2 - Math.floor(rows.length/2)]
                 [0]
                 [z+board.length/2 - Math.floor(longestRowLen/2)]
-                    = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+                    = new TexturedCube(g_texture_cell, g_cell_colors[0], 1);
             }
         }
     }
@@ -124,10 +124,12 @@ function parseCellsPlaintext(cells, board) {
 
 function makeSoup(density, board) {
     for (let x = 0; x < board.length; x++) {
+        for (let y = 0; y < board[x].length; y++) {
         for (let z = 0; z < board.length; z++) {
             if (Math.random() < density) {
-                board[x][0][z] = new TexturedCube(g_texture_cell, [1,1,1,1], 1);
+                board[x][y][z] = new TexturedCube(g_texture_cell, g_cell_colors[y], 1);
             }
+        }
         }
     }
 }

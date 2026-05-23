@@ -1,0 +1,22 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    /* justify-content: space-evenly; */
+    /* text-align: center; */
+    background-color: whitesmoke;
+}
+
+th {
+    font-weight: bold;
+}
+th, td {
+    border-style: outset;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
+label {
+    color: slateblue;
+    font-size: 15px;
+    font-weight: bold;
+}

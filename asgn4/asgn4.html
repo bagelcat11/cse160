@@ -1,0 +1,46 @@
+<!-- Name: Lynn Gen -->
+<!-- Email: lygen@ucsc.edu -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Asgn4: Lighting</title>
+    <link rel="stylesheet" href="asgn4.css">
+  </head>
+
+  <body onload="main()">
+    <div id="canvAndImg">
+      <canvas id="webgl" width="400" height="400">
+        Please use a browser that supports "canvas"
+      </canvas>
+    </div>
+    <p>FPS: <span id="fpsCounter"></span></p>
+
+    <div>
+      <label>Movement controls:</label>
+      <table>
+        <tr>
+          <th>WASD</th>
+          <th>Mouse, Q/E</th>
+        </tr>
+        <tr>
+          <td>Move</td>
+          <td>Look</td>
+        </tr>
+      </table>
+      <p></p>
+
+
+    <script src="lib/webgl-utils.js"></script>
+    <script src="lib/webgl-debug.js"></script>
+    <script src="lib/cuon-utils.js"></script>
+    <script src="lib/cuon-matrix-cse160.js"></script>
+    <script src="Shape.js"></script>
+    <script src="TexturedCube.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Camera.js"></script>
+    <script src="asgn4.js"></script>
+
+  </body>
+</html>

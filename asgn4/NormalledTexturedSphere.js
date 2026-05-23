@@ -1,7 +1,9 @@
-class Sphere extends Shape {
-  constructor(baseColor) {
+class NormalledTexturedSphere extends Shape {
+  constructor(textureNum, baseColor, texColorWeight) {
     super();
+    this.textureNum = textureNum;
     this.baseColor = baseColor;
+    this.texColorWeight = texColorWeight;
     this.matrix = new Matrix4();
 
     this.setUpBuffer();
@@ -20,15 +22,21 @@ class Sphere extends Shape {
             let p3 = [Math.sin(theta)*Math.cos(phi+triSize), Math.sin(theta)*Math.sin(phi+triSize), Math.cos(theta)];
             let p4 = [Math.sin(theta+triSize)*Math.cos(phi+triSize), Math.sin(theta+triSize)*Math.sin(phi+triSize), Math.cos(theta+triSize)];
 
+            let uv1 = [theta/Math.PI, phi/(2*Math.PI)];
+            let uv2 = [(theta+triSize)/Math.PI, phi/(2*Math.PI)];
+            let uv3 = [theta/Math.PI, (phi+triSize)/(2*Math.PI)];
+            let uv4 = [(theta+triSize)/Math.PI, (phi+triSize)/(2*Math.PI)];
+
             // first tri
-            arr = arr.concat(p1.concat([0,0]).concat(p1));  // for a sphere, the vertices are also the normals!
-            arr = arr.concat(p2.concat([0,0]).concat(p2));  // also using dummy UVs    
-            arr = arr.concat(p4.concat([0,0]).concat(p4));
+            // position, UVs (which are just theta and phi scaled!), normals (which are sphere vertices!)
+            arr = arr.concat(p1.concat(uv1).concat(p1));
+            arr = arr.concat(p2.concat(uv2).concat(p2));    
+            arr = arr.concat(p4.concat(uv4).concat(p4));
 
             // second tri
-            arr = arr.concat(p1.concat([0,0]).concat(p1));
-            arr = arr.concat(p4.concat([0,0]).concat(p4));
-            arr = arr.concat(p3.concat([0,0]).concat(p3));
+            arr = arr.concat(p1.concat(uv1).concat(p1));
+            arr = arr.concat(p4.concat(uv4).concat(p4));
+            arr = arr.concat(p3.concat(uv3).concat(p3));
         }
     }
 
@@ -40,8 +48,8 @@ class Sphere extends Shape {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.cornersAndNormalsBuffer);
 
     gl.enableVertexAttribArray(a_Position);
-    gl.enableVertexAttribArray(a_Normal);
     gl.enableVertexAttribArray(a_UVCoords);
+    gl.enableVertexAttribArray(a_Normal);
   }
 
   render() {
@@ -61,12 +69,12 @@ class Sphere extends Shape {
     gl.vertexAttribPointer(a_UVCoords, 2, gl.FLOAT, false, FSIZE * 8, FSIZE * 3);
     gl.vertexAttribPointer(a_Normal, 3, gl.FLOAT, false, FSIZE * 8, FSIZE * 5);
 
-    gl.uniform1i(u_Sampler, 0); // dummy
+    gl.uniform1i(u_Sampler, this.textureNum);
     gl.uniform1i(u_NormOrTex, (g_normVis === "on") ? 0 : 1);
 
     // set up base color filter
     gl.uniform4f(u_BaseColor, this.baseColor[0], this.baseColor[1], this.baseColor[2], this.baseColor[3]);
-    gl.uniform1f(u_TexColorWeight, 0);  //dummy
+    gl.uniform1f(u_TexColorWeight, this.texColorWeight);
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 

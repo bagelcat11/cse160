@@ -245,7 +245,7 @@ let c2;
 let test;
 function setUpScene() {
   g_camera = new Camera();
-  sphere = new Sphere([1,0,1,1]);
+  sphere = new NormalledTexturedSphere(g_texture_loki, [1,0,0,1], 1);
   floor = new NormalledTexturedCube(g_texture_floor, [1,1,1,1], 1);
   sky = new NormalledTexturedCube(g_texture_sky, [1,1,1,1], 1);
   c1 = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0.5);

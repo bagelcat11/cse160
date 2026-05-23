@@ -30,9 +30,8 @@ var FSHADER_SOURCE =
   'void main() {\n' + //TODO: maybe make multiple shaders instead
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
 
-      // 'gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor;\n' +  // set color with texture!
       'if (u_NormOrTex == 0) { gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0); }\n' +
-      'else if (u_NormOrTex == 1) { gl_FragColor = u_BaseColor * texColor; }\n' +
+      'else if (u_NormOrTex == 1) { gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor; }\n' +
   '}\n';
 
 // -- GLOBALS --
@@ -117,7 +116,6 @@ function addActionsForHtmlUI() {
   normToggles.forEach(s => {
     s.addEventListener("click", () => {
       g_normVis = s.value;
-      console.log(s.value)
     });
   });
 }
@@ -238,8 +236,20 @@ function initTexture(texturePath, glTextureNum) {
   img.src = texturePath;
 }
 
+let sphere;
+let floor;
+let sky;
+let c1;
+let c2;
+
+let test;
 function setUpScene() {
   g_camera = new Camera();
+  sphere = new Sphere([1,0,1,1]);
+  floor = new NormalledTexturedCube(g_texture_floor, [1,1,1,1], 1);
+  sky = new NormalledTexturedCube(g_texture_sky, [1,1,1,1], 1);
+  c1 = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0.5);
+  c2 = new NormalledTexturedCube(g_texture_loki, [0,0,1,1], 0.5);
 }
 
 function renderScene() {
@@ -254,21 +264,26 @@ function renderScene() {
   globalRotMtx.translate(0,-0.15,0);  // center her
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
-  let floor = new TexturedCube(g_texture_loki, [1,1,1,1], 1);
+  floor.matrix.set(g_identityM);
   floor.matrix.translate(0,-0.5,0);
   floor.matrix.scale(g_mapSize, 0.01, g_mapSize);
   floor.render();
 
-  let sky = new NormalledCube([1,0,0,1]);
+  sky.matrix.set(g_identityM);
   sky.matrix.scale(g_mapSize * -3, g_mapSize * -3, g_mapSize * -3);
   sky.render();
 
-  let c1 = new NormalledCube([1,0,0,1]);
-  c1.matrix.translate(0,0,-2);
+  c1.matrix.set(g_identityM);
+  c1.matrix.translate(0,0,-6);
   c1.matrix.translate(-0.5,0,-0.5);
   c1.render();
-  let c2 = new NormalledCube([1,0,0,1]);
-  c2.matrix.translate(1,1,-2);
+
+  c2.matrix.set(g_identityM);
+  c2.matrix.translate(1,1,-6);
   c2.matrix.translate(-0.5,0,-0.5);
   c2.render();
+
+  sphere.matrix.set(g_identityM);
+  sphere.matrix.translate(0,2,-3);
+  sphere.render();
 }

@@ -5,13 +5,16 @@ var VSHADER_SOURCE =
   'uniform mat4 u_ModelMatrix;\n'+  // for rotating parts of the model
   'uniform mat4 u_GlobalRotateMatrix;\n' +  // for the camera
   'attribute vec2 a_UVCoords;\n' +  // for textures!
+  'attribute vec3 a_Normal;\n' +
   'varying vec2 v_UVCoords;\n'+
+  'varying vec3 v_Normal;\n' +
   'uniform mat4 u_ProjectionMatrix;\n' + // for camera (look at)!
   'uniform mat4 u_ViewMatrix;\n' +       // (perspective)
   '\n' +
   'void main() {\n' +
   '   gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' + // now transformable with mtx!
   '   v_UVCoords = a_UVCoords;\n' + // set varying to attrib
+  '   v_Normal = a_Normal;\n' +
   '}\n';
 
 // -- Fragment shader program --
@@ -21,11 +24,15 @@ var FSHADER_SOURCE =
   'uniform float u_TexColorWeight;\n' + // 0 = all base color, 1 = all texture color
   'uniform sampler2D u_Sampler;\n' +  // for textures!
   'varying vec2 v_UVCoords;\n' +      // read the varying var!
+  'varying vec3 v_Normal;\n' +
+  'uniform int u_NormOrTex;\n' +  //TODO:
   '\n' +
-  'void main() {\n' +
+  'void main() {\n' + //TODO: maybe make multiple shaders instead
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
+
       // 'gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor;\n' +  // set color with texture!
-      'gl_FragColor = u_BaseColor * texColor;\n' + // multiply colors!
+      'if (u_NormOrTex == 0) { gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0); }\n' +
+      'else if (u_NormOrTex == 1) { gl_FragColor = u_BaseColor * texColor; }\n' +
   '}\n';
 
 // -- GLOBALS --
@@ -42,6 +49,9 @@ let u_ViewMatrix;
 let a_UVCoords;
 let u_Sampler;
 let u_GlobalRotateMatrix;
+let a_Normal;
+let u_NormOrTex;
+let g_normVis = "off";
 let g_identityM = new Matrix4();
 
 let g_camera; // this will be the Camera class
@@ -96,8 +106,20 @@ function connectVariablesToGLSL() {
   u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotateMatrix");
   a_UVCoords = gl.getAttribLocation(gl.program, "a_UVCoords");
   u_Sampler = gl.getUniformLocation(gl.program, "u_Sampler");
+  a_Normal = gl.getAttribLocation(gl.program, "a_Normal");
+  u_NormOrTex = gl.getUniformLocation(gl.program, "u_NormOrTex");
   
   gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
+}
+
+function addActionsForHtmlUI() {
+  let normToggles = document.getElementsByName("normToggle");
+  normToggles.forEach(s => {
+    s.addEventListener("click", () => {
+      g_normVis = s.value;
+      console.log(s.value)
+    });
+  });
 }
 
 
@@ -121,6 +143,7 @@ function main() {
   setupWebGL();
   connectVariablesToGLSL();
   setupAllTextures();
+  addActionsForHtmlUI();
 
   // Specify the color for clearing <canvas>
   gl.clearColor(0,0,0, 1.0);
@@ -231,20 +254,20 @@ function renderScene() {
   globalRotMtx.translate(0,-0.15,0);  // center her
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMtx.elements);
 
-  let floor = new TexturedCube(g_texture_floor, [1,1,1,1], 1);
+  let floor = new TexturedCube(g_texture_loki, [1,1,1,1], 1);
   floor.matrix.translate(0,-0.5,0);
   floor.matrix.scale(g_mapSize, 0.01, g_mapSize);
   floor.render();
 
-  let sky = new TexturedCube(g_texture_sky, [1,1,1,1], 1);
-  sky.matrix.scale(g_mapSize * 3, g_mapSize * 3, g_mapSize * 3);
+  let sky = new NormalledCube([1,0,0,1]);
+  sky.matrix.scale(g_mapSize * -3, g_mapSize * -3, g_mapSize * -3);
   sky.render();
 
-  let c1 = new TexturedCube(g_texture_loki, [1,1,1,1], 1);
+  let c1 = new NormalledCube([1,0,0,1]);
   c1.matrix.translate(0,0,-2);
   c1.matrix.translate(-0.5,0,-0.5);
   c1.render();
-  let c2 = new TexturedCube(g_texture_loki, [1,1,1,1], 1);
+  let c2 = new NormalledCube([1,0,0,1]);
   c2.matrix.translate(1,1,-2);
   c2.matrix.translate(-0.5,0,-0.5);
   c2.render();

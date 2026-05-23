@@ -51,6 +51,7 @@ class TexturedCube extends Shape {
 
     // give texture unit number to sampler
     gl.uniform1i(u_Sampler, textureNum);
+    gl.uniform1i(u_NormOrTex, (g_normVis === "on") ? 0 : 1);
 
     // set up base color filter
     gl.uniform4f(u_BaseColor, this.baseColor[0], this.baseColor[1], this.baseColor[2], this.baseColor[3]);

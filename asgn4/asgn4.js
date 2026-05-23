@@ -8,13 +8,15 @@ var VSHADER_SOURCE =
   'attribute vec3 a_Normal;\n' +
   'varying vec2 v_UVCoords;\n'+
   'varying vec3 v_Normal;\n' +
+  'varying vec4 v_VertPos;\n' +
   'uniform mat4 u_ProjectionMatrix;\n' + // for camera (look at)!
   'uniform mat4 u_ViewMatrix;\n' +       // (perspective)
-  '\n' +
+  
   'void main() {\n' +
   '   gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' + // now transformable with mtx!
   '   v_UVCoords = a_UVCoords;\n' + // set varying to attrib
   '   v_Normal = a_Normal;\n' +
+  '   v_VertPos = u_ModelMatrix * a_Position;\n' +  // in world space
   '}\n';
 
 // -- Fragment shader program --
@@ -23,15 +25,21 @@ var FSHADER_SOURCE =
   'uniform vec4 u_BaseColor;\n' + // color filter for texture
   'uniform float u_TexColorWeight;\n' + // 0 = all base color, 1 = all texture color
   'uniform sampler2D u_Sampler;\n' +  // for textures!
-  'varying vec2 v_UVCoords;\n' +      // read the varying var!
+  'varying vec2 v_UVCoords;\n' +  
   'varying vec3 v_Normal;\n' +
-  'uniform int u_NormOrTex;\n' +  //TODO:
+  'varying vec4 v_VertPos;\n' + // for light!
+  'uniform int u_NormOrTex;\n' +
+  'uniform vec3 u_LightPos;\n' +  // for light!
   '\n' +
   'void main() {\n' + //TODO: maybe make multiple shaders instead
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
 
       'if (u_NormOrTex == 0) { gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0); }\n' +
       'else if (u_NormOrTex == 1) { gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor; }\n' +
+
+      'vec3 lightVec = vec3(v_VertPos) - u_LightPos;\n' +
+      'float r = length(lightVec);\n' +
+      'if (r < 5.0) { gl_FragColor = vec4(1,1,0.5,1); }\n' +
   '}\n';
 
 // -- GLOBALS --
@@ -52,6 +60,12 @@ let a_Normal;
 let u_NormOrTex;
 let g_normVis = "off";
 let g_identityM = new Matrix4();
+
+let u_LightPos;
+let g_lightX = 0;
+let g_lightY = 16;
+let g_lightZ = 0;
+let g_lightAnim = "on";
 
 let g_camera; // this will be the Camera class
 // these ones are actually rotating world
@@ -107,6 +121,7 @@ function connectVariablesToGLSL() {
   u_Sampler = gl.getUniformLocation(gl.program, "u_Sampler");
   a_Normal = gl.getAttribLocation(gl.program, "a_Normal");
   u_NormOrTex = gl.getUniformLocation(gl.program, "u_NormOrTex");
+  u_LightPos = gl.getUniformLocation(gl.program, "u_LightPos");
   
   gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
 }
@@ -118,6 +133,34 @@ function addActionsForHtmlUI() {
       g_normVis = s.value;
     });
   });
+  let lightAnimToggles = document.getElementsByName("lightAnimToggle");
+  lightAnimToggles.forEach(s => {
+    s.addEventListener("click", () => {
+      g_lightAnim = s.value;
+    });
+  });
+
+  let lightXSlider = document.getElementById("lightXSlider");
+  lightXSlider.addEventListener("input", () => {
+    g_lightX = lightXSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let lightYSlider = document.getElementById("lightYSlider");
+  lightYSlider.addEventListener("input", () => {
+    g_lightY = lightYSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+  let lightZSlider = document.getElementById("lightZSlider");
+  lightZSlider.addEventListener("input", () => {
+    g_lightZ = lightZSlider.value;
+    disableAutoAnimWhenDoingSlider();
+  });
+}
+
+function disableAutoAnimWhenDoingSlider() {
+  let off = document.getElementById("lightAnimOff");
+  off.checked = true;
+  g_lightAnim = off.value;
 }
 
 
@@ -183,6 +226,8 @@ function tick() {
   let msElapsed = performance.now() - start; 
   fpsCounter.textContent = (1000 / msElapsed).toFixed(0);
 
+  updateAnimatedTransforms();
+
   // repeat as soon as browser can
   requestAnimationFrame(tick);
 }
@@ -241,6 +286,7 @@ let floor;
 let sky;
 let c1;
 let c2;
+let light;
 
 let test;
 function setUpScene() {
@@ -250,6 +296,7 @@ function setUpScene() {
   sky = new NormalledTexturedCube(g_texture_sky, [1,1,1,1], 1);
   c1 = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0.5);
   c2 = new NormalledTexturedCube(g_texture_loki, [0,0,1,1], 0.5);
+  light = new NormalledTexturedSphere(g_texture_loki, [1,1,0,1], 0);
 }
 
 function renderScene() {
@@ -286,4 +333,17 @@ function renderScene() {
   sphere.matrix.set(g_identityM);
   sphere.matrix.translate(0,2,-3);
   sphere.render();
+
+  light.matrix.set(g_identityM);
+  light.matrix.translate(g_lightX, g_lightY, g_lightZ);
+  light.render();
+  gl.uniform3f(u_LightPos, g_lightX, g_lightY, g_lightZ); // pass to shader!
+}
+
+function updateAnimatedTransforms() {
+  if (g_lightAnim === "on") {
+    g_lightX = Math.sin(g_elapsedTime / 2) * 16;
+    g_lightZ = Math.cos(g_elapsedTime / 2) * 16;
+    g_lightY = Math.sin(g_elapsedTime / 2) * 4 + 12;
+  }
 }

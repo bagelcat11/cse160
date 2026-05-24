@@ -345,6 +345,7 @@ let c2;
 let spinner;
 let light;
 let bunny;
+let teapot;
 
 let test;
 function setUpScene() {
@@ -357,6 +358,7 @@ function setUpScene() {
   spinner = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 1);
   light = new NormalledTexturedSphere(g_texture_loki, [1,1,0,1], 0);
   bunny = new ObjModel("model/bunny.obj", [0,1,0,1]);
+  teapot = new ObjModel("model/teapot.obj", [1,0.5,0.7]);
 
   test = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 0);
 }
@@ -411,7 +413,14 @@ function renderScene() {
   light.render();
 
   bunny.matrix.set(g_identityM);
+  bunny.matrix.translate(5,0,-5);
+  bunny.matrix.scale(0.5,0.5,0.5);
   bunny.render();
+
+  teapot.matrix.set(g_identityM);
+  teapot.matrix.translate(-5,0,-5);
+  teapot.matrix.scale(0.5,0.5,0.5);
+  teapot.render();
 
   gl.uniform3f(u_LightPos, g_lightX, g_lightY, g_lightZ); // pass to shader!
   gl.uniform3f(u_CameraPos, g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]);

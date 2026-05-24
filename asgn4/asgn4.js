@@ -39,6 +39,7 @@ var FSHADER_SOURCE =
   'uniform bool u_LightOn;\n' +
   'uniform vec3 u_LightColor;\n' +
   'uniform vec3 u_SpotlightColor;\n' +
+  'uniform bool u_SpotlightOn;\n' +
   '\n' +
   'void main() {\n' + //TODO: maybe make multiple shaders instead
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
@@ -71,20 +72,20 @@ var FSHADER_SOURCE =
       R = reflect(-L, N);
       nDotL = max(dot(L, N), 0.0);
       float dotDirToSpot = dot(normalize(spotlightVec), -normalize(u_SpotlightDir));
-      float dotOuterThreshold = 0.8;
-      float dotInnerThreshold = 0.75;
+      float dotOuterThreshold = 0.9;
+      float dotInnerThreshold = 0.85;
 
       float inSpotlight = smoothstep(dotInnerThreshold, dotOuterThreshold, dotDirToSpot);
       vec3 spotDiffuse = inSpotlight * nDotL * u_SpotlightColor;
-      vec3 spotSpecular = pow(max(dot(E, R), 0.0), 20.0) * u_SpotlightColor;
-      ` + 
+      vec3 spotSpecular = inSpotlight * pow(max(dot(E, R), 0.0), 20.0) * u_SpotlightColor;
 
-      'if (u_LightOn) {\n'+
-      '   if (u_TexColorWeight <= 0.0) { gl_FragColor = vec4(diffuse + ambient, 1.0); }\n' + // no specular for non textured, TODO: make this not conditional
-      '   else { gl_FragColor = vec4(diffuse + ambient + specular, 1.0); }\n' +
-
-      '   gl_FragColor += vec4(spotDiffuse + spotSpecular, 1.0);\n' +
-      '}\n' +
+      // if (u_LightOn || u_SpotlightOn) { gl_FragColor = vec4(0.0,0.0,0.0,1.0); }
+      if (u_LightOn) {
+        if (u_TexColorWeight <= 0.0) { gl_FragColor = vec4(diffuse + ambient, 1.0); } // no specular for non textured, TODO: make this not conditional
+        else { gl_FragColor = vec4(diffuse + ambient + specular, 1.0); }
+      }
+      if (u_SpotlightOn) { gl_FragColor += vec4(spotDiffuse + spotSpecular, 1.0); }
+      \n` + 
   '}\n';
 
 // -- GLOBALS --
@@ -132,6 +133,8 @@ let g_lightGreen = 1;
 let g_lightBlue = 1;
 let u_LightColor;
 
+let u_SpotLightOn;
+let g_spotlightOn = "on";
 let u_SpotlightPos;
 let u_SpotlightDir;
 let u_SpotlightColor;
@@ -190,6 +193,7 @@ function connectVariablesToGLSL() {
   u_SpotlightPos = gl.getUniformLocation(gl.program, "u_SpotlightPos");
   u_SpotlightDir = gl.getUniformLocation(gl.program, "u_SpotlightDir");
   u_SpotlightColor = gl.getUniformLocation(gl.program, "u_SpotlightColor");
+  u_SpotlightOn = gl.getUniformLocation(gl.program, "u_SpotlightOn");
   
   gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
 }
@@ -211,6 +215,12 @@ function addActionsForHtmlUI() {
   lightToggles.forEach(s => {
     s.addEventListener("click", () => {
       g_lightOn = s.value;
+    });
+  });
+  let spotlightToggles = document.getElementsByName("spotlightToggle");
+  spotlightToggles.forEach(s => {
+    s.addEventListener("click", () => {
+      g_spotlightOn = s.value;
     });
   });
 
@@ -375,12 +385,13 @@ let c2;
 let spinner;
 let light;
 let bunny;
-let teapot;
+let sphere2;
+// let teapot;
 
-let test;
+// let test;
 function setUpScene() {
   g_camera = new Camera();
-  sphere = new NormalledTexturedSphere(g_texture_loki, [1,0,0,1], 1);
+  sphere = new NormalledTexturedSphere(g_texture_sky, [1,0,0,1], 1);
   floor = new NormalledTexturedCube(g_texture_floor, [1,1,1,1], 1);
   sky = new NormalledTexturedCube(g_texture_sky, [0.5,0.5,1,1], 0);
   c1 = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0);
@@ -389,9 +400,10 @@ function setUpScene() {
   light = new NormalledTexturedSphere(g_texture_loki, [1,1,0,1], 0);
   spotlight = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0);
   bunny = new ObjModel("model/bunny.obj", [0,1,0,1]);
-  teapot = new ObjModel("model/teapot.obj", [1,0.5,0.7]);
+  sphere2 = new NormalledTexturedSphere(g_texture_loki, [0.2,1,0.2,1], 0);
+  // teapot = new ObjModel("model/teapot.obj", [1,0.5,0.7]);//TODO: disappeared when no lighting??
 
-  test = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 0);
+  // test = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 0);
 }
 
 function renderScene() {
@@ -419,21 +431,25 @@ function renderScene() {
   sky.render();
 
   c1.matrix.set(g_identityM);
-  c1.matrix.translate(0,0,-6);
+  c1.matrix.translate(0,0,-5);
   c1.matrix.translate(-0.5,0,-0.5);
   c1.render();
 
   c2.matrix.set(g_identityM);
-  c2.matrix.translate(1,1,-6);
+  c2.matrix.translate(1,1,-5);
   c2.matrix.translate(-0.5,0,-0.5);
   c2.render();
 
   sphere.matrix.set(g_identityM);
-  sphere.matrix.translate(0,2,-3);
+  sphere.matrix.translate(0,2,-8);
   sphere.render();
 
+  sphere2.matrix.set(g_identityM);
+  sphere2.matrix.translate(-1,3,-4);
+  sphere2.render();
+
   spinner.matrix.set(g_identityM);
-  spinner.matrix.translate(-2,2,-5);
+  spinner.matrix.translate(-2,2,-6);
   spinner.matrix.rotate(g_elapsedTime * 50, 1,1,1);
   spinner.matrix.rotate(g_elapsedTime * 50, -1,1,1);
   spinner.render();
@@ -445,7 +461,7 @@ function renderScene() {
 
   spotlight.matrix.set(g_identityM);
   spotlight.matrix.translate(g_spotlightX,g_spotlightY,g_spotlightZ);
-  spotlight.matrix.rotate()
+  // spotlight.matrix.rotate()
   spotlight.matrix.scale(0.25, 0.25, 0.25);
   spotlight.flipped = true;
   spotlight.render();
@@ -456,11 +472,11 @@ function renderScene() {
   bunny.matrix.scale(0.5,0.5,0.5);
   bunny.render();
 
-  teapot.matrix.set(g_identityM);
-  teapot.matrix.translate(-5,0,-5);
-  teapot.matrix.rotate(g_elapsedTime * 10, 0,1,0);
-  teapot.matrix.scale(0.5,0.5,0.5);
-  teapot.render();
+  // teapot.matrix.set(g_identityM);
+  // teapot.matrix.translate(-5,0,-5);
+  // teapot.matrix.rotate(g_elapsedTime * 10, 0,1,0);
+  // teapot.matrix.scale(0.5,0.5,0.5);
+  // teapot.render();
 
   gl.uniform3f(u_LightPos, g_lightX, g_lightY, g_lightZ); // pass to shader!
   gl.uniform3f(u_SpotlightPos, g_spotlightX,g_spotlightY,g_spotlightZ);
@@ -468,6 +484,7 @@ function renderScene() {
   gl.uniform3f(u_SpotlightColor, 1,0,0);
   gl.uniform3f(u_CameraPos, g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]);
   gl.uniform1i(u_LightOn, (g_lightOn === "on") ? 1 : 0);
+  gl.uniform1i(u_SpotlightOn, (g_spotlightOn === "on") ? 1 : 0);
   gl.uniform3f(u_LightColor, g_lightRed, g_lightGreen, g_lightBlue);
 }
 

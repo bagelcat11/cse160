@@ -24,38 +24,52 @@
       <input type="radio" id="normOff" name="normToggle" value="off" checked/>
       <label for="normOff">Off</label>
     </div>
-    <div>
-      <label><strong>Lighting: </strong></label>
-      <input type="radio" id="lightOn" name="lightToggle" value="on" checked/>
-      <label for="lightOn">On</label>
-      <input type="radio" id="lightOff" name="lightToggle" value="off"/>
-      <label for="lightOff">Off</label>
-    </div>
     <p></p>
 
     <label><strong>Point light controls:</strong></label>
-    <div>
-      <label><strong>Movement: </strong></label>
-      <input type="radio" id="lightAnimOn" name="lightAnimToggle" value="on" checked/>
-      <label for="lightAnimOn">On</label>
-      <input type="radio" id="lightAnimOff" name="lightAnimToggle" value="off"/>
-      <label for="lightAnimOff">Off</label>
+    <div class="container">
+      <div>
+        <label><strong>Light: </strong></label>
+        <input type="radio" id="lightOn" name="lightToggle" value="on" checked/>
+        <label for="lightOn">On</label>
+        <input type="radio" id="lightOff" name="lightToggle" value="off"/>
+        <label for="lightOff">Off</label>
+      </div>
+      <div>
+        <label><strong>Movement: </strong></label>
+        <input type="radio" id="lightAnimOn" name="lightAnimToggle" value="on" checked/>
+        <label for="lightAnimOn">On</label>
+        <input type="radio" id="lightAnimOff" name="lightAnimToggle" value="off"/>
+        <label for="lightAnimOff">Off</label>
+      </div>
+      <div>
+        <label><strong>Position: </strong>X</label>
+        <input type="range" min="-16" max="16" value="0" class="slider" id="lightXSlider">
+        <label>Y:</label>
+        <input type="range" min="-16" max="16" value="16" class="slider" id="lightYSlider">
+        <label>Z:</label>
+        <input type="range" min="-16" max="16" value="0" class="slider" id="lightZSlider">
+      </div>
+      <div>
+        <label><strong>Color: </strong>Red</label>
+        <input type="range" min="0" max="100" value="100" class="slider" id="redSlider">
+        <label>Green</label>
+        <input type="range" min="0" max="100" value="100" class="slider" id="greenSlider">
+        <label>Blue</label>
+        <input type="range" min="0" max="100" value="100" class="slider" id="blueSlider">
+      </div>
     </div>
-    <div>
-      <label><strong>Position: </strong>X</label>
-      <input type="range" min="-16" max="16" value="0" class="slider" id="lightXSlider">
-      <label>Y:</label>
-      <input type="range" min="-16" max="16" value="16" class="slider" id="lightYSlider">
-      <label>Z:</label>
-      <input type="range" min="-16" max="16" value="0" class="slider" id="lightZSlider">
-    </div>
-    <div>
-      <label><strong>Color: </strong>Red</label>
-      <input type="range" min="0" max="100" value="100" class="slider" id="redSlider">
-      <label>Green</label>
-      <input type="range" min="0" max="100" value="100" class="slider" id="greenSlider">
-      <label>Blue</label>
-      <input type="range" min="0" max="100" value="100" class="slider" id="blueSlider">
+    <p></p>
+
+    <label><strong>Spot light controls:</strong></label>
+    <div class="container">
+      <div>
+        <label><strong>Light: </strong></label>
+        <input type="radio" id="spotlightOn" name="spotlightToggle" value="on" checked/>
+        <label for="spotlightOn">On</label>
+        <input type="radio" id="spotlightOff" name="spotlightToggle" value="off"/>
+        <label for="spotlightOff">Off</label>
+      </div>
     </div>
     <p></p>
 

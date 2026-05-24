@@ -20,3 +20,10 @@ label {
     font-size: 15px;
     /* font-weight: bold; */
 }
+
+.container {
+    border-style: solid;
+    border-color: gray;
+    border-width: 0.15em;
+    padding: 0.5em
+}

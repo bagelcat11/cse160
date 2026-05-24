@@ -35,6 +35,7 @@ var FSHADER_SOURCE =
   'uniform vec3 u_LightPos;\n' +  // for light!
   'uniform vec3 u_CameraPos;\n' +
   'uniform bool u_LightOn;\n' +
+  'uniform vec3 u_LightColor;\n' +
   '\n' +
   'void main() {\n' + //TODO: maybe make multiple shaders instead
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
@@ -51,14 +52,14 @@ var FSHADER_SOURCE =
       'vec3 N = normalize(v_Normal);\n' +
       'float nDotL = max(dot(N, L), 0.0);\n' +
 
-      'vec3 diffuse = vec3(gl_FragColor) * nDotL;\n' +
+      'vec3 diffuse = vec3(gl_FragColor) * nDotL * u_LightColor;\n' + // give diffuse color
       'vec3 ambient = vec3(gl_FragColor) * 0.2;\n' +
 
       // specular
       'vec3 R = reflect(-L, N);\n' +
       'vec3 E = normalize(u_CameraPos - vec3(v_VertPos));\n' +
 
-      'float specular = pow(max(dot(E, R), 0.0), 20.0);\n' +
+      'vec3 specular = pow(max(dot(E, R), 0.0), 20.0) * u_LightColor;\n' +  // give specular color
       
       'if (u_LightOn) {\n'+
       '   if (u_TexColorWeight <= 0.0) { gl_FragColor = vec4(diffuse + ambient, 1.0); }\n' + // no specular for non textured, TODO: make this not conditional
@@ -105,6 +106,11 @@ let g_startTime = performance.now() / 1000;
 let g_elapsedTime = performance.now() / 1000 - g_startTime;
 
 let g_mapSize = 32;
+
+let g_lightRed = 1;
+let g_lightGreen = 1;
+let g_lightBlue = 1;
+let u_LightColor;
 
 // -- Setup helpers --
 function setupWebGL() {
@@ -153,6 +159,7 @@ function connectVariablesToGLSL() {
   u_CameraPos = gl.getUniformLocation(gl.program, "u_CameraPos");
   u_LightOn = gl.getUniformLocation(gl.program, "u_LightOn");
   u_NormalMatrix = gl.getUniformLocation(gl.program, "u_NormalMatrix");
+  u_LightColor = gl.getUniformLocation(gl.program, "u_LightColor");
   
   gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
 }
@@ -191,6 +198,18 @@ function addActionsForHtmlUI() {
   lightZSlider.addEventListener("input", () => {
     g_lightZ = lightZSlider.value;
     disableAutoAnimWhenDoingSlider();
+  });
+  let lightRedSlider = document.getElementById("redSlider");
+  lightRedSlider.addEventListener("input", () => {
+    g_lightRed = lightRedSlider.value / 100;
+  });
+  let lightBlueSlider = document.getElementById("blueSlider");
+  lightBlueSlider.addEventListener("input", () => {
+    g_lightBlue = lightBlueSlider.value / 100;
+  });
+  let lightGreenSlider = document.getElementById("greenSlider");
+  lightGreenSlider.addEventListener("input", () => {
+    g_lightGreen = lightGreenSlider.value / 100;
   });
 }
 
@@ -387,6 +406,7 @@ function renderScene() {
   gl.uniform3f(u_LightPos, g_lightX, g_lightY, g_lightZ); // pass to shader!
   gl.uniform3f(u_CameraPos, g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]);
   gl.uniform1i(u_LightOn, (g_lightOn === "on") ? 1 : 0);
+  gl.uniform3f(u_LightColor, g_lightRed, g_lightGreen, g_lightBlue);
 }
 
 function updateAnimatedTransforms() {

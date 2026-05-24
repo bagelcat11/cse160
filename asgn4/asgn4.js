@@ -389,6 +389,7 @@ let sphere2;
 // let teapot;
 
 // let test;
+let g_shapesList = [];
 function setUpScene() {
   g_camera = new Camera();
   sphere = new NormalledTexturedSphere(g_texture_sky, [1,0,0,1], 1);
@@ -401,6 +402,8 @@ function setUpScene() {
   spotlight = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0);
   bunny = new ObjModel("model/bunny.obj", [0,1,0,1]);
   sphere2 = new NormalledTexturedSphere(g_texture_loki, [0.2,1,0.2,1], 0);
+
+  setUpLoki();
   // teapot = new ObjModel("model/teapot.obj", [1,0.5,0.7]);//TODO: disappeared when no lighting??
 
   // test = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 0);
@@ -471,6 +474,8 @@ function renderScene() {
   bunny.matrix.rotate(g_elapsedTime * -10, 0,1,0);
   bunny.matrix.scale(0.5,0.5,0.5);
   bunny.render();
+
+  renderLoki();
 
   // teapot.matrix.set(g_identityM);
   // teapot.matrix.translate(-5,0,-5);

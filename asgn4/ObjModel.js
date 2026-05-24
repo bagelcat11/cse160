@@ -109,7 +109,7 @@ class ObjModel {
 
 
         // dummy things since we are only using 1 shader but this has no texture
-        gl.uniform1i(u_Sampler, 0);
+        gl.uniform1i(u_Sampler, g_texture_sky);
         gl.uniform1i(u_NormOrTex, (g_normVis === "on") ? 0 : 1);
         gl.uniform4f(u_BaseColor, this.baseColor[0], this.baseColor[1], this.baseColor[2], this.baseColor[3]);
         gl.uniform1f(u_TexColorWeight, 1);

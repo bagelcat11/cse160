@@ -25,14 +25,7 @@
       <label for="normOff">Off</label>
     </div>
     <div>
-      <label><strong>Light movement: </strong></label>
-      <input type="radio" id="lightAnimOn" name="lightAnimToggle" value="on" checked/>
-      <label for="lightAnimOn">On</label>
-      <input type="radio" id="lightAnimOff" name="lightAnimToggle" value="off"/>
-      <label for="lightAnimOff">Off</label>
-    </div>
-    <div>
-      <label><strong>Light: </strong></label>
+      <label><strong>Lighting: </strong></label>
       <input type="radio" id="lightOn" name="lightToggle" value="on" checked/>
       <label for="lightOn">On</label>
       <input type="radio" id="lightOff" name="lightToggle" value="off"/>
@@ -40,17 +33,24 @@
     </div>
     <p></p>
 
+    <label><strong>Point light controls:</strong></label>
     <div>
-      <label><strong>Light X: </strong></label>
+      <label><strong>Movement: </strong></label>
+      <input type="radio" id="lightAnimOn" name="lightAnimToggle" value="on" checked/>
+      <label for="lightAnimOn">On</label>
+      <input type="radio" id="lightAnimOff" name="lightAnimToggle" value="off"/>
+      <label for="lightAnimOff">Off</label>
+    </div>
+    <div>
+      <label><strong>Position: </strong>X</label>
       <input type="range" min="-16" max="16" value="0" class="slider" id="lightXSlider">
-      <label><strong>Light Y: </strong></label>
+      <label>Y:</label>
       <input type="range" min="-16" max="16" value="16" class="slider" id="lightYSlider">
-      <label><strong>Light Z: </strong></label>
+      <label>Z:</label>
       <input type="range" min="-16" max="16" value="0" class="slider" id="lightZSlider">
     </div>
-    <p></p>
     <div>
-      <label><strong>Light color: </strong>Red</label>
+      <label><strong>Color: </strong>Red</label>
       <input type="range" min="0" max="100" value="100" class="slider" id="redSlider">
       <label>Green</label>
       <input type="range" min="0" max="100" value="100" class="slider" id="greenSlider">
@@ -60,7 +60,7 @@
     <p></p>
 
     <div>
-      <label>Movement controls:</label>
+      <label><strong>Movement controls:</strong></label>
       <table>
         <tr>
           <th>WASD</th>

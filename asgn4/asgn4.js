@@ -33,9 +33,12 @@ var FSHADER_SOURCE =
   'varying vec4 v_VertPos;\n' + // for light!
   'uniform int u_NormOrTex;\n' +
   'uniform vec3 u_LightPos;\n' +  // for light!
+  'uniform vec3 u_SpotlightPos;\n' +
+  'uniform vec3 u_SpotlightDir;\n' +
   'uniform vec3 u_CameraPos;\n' +
   'uniform bool u_LightOn;\n' +
   'uniform vec3 u_LightColor;\n' +
+  'uniform vec3 u_SpotlightColor;\n' +
   '\n' +
   'void main() {\n' + //TODO: maybe make multiple shaders instead
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
@@ -59,11 +62,28 @@ var FSHADER_SOURCE =
       'vec3 R = reflect(-L, N);\n' +
       'vec3 E = normalize(u_CameraPos - vec3(v_VertPos));\n' +
 
-      'vec3 specular = pow(max(dot(E, R), 0.0), 20.0) * u_LightColor;\n' +  // give specular color
+      'vec3 specular = pow(max(dot(E, R), 0.0), 20.0) * u_LightColor;\n' +  // give specular color, power
       
+      // spotlight
+      // modified from https://webglfundamentals.org/webgl/lessons/webgl-3d-lighting-spot.html
+      `vec3 spotlightVec = u_SpotlightPos - vec3(v_VertPos);
+      L = normalize(spotlightVec);
+      R = reflect(-L, N);
+      nDotL = max(dot(L, N), 0.0);
+      float dotDirToSpot = dot(normalize(spotlightVec), -normalize(u_SpotlightDir));
+      float dotOuterThreshold = 0.8;
+      float dotInnerThreshold = 0.75;
+
+      float inSpotlight = smoothstep(dotInnerThreshold, dotOuterThreshold, dotDirToSpot);
+      vec3 spotDiffuse = inSpotlight * nDotL * u_SpotlightColor;
+      vec3 spotSpecular = pow(max(dot(E, R), 0.0), 20.0) * u_SpotlightColor;
+      ` + 
+
       'if (u_LightOn) {\n'+
       '   if (u_TexColorWeight <= 0.0) { gl_FragColor = vec4(diffuse + ambient, 1.0); }\n' + // no specular for non textured, TODO: make this not conditional
       '   else { gl_FragColor = vec4(diffuse + ambient + specular, 1.0); }\n' +
+
+      '   gl_FragColor += vec4(spotDiffuse + spotSpecular, 1.0);\n' +
       '}\n' +
   '}\n';
 
@@ -111,6 +131,13 @@ let g_lightRed = 1;
 let g_lightGreen = 1;
 let g_lightBlue = 1;
 let u_LightColor;
+
+let u_SpotlightPos;
+let u_SpotlightDir;
+let u_SpotlightColor;
+let g_spotlightX = 5;
+let g_spotlightY = 5;
+let g_spotlightZ = -5;
 
 // -- Setup helpers --
 function setupWebGL() {
@@ -160,6 +187,9 @@ function connectVariablesToGLSL() {
   u_LightOn = gl.getUniformLocation(gl.program, "u_LightOn");
   u_NormalMatrix = gl.getUniformLocation(gl.program, "u_NormalMatrix");
   u_LightColor = gl.getUniformLocation(gl.program, "u_LightColor");
+  u_SpotlightPos = gl.getUniformLocation(gl.program, "u_SpotlightPos");
+  u_SpotlightDir = gl.getUniformLocation(gl.program, "u_SpotlightDir");
+  u_SpotlightColor = gl.getUniformLocation(gl.program, "u_SpotlightColor");
   
   gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
 }
@@ -357,6 +387,7 @@ function setUpScene() {
   c2 = new NormalledTexturedCube(g_texture_loki, [0,0,1,1], 0.5);
   spinner = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 1);
   light = new NormalledTexturedSphere(g_texture_loki, [1,1,0,1], 0);
+  spotlight = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0);
   bunny = new ObjModel("model/bunny.obj", [0,1,0,1]);
   teapot = new ObjModel("model/teapot.obj", [1,0.5,0.7]);
 
@@ -412,17 +443,29 @@ function renderScene() {
   light.flipped = true;
   light.render();
 
+  spotlight.matrix.set(g_identityM);
+  spotlight.matrix.translate(g_spotlightX,g_spotlightY,g_spotlightZ);
+  spotlight.matrix.rotate()
+  spotlight.matrix.scale(0.25, 0.25, 0.25);
+  spotlight.flipped = true;
+  spotlight.render();
+
   bunny.matrix.set(g_identityM);
   bunny.matrix.translate(5,0,-5);
+  bunny.matrix.rotate(g_elapsedTime * -10, 0,1,0);
   bunny.matrix.scale(0.5,0.5,0.5);
   bunny.render();
 
   teapot.matrix.set(g_identityM);
   teapot.matrix.translate(-5,0,-5);
+  teapot.matrix.rotate(g_elapsedTime * 10, 0,1,0);
   teapot.matrix.scale(0.5,0.5,0.5);
   teapot.render();
 
   gl.uniform3f(u_LightPos, g_lightX, g_lightY, g_lightZ); // pass to shader!
+  gl.uniform3f(u_SpotlightPos, g_spotlightX,g_spotlightY,g_spotlightZ);
+  gl.uniform3f(u_SpotlightDir, 0,-1,0);
+  gl.uniform3f(u_SpotlightColor, 1,0,0);
   gl.uniform3f(u_CameraPos, g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]);
   gl.uniform1i(u_LightOn, (g_lightOn === "on") ? 1 : 0);
   gl.uniform3f(u_LightColor, g_lightRed, g_lightGreen, g_lightBlue);

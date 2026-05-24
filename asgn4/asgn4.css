@@ -18,5 +18,5 @@ th, td {
 label {
     color: slateblue;
     font-size: 15px;
-    font-weight: bold;
+    /* font-weight: bold; */
 }

@@ -355,6 +355,8 @@ function setUpScene() {
   c2 = new NormalledTexturedCube(g_texture_loki, [0,0,1,1], 0.5);
   spinner = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 1);
   light = new NormalledTexturedSphere(g_texture_loki, [1,1,0,1], 0);
+
+  test = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 0);
 }
 
 function renderScene() {
@@ -375,7 +377,10 @@ function renderScene() {
   floor.render();
 
   sky.matrix.set(g_identityM);
-  sky.matrix.scale(g_mapSize * -1, g_mapSize * -1, g_mapSize * -1);
+  sky.matrix.scale(g_mapSize * 1, g_mapSize * 1, g_mapSize * 1);
+  // sky.normalMatrix.setInverseOf(sky.matrix).transpose();
+  // sky.matrix.scale(-1,-1,-1);
+  sky.flipped = true;
   sky.render();
 
   c1.matrix.set(g_identityM);
@@ -400,7 +405,7 @@ function renderScene() {
 
   light.matrix.set(g_identityM);
   light.matrix.translate(g_lightX, g_lightY, g_lightZ);
-  light.matrix.scale(-1,-1,-1);
+  light.flipped = true;
   light.render();
 
   gl.uniform3f(u_LightPos, g_lightX, g_lightY, g_lightZ); // pass to shader!

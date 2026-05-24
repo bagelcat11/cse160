@@ -11,11 +11,14 @@ var VSHADER_SOURCE =
   'varying vec4 v_VertPos;\n' +
   'uniform mat4 u_ProjectionMatrix;\n' + // for camera (look at)!
   'uniform mat4 u_ViewMatrix;\n' +       // (perspective)
+  'uniform mat4 u_NormalMatrix;\n' +  // for rotating normals
   
   'void main() {\n' +
   '   gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' + // now transformable with mtx!
   '   v_UVCoords = a_UVCoords;\n' + // set varying to attrib
-  '   v_Normal = a_Normal;\n' +
+
+  // 'v_Normal = a_Normal;\n'+
+  '   v_Normal = normalize(vec3(u_NormalMatrix * vec4(a_Normal, 1.0)));\n' +
   '   v_VertPos = u_ModelMatrix * a_Position;\n' +  // in world space
   '}\n';
 
@@ -30,6 +33,8 @@ var FSHADER_SOURCE =
   'varying vec4 v_VertPos;\n' + // for light!
   'uniform int u_NormOrTex;\n' +
   'uniform vec3 u_LightPos;\n' +  // for light!
+  'uniform vec3 u_CameraPos;\n' +
+  'uniform bool u_LightOn;\n' +
   '\n' +
   'void main() {\n' + //TODO: maybe make multiple shaders instead
       'vec4 texColor = texture2D(u_Sampler, v_UVCoords);\n'+
@@ -37,9 +42,28 @@ var FSHADER_SOURCE =
       'if (u_NormOrTex == 0) { gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0); }\n' +
       'else if (u_NormOrTex == 1) { gl_FragColor = (1.0 - u_TexColorWeight) * u_BaseColor + u_TexColorWeight * texColor; }\n' +
 
-      'vec3 lightVec = vec3(v_VertPos) - u_LightPos;\n' +
+      'vec3 lightVec = u_LightPos - vec3(v_VertPos);\n' +
       'float r = length(lightVec);\n' +
-      'if (r < 5.0) { gl_FragColor = vec4(1,1,0.5,1); }\n' +
+      // 'gl_FragColor = vec4(vec3(gl_FragColor)/(r*r), 1);\n' + // lighting falloff
+
+      // diffuse + ambient
+      'vec3 L = normalize(lightVec);\n' +
+      'vec3 N = normalize(v_Normal);\n' +
+      'float nDotL = max(dot(N, L), 0.0);\n' +
+
+      'vec3 diffuse = vec3(gl_FragColor) * nDotL;\n' +
+      'vec3 ambient = vec3(gl_FragColor) * 0.2;\n' +
+
+      // specular
+      'vec3 R = reflect(-L, N);\n' +
+      'vec3 E = normalize(u_CameraPos - vec3(v_VertPos));\n' +
+
+      'float specular = pow(max(dot(E, R), 0.0), 20.0);\n' +
+      
+      'if (u_LightOn) {\n'+
+      '   if (u_TexColorWeight <= 0.0) { gl_FragColor = vec4(diffuse + ambient, 1.0); }\n' + // no specular for non textured, TODO: make this not conditional
+      '   else { gl_FragColor = vec4(diffuse + ambient + specular, 1.0); }\n' +
+      '}\n' +
   '}\n';
 
 // -- GLOBALS --
@@ -66,6 +90,10 @@ let g_lightX = 0;
 let g_lightY = 16;
 let g_lightZ = 0;
 let g_lightAnim = "on";
+let u_CameraPos;
+let u_LightOn;
+let g_lightOn = "on";
+let u_NormalMatrix;
 
 let g_camera; // this will be the Camera class
 // these ones are actually rotating world
@@ -122,6 +150,9 @@ function connectVariablesToGLSL() {
   a_Normal = gl.getAttribLocation(gl.program, "a_Normal");
   u_NormOrTex = gl.getUniformLocation(gl.program, "u_NormOrTex");
   u_LightPos = gl.getUniformLocation(gl.program, "u_LightPos");
+  u_CameraPos = gl.getUniformLocation(gl.program, "u_CameraPos");
+  u_LightOn = gl.getUniformLocation(gl.program, "u_LightOn");
+  u_NormalMatrix = gl.getUniformLocation(gl.program, "u_NormalMatrix");
   
   gl.uniformMatrix4fv(u_ModelMatrix, false, g_identityM.elements);
 }
@@ -137,6 +168,12 @@ function addActionsForHtmlUI() {
   lightAnimToggles.forEach(s => {
     s.addEventListener("click", () => {
       g_lightAnim = s.value;
+    });
+  });
+  let lightToggles = document.getElementsByName("lightToggle");
+  lightToggles.forEach(s => {
+    s.addEventListener("click", () => {
+      g_lightOn = s.value;
     });
   });
 
@@ -286,6 +323,7 @@ let floor;
 let sky;
 let c1;
 let c2;
+let spinner;
 let light;
 
 let test;
@@ -293,9 +331,10 @@ function setUpScene() {
   g_camera = new Camera();
   sphere = new NormalledTexturedSphere(g_texture_loki, [1,0,0,1], 1);
   floor = new NormalledTexturedCube(g_texture_floor, [1,1,1,1], 1);
-  sky = new NormalledTexturedCube(g_texture_sky, [1,1,1,1], 1);
-  c1 = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0.5);
+  sky = new NormalledTexturedCube(g_texture_sky, [0.5,0.5,1,1], 0);
+  c1 = new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 0);
   c2 = new NormalledTexturedCube(g_texture_loki, [0,0,1,1], 0.5);
+  spinner = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 1);
   light = new NormalledTexturedSphere(g_texture_loki, [1,1,0,1], 0);
 }
 
@@ -317,7 +356,7 @@ function renderScene() {
   floor.render();
 
   sky.matrix.set(g_identityM);
-  sky.matrix.scale(g_mapSize * -3, g_mapSize * -3, g_mapSize * -3);
+  sky.matrix.scale(g_mapSize * -1, g_mapSize * -1, g_mapSize * -1);
   sky.render();
 
   c1.matrix.set(g_identityM);
@@ -334,16 +373,26 @@ function renderScene() {
   sphere.matrix.translate(0,2,-3);
   sphere.render();
 
+  spinner.matrix.set(g_identityM);
+  spinner.matrix.translate(-2,2,-5);
+  spinner.matrix.rotate(g_elapsedTime * 50, 1,1,1);
+  spinner.matrix.rotate(g_elapsedTime * 50, -1,1,1);
+  spinner.render();
+
   light.matrix.set(g_identityM);
   light.matrix.translate(g_lightX, g_lightY, g_lightZ);
+  light.matrix.scale(-1,-1,-1);
   light.render();
+
   gl.uniform3f(u_LightPos, g_lightX, g_lightY, g_lightZ); // pass to shader!
+  gl.uniform3f(u_CameraPos, g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]);
+  gl.uniform1i(u_LightOn, (g_lightOn === "on") ? 1 : 0);
 }
 
 function updateAnimatedTransforms() {
   if (g_lightAnim === "on") {
-    g_lightX = Math.sin(g_elapsedTime / 2) * 16;
-    g_lightZ = Math.cos(g_elapsedTime / 2) * 16;
-    g_lightY = Math.sin(g_elapsedTime / 2) * 4 + 12;
+    g_lightX = Math.sin(g_elapsedTime / 2) * 12;
+    g_lightZ = Math.cos(g_elapsedTime / 2) * 12;
+    g_lightY = Math.sin(g_elapsedTime / 2) * 2 + 8;
   }
 }

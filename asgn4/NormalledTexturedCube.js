@@ -5,6 +5,7 @@ class NormalledTexturedCube extends Shape {
     this.baseColor = baseColor;
     this.texColorWeight = texColorWeight;
     this.matrix = new Matrix4();
+    this.normalMatrix = new Matrix4();
 
     this.setUpBuffer();
 
@@ -61,6 +62,8 @@ class NormalledTexturedCube extends Shape {
     gl.uniform1f(u_TexColorWeight, this.texColorWeight);
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
+    this.normalMatrix.setInverseOf(this.matrix).transpose();
+    gl.uniformMatrix4fv(u_NormalMatrix, false, this.normalMatrix.elements);
 
     // using a strip means the last 2 vertices of the prev tri are used for the next tri
     gl.drawArrays(gl.TRIANGLES, 0, cornersAndUVsAndNorms.length / 8);

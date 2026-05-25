@@ -142,6 +142,9 @@ let g_spotlightX = 5;
 let g_spotlightY = 5;
 let g_spotlightZ = -5;
 
+let g_conwayActive = false;
+let g_conwaySlowdown = 10;
+
 // -- Setup helpers --
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -221,6 +224,12 @@ function addActionsForHtmlUI() {
   spotlightToggles.forEach(s => {
     s.addEventListener("click", () => {
       g_spotlightOn = s.value;
+    });
+  });
+  let conwayToggles = document.getElementsByName("conwayToggle");
+  conwayToggles.forEach(s => {
+    s.addEventListener("click", () => {
+      g_conwayActive = s.value === "on";
     });
   });
 
@@ -390,6 +399,19 @@ let sphere2;
 
 // let test;
 let g_shapesList = [];
+
+let g_mapHeight = 5;
+let g_map = new Array(g_mapSize);
+for (let x = 0; x < g_mapSize; x++) {
+  g_map[x] = new Array(g_mapSize);
+  for (let y = 0; y < g_mapSize; y++) {
+    g_map[x][y] = new Array(g_mapSize);
+    for (let z = 0; z < g_mapSize; z++) {
+      g_map[x][y][z] = null; // null = no block, otherwise there will be a Cube
+    }
+  }
+}
+
 function setUpScene() {
   g_camera = new Camera();
   sphere = new NormalledTexturedSphere(g_texture_sky, [1,0,0,1], 1);
@@ -403,7 +425,8 @@ function setUpScene() {
   bunny = new ObjModel("model/bunny.obj", [0,1,0,1]);
   sphere2 = new NormalledTexturedSphere(g_texture_loki, [0.2,1,0.2,1], 0);
 
-  setUpLoki();
+  // setUpLoki();
+  loadPattern(g_map, 4);
   // teapot = new ObjModel("model/teapot.obj", [1,0.5,0.7]);//TODO: disappeared when no lighting??
 
   // test = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 0);
@@ -475,7 +498,40 @@ function renderScene() {
   bunny.matrix.scale(0.5,0.5,0.5);
   bunny.render();
 
-  renderLoki();
+  // renderLoki();
+
+  let cellFlipList = [];
+  for (let x = 0; x < g_mapSize; x++) {
+    for (let y = 0; y < g_mapHeight; y++) {
+      for (let z = 0; z < g_mapSize; z++) {
+        let c = g_map[x][y][z];
+
+        // play conway on floor
+        if (g_conwayActive && Math.floor(g_elapsedTime * 60) % g_conwaySlowdown == 0) {
+          let n = calcNumNeighbors(g_map, x, y, z);
+          // if cell is alive and has less than 2 or more than 3 neighbors, die;
+          // if dead and has 3 neighbors, be born
+          if (c != null && n != 2 && n != 3 ||
+              c == null && n == 3) {
+            cellFlipList.push([x, y, z]);
+          }
+        }
+
+        if (c != null) {
+          c.matrix.set(g_identityM);  // reset mtx every frame
+          let offset = g_mapSize / 2;
+          c.matrix.translate(x-offset, y, z-offset); // go from [0-32] to [-16, 16]
+          c.matrix.translate(0.5,0,0.5);  // put into [0-1]
+          c.render();
+        }
+      }
+    }
+  }
+  // update the cell grid
+  for (let i = 0; i < cellFlipList.length; i++) {
+    let x = cellFlipList[i][0], y = cellFlipList[i][1], z = cellFlipList[i][2];
+    g_map[x][y][z] = (g_map[x][y][z] == null) ? new NormalledTexturedCube(g_texture_loki, [1,0,0,1], 1) : null;
+  }
 
   // teapot.matrix.set(g_identityM);
   // teapot.matrix.translate(-5,0,-5);

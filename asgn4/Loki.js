@@ -1,8 +1,13 @@
+/*
+converting her cube parts into this project was fine, but the head, etc. would definitely have to be rewritten from the ground up unfortunately
+*/
+
+
 function setUpLoki() {
     // g_shapesList["head"] = new Head();
     // g_shapesList["earLeft"] = new Ear();
     // g_shapesList["earRight"] = new Ear();
-    // g_shapesList["body"] = new Body();
+    g_shapesList["body"] = new Body();
     // g_shapesList["jaw"] = new Jaw();
     g_shapesList["eyeLeft"] = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 0);
     g_shapesList["eyeRight"] = new NormalledTexturedCube(g_texture_loki, [1,1,1,1], 0);
@@ -69,7 +74,7 @@ function renderLoki() {
 //   let earLeft = g_shapesList["earLeft"];
 //   let earRight = g_shapesList["earRight"];
 //   let jaw = g_shapesList["jaw"];
-//     let body = g_shapesList["body"];
+    let body = g_shapesList["body"];
 
       let neck = g_shapesList["neck"];
   let eyeLeft = g_shapesList["eyeLeft"];
@@ -209,10 +214,10 @@ function renderLoki() {
 
 
   // BODY
-//   body.matrix.set(LOKI_IDENTITY);
-//   body.matrix.translate(0, 0, g_bodyBobHeight);
-//   body.matrix.translate(0, -0.25, 0.25);
-//   body.render();
+  body.matrix.set(LOKI_IDENTITY);
+  body.matrix.translate(0, 0, g_bodyBobHeight);
+  body.matrix.translate(0, -0.25, 0.25);
+  body.render();
 
   // TAIL
   tail1.baseColor = LOKI_DARK_BROWN;
@@ -353,4 +358,62 @@ function renderLoki() {
   rightLegPaw.matrix.scale(0.15, 0.15, 0.07);
   rightLegPaw.render();
 }
+
+
+// class Body extends NormalledTexturedSphere {
+//     constructor(textureNum, baseColor, texColorWeight) {
+//         super(textureNum, baseColor, texColorWeight);
+//     }
+
+//     render() {
+//         let radius = 0.25;
+//         let length = 1.0;
+//         let numSides = 8
+//         // front octagonal prism
+//         let v = [0,0,0];
+//         let angleStep = 360 / numSides;
+//         for (let angle = 0; angle < 360; angle += angleStep) {
+//             let angle2 = angle + angleStep;
+//             let vec1 = [Math.cos(angle * Math.PI / 180) * radius, Math.sin(angle * Math.PI / 180) * radius];
+//             let vec2 = [Math.cos(angle2 * Math.PI / 180) * radius, Math.sin(angle2 * Math.PI / 180) * radius];
+
+//             v.push(vec1[0], 0, vec1[1], vec2[0], 0, vec2[1],);
+//         }
+
+//         this.baseColor = LOKI_WHITE;
+//         this.drawNormalledTexturedTri(v, gl.TRIANGLE_FAN);
+
+//         // back
+//         v = [0,length,0];
+//         for (let angle = 0; angle < 360; angle += angleStep) {
+//             let angle2 = angle + angleStep;
+//             let vec1 = [Math.cos(angle * Math.PI / 180) * radius, Math.sin(angle * Math.PI / 180) * radius];
+//             let vec2 = [Math.cos(angle2 * Math.PI / 180) * radius, Math.sin(angle2 * Math.PI / 180) * radius];
+
+//             v.push(vec1[0], length, vec1[1], vec2[0], length, vec2[1],);
+//         }
+
+//         this.baseColor = LOKI_MED_BROWN;
+//         this.drawNormalledTexturedTri(v, gl.TRIANGLE_FAN);
+
+//         // fill rects (bottom half)
+//         for (let i = 1; i < numSides; i++) {
+//             let rgba = LOKI_WHITE;
+//             this.drawRectangle3D([  v[i*3+0], length, v[i*3+2],
+//                                     v[i*3+3], length, v[i*3+5],
+//                                     v[i*3+0], 0, v[i*3+2],
+//                                     v[i*3+3], 0, v[i*3+5],],
+//                                     rgba);
+//         }
+//         // top half
+//         for (let i = numSides; i <= numSides * 2; i++) {
+//             let rgba = LOKI_DARK_BROWN;
+//             this.drawRectangle3D([  v[i*3+0], length, v[i*3+2],
+//                                     v[i*3+3], length, v[i*3+5],
+//                                     v[i*3+0], 0, v[i*3+2],
+//                                     v[i*3+3], 0, v[i*3+5],],
+//                                     rgba);
+//         }
+//     }
+// }
 

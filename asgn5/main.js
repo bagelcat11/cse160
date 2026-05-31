@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+// import {FirstPersonControls} from "three/addons/controls/FirstPersonControls.js";
 
 // -- setup --
 const scene = new THREE.Scene();
@@ -9,18 +11,26 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+const controls = new OrbitControls(camera, renderer.domElement);
+
+
 // -- define scene --
 
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const shapes = [];
 
 const texLoader = new THREE.TextureLoader();
-const lokiTex = texLoader.load("img/test_loki.png", (t) => {
+const lokiTex = texLoader.load("img/test_loki.png", () => {
     const material = new THREE.MeshBasicMaterial({map: lokiTex});
     const cube = new THREE.Mesh(geometry, material);
     cube.position.y = -1;
     scene.add(cube);
     shapes.push(cube);
+});
+const background = texLoader.load("img/sky.png", () => {
+    background.mapping = THREE.EquirectangularReflectionMapping;
+    background.colorSpace = THREE.SRGBColorSpace;
+    scene.background = background;
 });
 
 const gltfLoader = new GLTFLoader();
@@ -37,6 +47,7 @@ scene.add(light);
 scene.add(light.target);
 
 camera.position.z = 5;
+controls.update();  // controls need to be updated any time the camera transforms
 
 // -- update loop --
 function animate(time) {
@@ -45,6 +56,7 @@ function animate(time) {
         shapes[i].rotation.y = time / 1000;
     }
 
+    controls.update();
     renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);

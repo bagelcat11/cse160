@@ -2,6 +2,7 @@ import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import { Turtle } from "./3DGraphicsTurtle.js";
+import { TurtleLSystem } from "./TurtleLSystem.js";
 // import {FirstPersonControls} from "three/addons/controls/FirstPersonControls.js";
 
 // -- setup --
@@ -48,70 +49,52 @@ scene.add(light);
 scene.add(light.target);
 
 camera.position.z = 3;
+camera.position.y = 1;
 controls.update();  // controls need to be updated any time the camera transforms
 
-// -- turtle time --
-let turtle = new Turtle();
-const turtleArrow = new THREE.Mesh(
-    new THREE.ConeGeometry(0.25, 0.5),
-    new THREE.MeshBasicMaterial({map: lokiTex})
-);
-scene.add(turtleArrow);
-shapes.push(turtleArrow);
-turtleArrow.rotateOnAxis(new THREE.Vector3(1,0,0), -Math.PI / 2);
-// console.log(turtleArrow.position);
-
-const m = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-const points = [];
-points.push( turtle.up );
-points.push( new THREE.Vector3( 0, 0, 0 ) );
-const g = new THREE.BufferGeometry().setFromPoints( points );
-const line = new THREE.Line( g, m );
-scene.add( line );
-
+const koch1 = new TurtleLSystem(scene, 4, 0.05, 90, "F+F+F+F", {"F": "F+F-F-FF+F+F-F"})
+koch1.draw();
 // -- listeners --
-document.onkeydown = (event) => {
-    let amt = 5 * Math.PI / 180;
-    switch (event.key) {
-        case "w":
-            turtle.forward(0.1)
-            turtleArrow.position.set(turtle.position.x, turtle.position.y, turtle.position.z);
-            break;
-        case "a":
-            // wow it is really nasty that these have to go in opposite directions
-            turtle.turn(amt);
-            turtleArrow.rotateOnWorldAxis(turtle.up, -amt);
-            break;
-        case "d":
-            turtle.turn(-amt);
-            turtleArrow.rotateOnWorldAxis(turtle.up, amt);
-            break;
-        case "s":
-            turtle.forward(-0.1);
-            turtleArrow.position.set(turtle.position.x, turtle.position.y, turtle.position.z);
-            break;
-        case "ArrowUp":
-            turtle.pitch(amt);
-            turtleArrow.rotateOnWorldAxis(turtle.left, -amt);
-            break;
-        case "ArrowDown":
-            turtle.pitch(-amt);
-            turtleArrow.rotateOnWorldAxis(turtle.left, amt);
-            break;
-        case "ArrowLeft":
-            turtle.roll(amt);
-            turtleArrow.rotateOnWorldAxis(turtle.heading, -amt);
-            break;
-        case "ArrowRight":
-            turtle.roll(-amt);
-            turtleArrow.rotateOnWorldAxis(turtle.heading, amt);
-            break;
-        default:
-            break;
-        }
-
-    // console.log(turtleArrow.position)
-}
+// document.onkeydown = (event) => {
+//     let amt = 5 * Math.PI / 180;
+//     switch (event.key) {
+//         case "w":
+//             turtle.forward(0.1)
+//             turtleArrow.position.set(turtle.position.x, turtle.position.y, turtle.position.z);
+//             break;
+//         case "a":
+//             // wow it is really nasty that these have to go in opposite directions
+//             turtle.turn(amt);
+//             turtleArrow.rotateOnWorldAxis(turtle.up, -amt);
+//             break;
+//         case "d":
+//             turtle.turn(-amt);
+//             turtleArrow.rotateOnWorldAxis(turtle.up, amt);
+//             break;
+//         case "s":
+//             turtle.forward(-0.1);
+//             turtleArrow.position.set(turtle.position.x, turtle.position.y, turtle.position.z);
+//             break;
+//         case "i":
+//             turtle.pitch(amt);
+//             turtleArrow.rotateOnWorldAxis(turtle.left, -amt);
+//             break;
+//         case "k":
+//             turtle.pitch(-amt);
+//             turtleArrow.rotateOnWorldAxis(turtle.left, amt);
+//             break;
+//         case "j":
+//             turtle.roll(amt);
+//             turtleArrow.rotateOnWorldAxis(turtle.heading, -amt);
+//             break;
+//         case "l":
+//             turtle.roll(-amt);
+//             turtleArrow.rotateOnWorldAxis(turtle.heading, amt);
+//             break;
+//         default:
+//             break;
+//         }
+// }
 
 // -- update loop --
 function animate(time) {

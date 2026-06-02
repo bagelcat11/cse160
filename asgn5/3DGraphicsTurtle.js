@@ -20,6 +20,7 @@ export class Turtle {
         // console.log("new pos:", this.position);
     }
 
+    // like looking left/right
     turn(deg) {
         // deg = deg * Math.PI / 180;
         this.upRotMtx = new THREE.Matrix3(Math.cos(deg), Math.sin(deg), 0,
@@ -37,6 +38,7 @@ export class Turtle {
         // console.log(this.heading, this.left, this.up)
     }
 
+    // like looking up/down
     pitch(deg) {
         this.leftRotMtx = new THREE.Matrix3(Math.cos(deg), 0, -Math.sin(deg),
                                             0, 1, 0,
@@ -49,6 +51,7 @@ export class Turtle {
         this.up.set(e[6],e[7],e[8]);
     }
 
+    // like tilting view
     roll(deg) {
         this.headRotMtx = new THREE.Matrix3(1, 0, 0,
                                             0, Math.cos(deg), -Math.sin(deg),

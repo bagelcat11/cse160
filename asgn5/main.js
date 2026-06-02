@@ -21,13 +21,13 @@ const geometry = new THREE.BoxGeometry(1, 1, 1);
 const shapes = [];
 
 const texLoader = new THREE.TextureLoader();
-// const lokiTex = texLoader.load("img/test_loki.png", () => {
-//     const material = new THREE.MeshBasicMaterial({map: lokiTex});
-//     const cube = new THREE.Mesh(geometry, material);
-//     cube.position.y = -1;
-//     scene.add(cube);
-//     shapes.push(cube);
-// });
+const lokiTex = texLoader.load("img/test_loki.png", () => {
+    const material = new THREE.MeshBasicMaterial({map: lokiTex});
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.y = -1;
+    scene.add(cube);
+    shapes.push(cube);
+});
 const background = texLoader.load("img/sky.png", () => {
     background.mapping = THREE.EquirectangularReflectionMapping;
     background.colorSpace = THREE.SRGBColorSpace;
@@ -47,30 +47,69 @@ light.target.position.set(0,0,0);
 scene.add(light);
 scene.add(light.target);
 
-camera.position.z = 5;
+camera.position.z = 3;
 controls.update();  // controls need to be updated any time the camera transforms
 
 // -- turtle time --
 let turtle = new Turtle();
 const turtleArrow = new THREE.Mesh(
     new THREE.ConeGeometry(0.25, 0.5),
-    new THREE.MeshBasicMaterial({color: 0x009900})
+    new THREE.MeshBasicMaterial({map: lokiTex})
 );
 scene.add(turtleArrow);
 shapes.push(turtleArrow);
-console.log(turtleArrow.position);
+turtleArrow.rotateOnAxis(new THREE.Vector3(1,0,0), -Math.PI / 2);
+// console.log(turtleArrow.position);
+
+const m = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+const points = [];
+points.push( turtle.up );
+points.push( new THREE.Vector3( 0, 0, 0 ) );
+const g = new THREE.BufferGeometry().setFromPoints( points );
+const line = new THREE.Line( g, m );
+scene.add( line );
 
 // -- listeners --
 document.onkeydown = (event) => {
+    let amt = 5 * Math.PI / 180;
     switch (event.key) {
         case "w":
-            turtle.forward(1)
+            turtle.forward(0.1)
             turtleArrow.position.set(turtle.position.x, turtle.position.y, turtle.position.z);
+            break;
+        case "a":
+            // wow it is really nasty that these have to go in opposite directions
+            turtle.turn(amt);
+            turtleArrow.rotateOnWorldAxis(turtle.up, -amt);
+            break;
+        case "d":
+            turtle.turn(-amt);
+            turtleArrow.rotateOnWorldAxis(turtle.up, amt);
+            break;
+        case "s":
+            turtle.forward(-0.1);
+            turtleArrow.position.set(turtle.position.x, turtle.position.y, turtle.position.z);
+            break;
+        case "ArrowUp":
+            turtle.pitch(amt);
+            turtleArrow.rotateOnWorldAxis(turtle.left, -amt);
+            break;
+        case "ArrowDown":
+            turtle.pitch(-amt);
+            turtleArrow.rotateOnWorldAxis(turtle.left, amt);
+            break;
+        case "ArrowLeft":
+            turtle.roll(amt);
+            turtleArrow.rotateOnWorldAxis(turtle.heading, -amt);
+            break;
+        case "ArrowRight":
+            turtle.roll(-amt);
+            turtleArrow.rotateOnWorldAxis(turtle.heading, amt);
             break;
         default:
             break;
         }
-    //TODO: have it look
+
     // console.log(turtleArrow.position)
 }
 

@@ -6,12 +6,12 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
         super();
 
         this.turtle = new Turtle();
-        this.turtleArrow = new THREE.Mesh(
-            new THREE.ConeGeometry(0.12, 0.25),
-            new THREE.MeshNormalMaterial()
-        );
-        this.add(this.turtleArrow);
-        this.turtleArrow.rotateOnAxis(new THREE.Vector3(1,0,0), -Math.PI / 2);
+        // this.turtleArrow = new THREE.Mesh(
+            // new THREE.ConeGeometry(0.12, 0.25),
+            // new THREE.MeshNormalMaterial()
+        // );
+        // this.add(this.turtleArrow);
+        // this.turtleArrow.rotateOnAxis(new THREE.Vector3(1,0,0), -Math.PI / 2);
 
         this.iterations = iters;
         this.distance = dist;
@@ -62,29 +62,54 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
 
         for (let i = 0; i < str.length; i++) {
             switch (str[i]) {
-                case "F":
+                case "F":   // forwards
                     this.turtle.forward(this.distance);
-                    this.turtleArrow.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
+                    // this.turtleArrow.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
                     lines.at(-1).push(this.turtle.position.clone());  // you're telling me it got passed by ref here
                     // console.log("points now has", points)
                     break;
-                case "+":
+
+                case "+":   // turn left
                     // wow it is really nasty that these have to go in opposite directions
                     this.turtle.turn(this.rotationAmt);
-                    this.turtleArrow.rotateOnWorldAxis(this.turtle.up, -this.rotationAmt);
+                    // this.turtleArrow.rotateOnWorldAxis(this.turtle.up, -this.rotationAmt);
                     break;
-                case "-":
+                case "-":   // turn right
                     this.turtle.turn(-this.rotationAmt);
-                    this.turtleArrow.rotateOnWorldAxis(this.turtle.up, this.rotationAmt);
+                    // this.turtleArrow.rotateOnWorldAxis(this.turtle.up, this.rotationAmt);
                     break;
-                case "[":
+                case "&":   // pitch down
+                    this.turtle.pitch(this.rotationAmt);
+                    // this.turtleArrow.rotateOnWorldAxis(this.turtle.left, -this.rotationAmt);
+                    break;
+                case "^":   // pitch up
+                    this.turtle.pitch(-this.rotationAmt);
+                    // this.turtleArrow.rotateOnWorldAxis(this.turtle.left, this.rotationAmt);
+                    break;
+                case "\\":   // roll left
+                    //TODO: do we need to worry about \ being escaped?
+                    this.turtle.roll(this.rotationAmt);
+                    // this.turtleArrow.rotateOnWorldAxis(this.turtle.heading, -this.rotationAmt);
+                    break;
+                case "/":   // roll right
+                    this.turtle.roll(-this.rotationAmt);
+                    // this.turtleArrow.rotateOnWorldAxis(this.turtle.heading, this.rotationAmt);
+                    break;
+                case "|":   // turn around
+                    this.turtle.turn(Math.PI);
+                    // this.turtleArrow.rotateOnWorldAxis(this.turtle.up, Math.PI);
+                    break;
+                
+                case "[":   // push state to stack
                     stack.push(this.turtle.getStateObj());
                     break;
-                case "]":
+                case "]":   // pop state from stack
                     this.turtle.setStateFromObj(stack.pop());
-                    this.turtleArrow.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
+                    // this.turtleArrow.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
                     lines.push([this.turtle.position.clone()]); // start new line to emulate penup/pendown
                     //TODO: set arrow rotationAmt?
+                    break;
+
                 default:
                     break;
             }

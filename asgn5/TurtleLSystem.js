@@ -8,7 +8,7 @@ export class TurtleLSystem {    // TODO: could make this extend Object3D
         this.scene = scene;
         this.turtle = new Turtle();
         this.turtleArrow = new THREE.Mesh(
-            new THREE.ConeGeometry(0.25, 0.5),
+            new THREE.ConeGeometry(0.12, 0.25),
             new THREE.MeshNormalMaterial()
         );
         scene.add(this.turtleArrow);
@@ -57,7 +57,7 @@ export class TurtleLSystem {    // TODO: could make this extend Object3D
     }
 
     interpretString(str, points) {
-        // let stack = [];
+        let stack = [];
 
         for (let i = 0; i < str.length; i++) {
             switch (str[i]) {
@@ -76,6 +76,14 @@ export class TurtleLSystem {    // TODO: could make this extend Object3D
                     this.turtle.turn(-this.rotation);
                     this.turtleArrow.rotateOnWorldAxis(this.turtle.up, this.rotation);
                     break;
+                case "[":
+                    stack.push(this.turtle.getStateObj());
+                    break;
+                case "]":
+                    this.turtle.setStateFromObj(stack.pop());
+                    this.turtleArrow.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
+                    //TODO: set arrow rotation.....
+                    //TODO: penup....
                 default:
                     break;
             }

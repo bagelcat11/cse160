@@ -63,4 +63,16 @@ export class Turtle {
         this.left.set(e[3],e[4],e[5]);
         this.up.set(e[6],e[7],e[8]);
     }
+
+    // helpers for bracket notation
+    getStateObj() {
+        return {"p": this.position.clone(), "h": this.heading.clone(), "l": this.left.clone(), "u": this.up.clone()};
+    }
+
+    setStateFromObj(obj) {
+        this.position = obj["p"];
+        this.heading = obj["h"];
+        this.left = obj["l"];
+        this.up = obj["u"];
+    }
 }

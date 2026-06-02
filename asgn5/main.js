@@ -35,11 +35,6 @@ const background = texLoader.load("img/sky.png", () => {
 });
 
 const gltfLoader = new GLTFLoader();
-// gltfLoader.load("model/Dingus the cat.glb", (gltf) => {
-//     const root = gltf.scene;
-//     scene.add(root);
-//     shapes.push(root);
-// });
 
 const light = new THREE.DirectionalLight(0xFFFFFF, 10);
 light.position.set(0,0,10);
@@ -59,7 +54,7 @@ const controls = new PointerLockControls(camera, document.body);
 document.onmousedown = (event) => {
     controls.lock();
 }
-let speed = 0.5;
+let speed = 0.25;
 document.onkeydown = (event) => {
     switch (event.key) {
         case "w":
@@ -103,14 +98,25 @@ controls.update();  // controls need to be updated any time the camera transform
 // scene.add(threedtest);
 // threedtest.draw();
 
-const threeplant = new TurtleLSystem(7, 0.005, 22.5, "A", {
+let leafModel = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), background);  // dummy
+gltfLoader.load("model/Leaf.glb", (gltf) => {
+    leafModel = gltf.scene;
+    leafModel.scale.set(0.05,0.05,0.05)
+    leafModel.rotateOnAxis  // make it point up
+    // console.log("loaded leaf")
+
+    const threeplant = new TurtleLSystem(7, 0.01, 30, "A", {
     "A": "[&FL!A]///'[&FL!A]////'[&FL!A]",
     "F": "S////F",
-    "S": "FL",
-    //"L": "['''^^{-f+f+f-|-f+f+f}]"
-});
+    "S": "F",
+    "L": "L"
+}, leafModel);
 scene.add(threeplant);
-threeplant.draw();
+    threeplant.draw();
+    // scene.add(leafModel);
+
+
+});
 
 
 

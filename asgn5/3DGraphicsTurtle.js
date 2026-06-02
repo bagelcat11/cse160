@@ -6,9 +6,9 @@ export class Turtle {
     constructor() {
         this.position = new THREE.Vector3(0,0,0);
         
-        this.heading = new THREE.Vector3(0,0,-1);
+        this.heading = new THREE.Vector3(0,1,0);    // look upwards
         this.left = new THREE.Vector3(-1,0,0);
-        this.up = new THREE.Vector3(0,1,0);
+        this.up = new THREE.Vector3(0,0,1);
     }
 
     forward(amount) {

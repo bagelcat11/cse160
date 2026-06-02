@@ -1,22 +1,21 @@
 import * as THREE from "three";
 import { Turtle } from "./3DGraphicsTurtle.js";
-// import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
-// import { Line2 } from 'three/addons/lines/Line2.js';
 
-export class TurtleLSystem {    // TODO: could make this extend Object3D
-    constructor(scene, iters, dist, rot, initStr, rulesObj) {
-        this.scene = scene;
+export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can add this to scene, and add lines to this
+    constructor(iters, dist, rot, initStr, rulesObj) {
+        super();
+
         this.turtle = new Turtle();
         this.turtleArrow = new THREE.Mesh(
             new THREE.ConeGeometry(0.12, 0.25),
             new THREE.MeshNormalMaterial()
         );
-        scene.add(this.turtleArrow);
+        this.add(this.turtleArrow);
         this.turtleArrow.rotateOnAxis(new THREE.Vector3(1,0,0), -Math.PI / 2);
 
         this.iterations = iters;
         this.distance = dist;
-        this.rotation = rot * Math.PI / 180;
+        this.rotationAmt = rot * Math.PI / 180;
         this.seed = initStr;
         this.rules = rulesObj;
     }
@@ -31,15 +30,17 @@ export class TurtleLSystem {    // TODO: could make this extend Object3D
         }
 
         const m = new THREE.LineBasicMaterial( { color: 0x003300 } );
-        const points = [];
-        points.push( new THREE.Vector3( 0, 0, 0 ) );
+        const lines = [];   // holds arrays of point vectors
+        lines.push( [new THREE.Vector3( 0, 0, 0 )] );
 
-        this.interpretString(str, points);
+        this.interpretString(str, lines);
 
         // console.log("got points", points)
-        const g = new THREE.BufferGeometry().setFromPoints( points );
-        const line = new THREE.Line( g, m );
-        this.scene.add( line );
+        lines.forEach((line) => {
+            let g = new THREE.BufferGeometry().setFromPoints( line );
+            let l = new THREE.Line( g, m );
+            this.add(l);
+        });
     }
 
     applyRule(str, ruleLeft) {
@@ -56,7 +57,7 @@ export class TurtleLSystem {    // TODO: could make this extend Object3D
         return tmpstr;
     }
 
-    interpretString(str, points) {
+    interpretString(str, lines) {
         let stack = [];
 
         for (let i = 0; i < str.length; i++) {
@@ -64,17 +65,17 @@ export class TurtleLSystem {    // TODO: could make this extend Object3D
                 case "F":
                     this.turtle.forward(this.distance);
                     this.turtleArrow.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
-                    points.push(this.turtle.position.clone());  // you're telling me it got passed by ref here
+                    lines.at(-1).push(this.turtle.position.clone());  // you're telling me it got passed by ref here
                     // console.log("points now has", points)
                     break;
                 case "+":
                     // wow it is really nasty that these have to go in opposite directions
-                    this.turtle.turn(this.rotation);
-                    this.turtleArrow.rotateOnWorldAxis(this.turtle.up, -this.rotation);
+                    this.turtle.turn(this.rotationAmt);
+                    this.turtleArrow.rotateOnWorldAxis(this.turtle.up, -this.rotationAmt);
                     break;
                 case "-":
-                    this.turtle.turn(-this.rotation);
-                    this.turtleArrow.rotateOnWorldAxis(this.turtle.up, this.rotation);
+                    this.turtle.turn(-this.rotationAmt);
+                    this.turtleArrow.rotateOnWorldAxis(this.turtle.up, this.rotationAmt);
                     break;
                 case "[":
                     stack.push(this.turtle.getStateObj());
@@ -82,8 +83,8 @@ export class TurtleLSystem {    // TODO: could make this extend Object3D
                 case "]":
                     this.turtle.setStateFromObj(stack.pop());
                     this.turtleArrow.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
-                    //TODO: set arrow rotation.....
-                    //TODO: penup....
+                    lines.push([this.turtle.position.clone()]); // start new line to emulate penup/pendown
+                    //TODO: set arrow rotationAmt?
                 default:
                     break;
             }

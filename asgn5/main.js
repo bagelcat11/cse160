@@ -52,10 +52,11 @@ camera.position.z = 3;
 camera.position.y = 1;
 controls.update();  // controls need to be updated any time the camera transforms
 
-const koch1 = new TurtleLSystem(scene, 5, 0.05, 90, "F+F+F+F", {"F": "F+F-F-FF+F+F-F"});
+// const koch1 = new TurtleLSystem(scene, 5, 0.05, 90, "F+F+F+F", {"F": "F+F-F-FF+F+F-F"});
 // koch1.draw();
 
-const bracketed = new TurtleLSystem(scene, 7, 0.01, 20, "X", {"X": "F[+X]F[-X]+X", "F": "FF"})
+const bracketed = new TurtleLSystem(5, 0.01, 23, "X", {"X": "F-[[X]+X]+F[+FX]-X", "F": "FF"})
+scene.add(bracketed);
 bracketed.draw();
 
 // -- update loop --

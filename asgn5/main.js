@@ -12,12 +12,12 @@ const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
+scene.fog = new THREE.FogExp2(0x999988, 0.03);
 document.body.appendChild(renderer.domElement);
-
 
 // -- define scene --
 
-const floor = new THREE.PlaneGeometry(64, 64);
+const floor = new THREE.PlaneGeometry(128, 128);
 const shapes = [];
 
 const texLoader = new THREE.TextureLoader();
@@ -25,13 +25,19 @@ const floorTex = texLoader.load("img/coast_sand_rocks.png", () => {
     floorTex.repeat.set(8, 8);
     floorTex.wrapS = THREE.RepeatWrapping;
     floorTex.wrapT = THREE.RepeatWrapping;
-    const material = new THREE.MeshLambertMaterial({map: floorTex});
-    const cube = new THREE.Mesh(floor, material);
-    cube.rotateX(-Math.PI / 2);
-    cube.receiveShadow = true;
-    // cube.position.y = -1;
-    scene.add(cube);
-    shapes.push(cube);
+    // const bump = texLoader.load("img/ground-bump.png", () => {  // yay callback hell
+        // bump.repeat.set(8, 8);
+        // bump.wrapS = THREE.RepeatWrapping;
+        // bump.wrapT = THREE.RepeatWrapping;
+        const material = new THREE.MeshLambertMaterial({map: floorTex});//, bumpMap: bump, bumpScale: 5});
+        const cube = new THREE.Mesh(floor, material);
+        cube.rotateX(-Math.PI / 2);
+        cube.receiveShadow = true;
+        // cube.position.y = -1;
+        scene.add(cube);
+        shapes.push(cube);
+    // });
+
 });
 const background = texLoader.load("img/sky.png", () => {
     background.mapping = THREE.EquirectangularReflectionMapping;
@@ -41,13 +47,13 @@ const background = texLoader.load("img/sky.png", () => {
 
 const gltfLoader = new GLTFLoader();
 
-const sun = new THREE.DirectionalLight(0xFFFFFF, 2);
-sun.position.set(100,30,100);
+const sun = new THREE.DirectionalLight(0xFFFFEE, 2);
+sun.position.set(128,24,128);
 sun.target.position.set(0,0,0);
 sun.castShadow = true;
 scene.add(sun);
 scene.add(sun.target);
-const ambient = new THREE.AmbientLight(0xFFFFFF, 0.2);
+const ambient = new THREE.AmbientLight(0xFFFFFF, 0.1);
 scene.add(ambient);
 
 // -- camera/controls --
@@ -164,6 +170,37 @@ const tent = gltfLoader.load("model/Tent.glb", (gltf) => {
     t.position.set(3,0,0);
     scene.add(t);
 });
+const lantern = gltfLoader.load("model/Lantern.glb", (gltf) => {
+    let t = gltf.scene;
+    t.traverse((o) => { // get rid of shininess; metal = 0 didn't work for some reason
+        if (o instanceof THREE.Mesh) {
+            // o.material.metalness = 0;
+            o.material = new THREE.MeshLambertMaterial({color: o.material.color})
+            o.castShadow = true;    // have to do this for every mesh in glb!!!
+            o.receiveShadow = true;
+        }
+    })
+    t.position.set(-0.5,0.25,0);
+    scene.add(t);
+
+    let lanternLight = new THREE.PointLight(0xFFFFFF, 2, 10, 2);
+    lanternLight.position.y += 0.25;
+    // lanternLight.castShadow = true;
+    t.add(lanternLight);
+});
+
+const rockyTex = texLoader.load("img/worn-sandy-rock.png", () => {
+    const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(),
+    new THREE.MeshLambertMaterial({map: rockyTex, color: 0xCCCCBB}));
+    rock.rotateOnAxis(new THREE.Vector3(1,1,1).normalize(),2.0);
+    scene.add(rock);
+    rock.scale.set(2,3,2);
+    rock.position.set(-5,1,-10);
+    rock.castShadow = true;
+    rock.receiveShadow = true;
+});
+
+
 
 // -- update loop --
 function animate(time) {

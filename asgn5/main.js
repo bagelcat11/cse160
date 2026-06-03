@@ -33,7 +33,6 @@ const floorTex = texLoader.load("img/coast_sand_rocks.png", () => {
         const cube = new THREE.Mesh(floor, material);
         cube.rotateX(-Math.PI / 2);
         cube.receiveShadow = true;
-        // cube.position.y = -1;
         scene.add(cube);
         shapes.push(cube);
     // });

@@ -53,7 +53,7 @@ const background = texLoader.load("img/sky.png", () => {
 const gltfLoader = new GLTFLoader();
 
 const sun = new THREE.DirectionalLight(0xFFFFEE, 2);
-sun.position.set(164,24,128);
+sun.position.set(164,32,128);
 sun.target.position.set(0,0,0);
 // let helper = new THREE.DirectionalLightHelper(sun, 5);
 // scene.add(helper)
@@ -106,6 +106,8 @@ controls.addEventListener("change", () => {
 });
 controls.update();  // controls need to be updated any time the camera transforms
 
+
+// -- add things to scene --
 // const koch1 = new TurtleLSystem(scene, 5, 0.05, 90, "F+F+F+F", {"F": "F+F-F-FF+F+F-F"});
 // koch1.draw();
 
@@ -237,7 +239,6 @@ const rockyTex = texLoader.load("img/worn-sandy-rock.png", () => {
     
     let rock1 = new THREE.Mesh(new THREE.IcosahedronGeometry(), rockMat);
     rock1.rotateOnAxis(new THREE.Vector3(1,1,1).normalize(),2.0);
-    scene.add(rock1);
     rock1.scale.set(2,3,2);
     rock1.position.set(-5,1,-10);
     rock1.castShadow = true;
@@ -249,9 +250,32 @@ const rockyTex = texLoader.load("img/worn-sandy-rock.png", () => {
     rock2.position.set(-1,-1,-12);
     rock2.castShadow = true;
     rock2.receiveShadow = true;
-    scene.add(rock2);
-});
 
+    let rock3 = new THREE.Mesh(new THREE.IcosahedronGeometry(), rockMat);
+    rock3.rotateOnAxis(new THREE.Vector3(2,-5,0.2).normalize(),-0.7);
+    rock3.scale.set(2,-3,4.5);
+    rock3.position.set(5,0,-15);
+    rock3.castShadow = true;
+    rock3.receiveShadow = true;
+
+    let rocksGroup = new THREE.Group();
+    rocksGroup.add(rock1, rock2, rock3);
+    scene.add(rocksGroup);
+
+    let r4 = rocksGroup.clone();
+    r4.rotateOnAxis(new THREE.Vector3(0,0,1), Math.PI * 9 / 10);
+    r4.rotateOnAxis(new THREE.Vector3(0,1,0), Math.PI);
+    scene.add(r4);
+    let r5 = rocksGroup.clone();
+    r5.scale.set(2,1.5,2);
+    r5.rotateOnAxis(new THREE.Vector3(0,1,0), Math.PI / 2);
+    scene.add(r5);
+    let r6 = r5.clone();
+    r6.scale.set(2,2.5,2);
+    r6.rotateOnAxis(new THREE.Vector3(0,1,0), Math.PI * -7/8);
+    r6.position.z -= 5;
+    scene.add(r6);
+});
 
 
 // -- update loop --

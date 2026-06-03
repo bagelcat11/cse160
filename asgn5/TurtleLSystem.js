@@ -50,8 +50,8 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
             let l = new MeshLine();
             l.setPoints(line, p => (1-p/4)*Math.cos(p));  // THIS HAS TO BE ON ITS OWN LINE
             
-            let lokiTex = this.texLoader.load("img/wood.png", () => {
-                let m = new MeshLineMaterial({useMap: true, map: lokiTex, lineWidth: 0.1})
+            let woodTex = this.texLoader.load("img/wood.png", () => {
+                let m = new MeshLineMaterial({useMap: true, map: woodTex, lineWidth: 0.15})
                 // let m = new THREE.MeshLambertMaterial({map: lokiTex});
                 const mesh = new THREE.Mesh(l, m);
                 mesh.castShadow = true;

@@ -126,33 +126,22 @@ controls.update();  // controls need to be updated any time the camera transform
 // threedtest.draw();
 
 let leafModel = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), background);  // dummy
-gltfLoader.load("model/Leaf.glb", (gltf) => {
+gltfLoader.load("model/Sea Urchin2.glb", (gltf) => {
     leafModel = gltf.scene;
-    let samt = 0.15;
+    let samt = 0.05;
     leafModel.scale.set(samt,samt,samt)
     leafModel.traverse((o) => {
         if (o instanceof THREE.Mesh) {
+            o.material = new THREE.MeshLambertMaterial({color: 0x666644})
             o.castShadow = true;    // have to do this for every mesh in glb!!!
             o.receiveShadow = true;
         }
     })
-    // leafModel.rotateOnAxis  // make it point up
-    // console.log("loaded leaf")
 
-    // const threeplant = new TurtleLSystem(4, 0.04, 40, "FAA", {
-    //     "A": "F[&FL!A]/////'[&FL!A]///////'[&FL!A]",
-    //     "F": String.raw`S\\\\F`,
-    //     "S": "F",
-    //     "L": "L"
-    // }, leafModel);
-
-    // scene.add(threeplant);
-    // threeplant.draw();
-
-    const stochastic = new TurtleLSystem(4, 0.04, 25, "AFA", {
-        "A": ["F[&FL!A]//SL/'[&FL!A]/SL//'[&FL!A]", "F[&FL!A]/L/'[&FL!A]"],
-        "F": ["S///////F"],
-        "S": ["F"],
+    const stochastic = new TurtleLSystem(3, 0.07, 30, "FAA", {
+        "A": ["F[&FL!A]//S/'[&FL!A]/S//'[&FL!A]", "F[&FL!A]//'[&FL!A]", "F[&FL!A]////'[&FL!A]"],
+        "F": ["S///////F", "S/////F"],
+        "S": ["F", "F", "F", "/////F"],
         "L": ["L"]
     }, leafModel);
     stochastic.castShadow = true;
@@ -161,11 +150,6 @@ gltfLoader.load("model/Leaf.glb", (gltf) => {
     stochastic.draw();
     updateables.push(stochastic);
 });
-
-// const testcube = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshLambertMaterial());
-// scene.add(testcube);
-// testcube.castShadow = true; // wish this set it for children
-// testcube.position.y = 1;
 
 const tent = gltfLoader.load("model/Tent.glb", (gltf) => {
     let t = gltf.scene;

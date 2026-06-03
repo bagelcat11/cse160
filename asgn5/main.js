@@ -36,11 +36,13 @@ const background = texLoader.load("img/sky.png", () => {
 
 const gltfLoader = new GLTFLoader();
 
-const light = new THREE.DirectionalLight(0xFFFFFF, 10);
-light.position.set(0,0,10);
+const light = new THREE.DirectionalLight(0xFFFFFF, 3);
+light.position.set(0,5,100);
 light.target.position.set(0,0,0);
 scene.add(light);
 scene.add(light.target);
+const ambient = new THREE.AmbientLight(0xFFFFFF, 0.3);
+scene.add(ambient);
 
 // -- camera/controls --
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -89,25 +91,27 @@ controls.update();  // controls need to be updated any time the camera transform
 // scene.add(bracketed);
 // bracketed.draw();
 
-// const threedtest = new TurtleLSystem(2, 0.1, 90, "A", {
-//     "A": "B-F+CFC+F-D&F^D-F+&&CFC+F+B//",
-//     "B": "A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//",
-//     "C": "|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//",
-//     "D": "|CFB-F+B|FA&F^A&&FB-F+B|FC//"
-// });
-// scene.add(threedtest);
-// threedtest.draw();
+const threedtest = new TurtleLSystem(2, 0.1, 90, "A", {
+    "A": "B-F+CFC+F-D&F^D-F+&&CFC+F+B//",
+    "B": "A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//",
+    "C": "|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//",
+    "D": "|CFB-F+B|FA&F^A&&FB-F+B|FC//"
+});
+scene.add(threedtest);
+threedtest.position.x = 10;
+threedtest.draw();
 
 let leafModel = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), background);  // dummy
 gltfLoader.load("model/Leaf.glb", (gltf) => {
     leafModel = gltf.scene;
-    leafModel.scale.set(0.05,0.05,0.05)
+    let samt = 0.15;
+    leafModel.scale.set(samt,samt,samt)
     leafModel.rotateOnAxis  // make it point up
     // console.log("loaded leaf")
 
-    const threeplant = new TurtleLSystem(7, 0.01, 30, "A", {
-    "A": "[&FL!A]///'[&FL!A]////'[&FL!A]",
-    "F": "S////F",
+    const threeplant = new TurtleLSystem(4, 0.04, 40, "FAA", {
+    "A": "F[&FL!A]/////'[&FL!A]///////'[&FL!A]",
+    "F": String.raw`S\\\\F`,
     "S": "F",
     "L": "L"
 }, leafModel);

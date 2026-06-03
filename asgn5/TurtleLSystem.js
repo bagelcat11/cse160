@@ -22,6 +22,7 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
         this.seed = initStr;
         this.rules = rulesObj;
         this.leafModel = leafModel;
+        this.stemMaterial = new LineMaterial( { color: 0x443322, linewidth: 5 } );
     }
 
     draw() {
@@ -33,7 +34,6 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
             // console.log("got string", str, "after", i+1)
         }
 
-        const m = new LineMaterial( { color: 0x443322, linewidth: 5 } );
         const lines = [];   // holds arrays of point vectors
         lines.push( [new THREE.Vector3( 0, 0, 0 )] );
 
@@ -42,7 +42,7 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
         // console.log("got points", points)
         lines.forEach((line) => {
             let g = new LineGeometry().setFromPoints( line );
-            let l = new Line2( g, m );
+            let l = new Line2( g, this.stemMaterial.clone() );
             this.add(l);
         });
     }
@@ -114,16 +114,21 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
                     //TODO: set arrow rotationAmt?
                     break;
 
-                case "L":
+                case "L":   // add leaf
                     let l = this.leafModel.clone();
                     l.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
-                    // l.lookAt(this.turtle.position.clone().add(this.turtle.heading));
-    //                     l.rotateOnAxis(new THREE.Vector3(1,0,0), -Math.PI / 4);
+                    l.lookAt(this.turtle.position.clone().add(this.turtle.heading));
+                    // l.rotateOnAxis(this.turtle.up, Math.PI / 2);
     // l.rotateOnAxis(new THREE.Vector3(0,0,1), -Math.PI)
                     this.add(l);
                     // console.log("adding leaf",l)
                     //TODO: set leaf rotation
                     break;
+                case "'":   // make branch color greener
+                    // this.stemMaterial.color.g += 0.02;
+                    // console.log(this.stemMaterial.color);
+                    break;
+
 
                 default:
                     break;

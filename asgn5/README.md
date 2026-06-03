@@ -3,6 +3,6 @@
 
 
 - skybox, ground, wood textures modified from [polyhaven.com]
-- leaf model from [poly.pizza]
+- leaf, tent model from [poly.pizza]
 - [THREE.MeshLine](https://github.com/spite/THREE.MeshLine) to be able to texture lines
     - Slightly [modified](https://github.com/spite/THREE.MeshLine/issues/103#issuecomment-1551044669) to import as local module

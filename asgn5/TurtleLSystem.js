@@ -44,19 +44,16 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
 
         this.interpretString(str, lines);
 
-        // console.log("got points", points)
+        //TODO: because the branches are made with meshline, they ignore lighting, and can't cast/receive shadow
         lines.forEach((line) => {
-            // let g = new MeshLineGeometry().setPoints( line );
-            // let l = new Line2( g, this.stemMaterial.clone() );
-
             let l = new MeshLine();
             l.setPoints(line, p => (1-p/4)*Math.cos(p));  // THIS HAS TO BE ON ITS OWN LINE
-            // l.setPoints(g);
+            
             let lokiTex = this.texLoader.load("img/wood.png", () => {
                 let m = new MeshLineMaterial({useMap: true, map: lokiTex, lineWidth: 0.1})
-                // let m = new THREE.MeshPhongMaterial();
+                // let m = new THREE.MeshLambertMaterial({map: lokiTex});
                 const mesh = new THREE.Mesh(l, m);
-                // console.log(mesh)
+                mesh.castShadow = true;
                 this.add(mesh);
             })
         });
@@ -135,6 +132,8 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
                     let l = this.leafModel.clone();
                     l.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
                     l.lookAt(this.turtle.position.clone().add(this.turtle.heading));
+                    // l.castShadow = true;
+                    // l.receiveShadow = true;
                     // l.rotateOnAxis(this.turtle.up, Math.PI / 2);
     // l.rotateOnAxis(new THREE.Vector3(0,0,1), -Math.PI)
                     this.add(l);

@@ -11,12 +11,13 @@ import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "./lib/THREE.MeshLin
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
 
 // -- define scene --
 
-const floor = new THREE.BoxGeometry(64, 0.01, 64);
+const floor = new THREE.PlaneGeometry(64, 64);
 const shapes = [];
 
 const texLoader = new THREE.TextureLoader();
@@ -24,8 +25,10 @@ const floorTex = texLoader.load("img/coast_sand_rocks.png", () => {
     floorTex.repeat.set(8, 8);
     floorTex.wrapS = THREE.RepeatWrapping;
     floorTex.wrapT = THREE.RepeatWrapping;
-    const material = new THREE.MeshBasicMaterial({map: floorTex});
+    const material = new THREE.MeshLambertMaterial({map: floorTex});
     const cube = new THREE.Mesh(floor, material);
+    cube.rotateX(-Math.PI / 2);
+    cube.receiveShadow = true;
     // cube.position.y = -1;
     scene.add(cube);
     shapes.push(cube);
@@ -38,12 +41,13 @@ const background = texLoader.load("img/sky.png", () => {
 
 const gltfLoader = new GLTFLoader();
 
-const light = new THREE.DirectionalLight(0xFFFFFF, 3);
-light.position.set(0,5,100);
-light.target.position.set(0,0,0);
-scene.add(light);
-scene.add(light.target);
-const ambient = new THREE.AmbientLight(0xFFFFFF, 0.3);
+const sun = new THREE.DirectionalLight(0xFFFFFF, 2);
+sun.position.set(100,30,100);
+sun.target.position.set(0,0,0);
+sun.castShadow = true;
+scene.add(sun);
+scene.add(sun.target);
+const ambient = new THREE.AmbientLight(0xFFFFFF, 0.2);
 scene.add(ambient);
 
 // -- camera/controls --
@@ -108,7 +112,13 @@ gltfLoader.load("model/Leaf.glb", (gltf) => {
     leafModel = gltf.scene;
     let samt = 0.15;
     leafModel.scale.set(samt,samt,samt)
-    leafModel.rotateOnAxis  // make it point up
+    leafModel.traverse((o) => {
+        if (o instanceof THREE.Mesh) {
+            o.castShadow = true;    // have to do this for every mesh in glb!!!
+            o.receiveShadow = true;
+        }
+    })
+    // leafModel.rotateOnAxis  // make it point up
     // console.log("loaded leaf")
 
     // const threeplant = new TurtleLSystem(4, 0.04, 40, "FAA", {
@@ -127,10 +137,33 @@ gltfLoader.load("model/Leaf.glb", (gltf) => {
         "S": ["F"],
         "L": ["L"]
     }, leafModel);
+    stochastic.castShadow = true;
+    stochastic.position.z = -3;
     scene.add(stochastic);
     stochastic.draw();
 });
 
+// const testcube = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshLambertMaterial());
+// scene.add(testcube);
+// testcube.castShadow = true; // wish this set it for children
+// testcube.position.y = 1;
+
+const tent = gltfLoader.load("model/Tent.glb", (gltf) => {
+    let t = gltf.scene;
+    t.traverse((o) => { // get rid of shininess; metal = 0 didn't work for some reason
+        if (o instanceof THREE.Mesh) {
+            // o.material.metalness = 0;
+            o.material = new THREE.MeshLambertMaterial({color: o.material.color})
+            o.castShadow = true;    // have to do this for every mesh in glb!!!
+            o.receiveShadow = true;
+        }
+    })
+    let samt = 0.2;
+    t.scale.set(samt,samt,samt)
+    t.rotateY(-Math.PI / 3)
+    t.position.set(3,0,0);
+    scene.add(t);
+});
 
 // -- update loop --
 function animate(time) {

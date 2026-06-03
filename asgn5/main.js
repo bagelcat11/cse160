@@ -104,11 +104,12 @@ document.onkeydown = (event) => {
     }
 }
 //TODO: MENU OVERLAY
+let overlay = document.getElementById("overlay");
 controls.addEventListener("lock", () => {
-	// menu.style.display = 'none';
+	overlay.style.visibility = "hidden";
 });
 controls.addEventListener("unlock", () => {
-	// menu.style.display = 'block';
+	overlay.style.visibility = "visible";
 });
 controls.addEventListener("change", () => {
     controls.update();

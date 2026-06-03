@@ -12,13 +12,14 @@ const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
-scene.fog = new THREE.FogExp2(0x999988, 0.03);
+scene.fog = new THREE.FogExp2(0x555544, 0.03);
 document.body.appendChild(renderer.domElement);
 
 // -- define scene --
 
 const floor = new THREE.PlaneGeometry(128, 128);
 const shapes = [];
+const updateables = [];
 
 const texLoader = new THREE.TextureLoader();
 const floorTex = texLoader.load("img/coast_sand_rocks.png", () => {
@@ -143,6 +144,7 @@ gltfLoader.load("model/Leaf.glb", (gltf) => {
     stochastic.position.z = -3;
     scene.add(stochastic);
     stochastic.draw();
+    updateables.push(stochastic);
 });
 
 // const testcube = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshLambertMaterial());
@@ -166,15 +168,36 @@ const tent = gltfLoader.load("model/Tent.glb", (gltf) => {
     t.position.set(3,0,0);
     scene.add(t);
 });
+let ufo = gltfLoader.load("model/Flying saucer.glb", (gltf) => {
+    ufo = gltf.scene;
+    let samt = 0.1;
+    ufo.scale.set(samt,samt/2,samt);
+    ufo.position.set(10,10,10)
+    scene.add(ufo);
+
+    let beamTarget = new THREE.Object3D();
+    // beamTarget.position.set(0, 0, 0);
+    ufo.add(beamTarget);
+    
+    let ufoBeam = new THREE.SpotLight(0x00FF33);
+    ufoBeam.castShadow = true;
+    ufoBeam.intensity = 5;
+    // ufoBeam.power = 100;
+    ufoBeam.decay = 0;
+    ufoBeam.angle = Math.PI / 6;
+    ufoBeam.target = beamTarget;
+    console.log(beamTarget.position)
+    ufo.add(ufoBeam);
+});
+
+let lanternLight;
 const lantern = gltfLoader.load("model/Lantern.glb", (gltf) => {
     let t = gltf.scene;
     t.traverse((o) => { // get rid of shininess; metal = 0 didn't work for some reason
         if (o instanceof THREE.Mesh) {
             // o.material.metalness = 0;
-            console.log(o.name, o, o.material.name)
             o.material = new THREE.MeshLambertMaterial({color: o.material.color})
             if (o.name == "Lantern_5") {    // make glowy
-                console.log("hi");
                 o.material.emissive.set(1,1,0.5);
                 o.material.emissiveIntensity = 1;
             }
@@ -185,7 +208,7 @@ const lantern = gltfLoader.load("model/Lantern.glb", (gltf) => {
     t.position.set(-0.5,0.25,0);
     scene.add(t);
 
-    let lanternLight = new THREE.PointLight(0xFFFFFF, 2, 10, 2);
+    lanternLight = new THREE.PointLight(0xFFFFFF, 2, 10, 1);
     lanternLight.position.y += 0.25;
     // lanternLight.castShadow = true;
     t.add(lanternLight);
@@ -206,10 +229,16 @@ const rockyTex = texLoader.load("img/worn-sandy-rock.png", () => {
 
 // -- update loop --
 function animate(time) {
-    // for (let i = 0; i < shapes.length; i++) {
-    //     shapes[i].rotation.x = Math.sin(time / 1000) / 5;
-    //     shapes[i].rotation.y = time / 1000;
-    // }
+    if (lanternLight) {
+        lanternLight.power = (10 + Math.sin(time / 500) * 5);
+    }
+
+    if (ufo) {
+        // gerono lemniscate (figure 8)
+        ufo.position.set(Math.sin(time / 5000) * 64, Math.sin(time / 3000) * 5 + 15, Math.cos(time / 5000) * Math.sin(time / 5000) * 64);
+        // ufo.lookAt(0,5,0);
+    }
+    // updateables.forEach((u) => {u.update(time);});
 
     controls.update();
     renderer.render(scene, camera);

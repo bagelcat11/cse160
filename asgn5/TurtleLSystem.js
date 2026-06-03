@@ -27,6 +27,7 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
         this.stemMaterial = new LineMaterial( { color: 0x443322, linewidth: 5 } );
 
         this.texLoader = new THREE.TextureLoader();
+        this.leaves = [];
         // this.lokiTex = texLoader.load("img/test_loki.png");
     }
 
@@ -137,6 +138,7 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
                     // l.rotateOnAxis(this.turtle.up, Math.PI / 2);
     // l.rotateOnAxis(new THREE.Vector3(0,0,1), -Math.PI)
                     this.add(l);
+                    this.leaves.push(l);
                     // console.log("adding leaf",l)
                     //TODO: set leaf rotation
                     break;
@@ -151,4 +153,11 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
             }
         }
     }
+
+    // called in main update loop
+    // update(time) {
+    //     this.leaves.forEach((leaf) => {
+    //         leaf.position.y += Math.sin((time) / 1000) / 5000;
+    //     });       
+    // }
 }

@@ -63,15 +63,17 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
     }
 
     applyRule(str, ruleLeft) {
-        let ruleRight = this.rules[ruleLeft];    // left is the starting string, right is the resulting string
+        let rulesRight = this.rules[ruleLeft];    // left is the starting string, right is possible resulting strings (randomly chosen)
         let tmpstr = str;
         let i = 0;
         while (true) {
             i = tmpstr.indexOf(ruleLeft, i);    // find next instance of thing to replace
             if (i < 0) { break; }
 
-            tmpstr = tmpstr.substring(0, i) + ruleRight + tmpstr.substring(i+1);    // replace
-            i += ruleRight.length;
+            // get random right rule
+            let randi = Math.floor(Math.random() * rulesRight.length);
+            tmpstr = tmpstr.substring(0, i) + rulesRight[randi] + tmpstr.substring(i+1);    // replace
+            i += rulesRight[randi].length;
         }
         return tmpstr;
     }

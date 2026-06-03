@@ -111,15 +111,24 @@ gltfLoader.load("model/Leaf.glb", (gltf) => {
     leafModel.rotateOnAxis  // make it point up
     // console.log("loaded leaf")
 
-    const threeplant = new TurtleLSystem(4, 0.04, 40, "FAA", {
-    "A": "F[&FL!A]/////'[&FL!A]///////'[&FL!A]",
-    "F": String.raw`S\\\\F`,
-    "S": "F",
-    "L": "L"
-}, leafModel);
-scene.add(threeplant);
-    threeplant.draw();
-    // scene.add(leafModel);
+    // const threeplant = new TurtleLSystem(4, 0.04, 40, "FAA", {
+    //     "A": "F[&FL!A]/////'[&FL!A]///////'[&FL!A]",
+    //     "F": String.raw`S\\\\F`,
+    //     "S": "F",
+    //     "L": "L"
+    // }, leafModel);
+
+    // scene.add(threeplant);
+    // threeplant.draw();
+
+    const stochastic = new TurtleLSystem(4, 0.04, 25, "AFA", {
+        "A": ["F[&FL!A]//SL/'[&FL!A]/SL//'[&FL!A]", "F[&FL!A]/L/'[&FL!A]"],
+        "F": ["S///////F"],
+        "S": ["F"],
+        "L": ["L"]
+    }, leafModel);
+    scene.add(stochastic);
+    stochastic.draw();
 });
 
 

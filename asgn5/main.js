@@ -59,9 +59,6 @@ scene.add(ambient);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 3;
 camera.position.y = 1;
-// camera.lookAt(scene.position);
-// camera.updateProjectionMatrix();
-// window.camera = camera;
 
 const controls = new PointerLockControls(camera, document.body);
 document.onmousedown = (event) => {
@@ -174,7 +171,13 @@ const lantern = gltfLoader.load("model/Lantern.glb", (gltf) => {
     t.traverse((o) => { // get rid of shininess; metal = 0 didn't work for some reason
         if (o instanceof THREE.Mesh) {
             // o.material.metalness = 0;
+            console.log(o.name, o, o.material.name)
             o.material = new THREE.MeshLambertMaterial({color: o.material.color})
+            if (o.name == "Lantern_5") {    // make glowy
+                console.log("hi");
+                o.material.emissive.set(1,1,0.5);
+                o.material.emissiveIntensity = 1;
+            }
             o.castShadow = true;    // have to do this for every mesh in glb!!!
             o.receiveShadow = true;
         }

@@ -7,7 +7,7 @@ import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "./lib/THREE.MeshLine.js";
 
 export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can add this to scene, and add lines to this
-    constructor(iters, dist, rot, initStr, rulesObj, leafModel) {
+    constructor(iters, dist, rot, initStrs, rulesObj, leafModel) {
         super();
 
         this.turtle = new Turtle();
@@ -21,23 +21,27 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
         this.iterations = iters;
         this.distance = dist;
         this.rotationAmt = rot * Math.PI / 180;
-        this.seed = initStr;
+        this.seeds = initStrs;
         this.rules = rulesObj;
         this.leafModel = leafModel;
         this.stemMaterial = new LineMaterial( { color: 0x443322, linewidth: 5 } );
 
         this.texLoader = new THREE.TextureLoader();
         this.leaves = [];
-        // this.lokiTex = texLoader.load("img/test_loki.png");
     }
 
     draw() {
-        let str = this.seed;
+        // reset children meshes, turtle on draw
+        this.turtle = new Turtle();
+        this.clear();
+
+        // random seed
+        let randi = Math.floor(Math.random() * this.seeds.length);
+        let str = this.seeds[randi];
         for (let i = 0; i < this.iterations; i++) {
             for (let [key, val] of Object.entries(this.rules)) {
                 str = this.applyRule(str, key);
             }
-            // console.log("got string", str, "after", i+1)
         }
 
         const lines = [];   // holds arrays of point vectors
@@ -52,7 +56,6 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
             
             let woodTex = this.texLoader.load("img/wood.png", () => {
                 let m = new MeshLineMaterial({useMap: true, map: woodTex, lineWidth: 0.15})
-                // let m = new THREE.MeshLambertMaterial({map: lokiTex});
                 const mesh = new THREE.Mesh(l, m);
                 mesh.castShadow = true;
                 this.add(mesh);
@@ -85,7 +88,6 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
                     this.turtle.forward(this.distance);
                     this.turtleArrow.position.set(this.turtle.position.x, this.turtle.position.y, this.turtle.position.z);
                     lines.at(-1).push(this.turtle.position.clone());  // you're telling me it got passed by ref here
-                    // console.log("points now has", points)
                     break;
 
                 case "+":   // turn left
@@ -106,7 +108,6 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
                     this.turtleArrow.rotateOnWorldAxis(this.turtle.left, this.rotationAmt);
                     break;
                 case "\\":   // roll left
-                    //TODO: do we need to worry about \ being escaped?
                     this.turtle.roll(this.rotationAmt);
                     this.turtleArrow.rotateOnWorldAxis(this.turtle.heading, -this.rotationAmt);
                     break;
@@ -155,9 +156,10 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
     }
 
     // called in main update loop
-    // update(time) {
-    //     this.leaves.forEach((leaf) => {
-    //         leaf.position.y += Math.sin((time) / 1000) / 5000;
-    //     });       
-    // }
+    update(time) {
+        this.leaves.forEach((leaf) => {
+            leaf.position.x += Math.sin((time + leaf.position.z * 100) / 600) / 3000;
+            leaf.position.z += Math.cos((time + leaf.position.x * 100) / 800) / 3000;
+        });       
+    }
 }

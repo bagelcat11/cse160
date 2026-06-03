@@ -7,7 +7,9 @@ import {PointerLockControls} from "three/addons/controls/PointerLockControls.js"
 
 import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "./lib/THREE.MeshLine.js";
 
+
 // -- setup --
+
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -19,6 +21,7 @@ window.addEventListener("resize", () => {
 renderer.shadowMap.enabled = true;
 scene.fog = new THREE.FogExp2(0x555544, 0.03);
 document.body.appendChild(renderer.domElement);
+
 
 // -- define scene --
 
@@ -60,16 +63,18 @@ sun.target.position.set(0,0,0);
 sun.castShadow = true;
 scene.add(sun);
 scene.add(sun.target);
-sun.shadow.camera.top = 20; // configuring shadow camera bounds helps it shade the whole scene somehow
-sun.shadow.camera.bottom = - 20;
-sun.shadow.camera.left = - 20;
-sun.shadow.camera.right = 20;
+sun.shadow.camera.top = 40; // configuring shadow camera bounds helps it shade the whole scene somehow
+sun.shadow.camera.bottom = - 40;
+sun.shadow.camera.left = - 40;
+sun.shadow.camera.right = 40;
 sun.shadow.camera.near = 1;
 sun.shadow.camera.far = 1000;
 const ambient = new THREE.AmbientLight(0xFFFFFF, 0.1);
 scene.add(ambient);
 
+
 // -- camera/controls --
+
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 3;
 camera.position.y = 1;
@@ -93,8 +98,12 @@ document.onkeydown = (event) => {
         case "a":
             controls.moveRight(-speed);
             break;
+        case "r":
+            trees.forEach((tree) => { tree.draw(); });
+            break;
     }
 }
+//TODO: MENU OVERLAY
 controls.addEventListener("lock", () => {
 	// menu.style.display = 'none';
 });
@@ -108,23 +117,8 @@ controls.update();  // controls need to be updated any time the camera transform
 
 
 // -- add things to scene --
-// const koch1 = new TurtleLSystem(scene, 5, 0.05, 90, "F+F+F+F", {"F": "F+F-F-FF+F+F-F"});
-// koch1.draw();
 
-// const bracketed = new TurtleLSystem(5, 0.01, 23, "X", {"X": "F-[[X]+X]+F[+FX]-X", "F": "FF"})
-// scene.add(bracketed);
-// bracketed.draw();
-
-// const threedtest = new TurtleLSystem(2, 0.1, 90, "A", {
-//     "A": "B-F+CFC+F-D&F^D-F+&&CFC+F+B//",
-//     "B": "A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//",
-//     "C": "|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//",
-//     "D": "|CFB-F+B|FA&F^A&&FB-F+B|FC//"
-// });
-// scene.add(threedtest);
-// threedtest.position.x = 10;
-// threedtest.draw();
-
+let trees = [];
 let leafModel = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), background);  // dummy
 gltfLoader.load("model/Sea Urchin2.glb", (gltf) => {
     leafModel = gltf.scene;
@@ -138,17 +132,32 @@ gltfLoader.load("model/Sea Urchin2.glb", (gltf) => {
         }
     })
 
-    const stochastic = new TurtleLSystem(3, 0.07, 30, "FAA", {
+    let joshuaTreeConfig = {
         "A": ["F[&FL!A]//S/'[&FL!A]/S//'[&FL!A]", "F[&FL!A]//'[&FL!A]", "F[&FL!A]////'[&FL!A]"],
         "F": ["S///////F", "S/////F"],
         "S": ["F", "F", "F", "/////F"],
         "L": ["L"]
-    }, leafModel);
+    };
+    const stochastic = new TurtleLSystem(3, 0.07, 30, ["FAA", "FAA", "AFA"], joshuaTreeConfig, leafModel);
     stochastic.castShadow = true;
     stochastic.position.z = -3;
     scene.add(stochastic);
     stochastic.draw();
     updateables.push(stochastic);
+    trees.push(stochastic);
+
+    placeJoshuaTree(5,0,-10, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(8,0,-5, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(11,0,-9, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(-7,0,-6, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(-18,0,-8, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(-16,0,-20, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(8,0,1, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(2,0,8, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(8,0,12, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(-6,0,5, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(-17,0,5, joshuaTreeConfig, leafModel);
+    placeJoshuaTree(-15,0,3, joshuaTreeConfig, leafModel);
 });
 
 const tent = gltfLoader.load("model/Tent.glb", (gltf) => {
@@ -263,6 +272,7 @@ const rockyTex = texLoader.load("img/worn-sandy-rock.png", () => {
 
 
 // -- update loop --
+
 function animate(time) {
     if (lanternLight) {
         lanternLight.power = (10 + Math.sin(time / 500) * 5);
@@ -274,9 +284,21 @@ function animate(time) {
         ufo.position.set(Math.sin(time / 5000) * 64, Math.sin(time / 3000) * 5 + 15, Math.cos(time / 5000) * Math.sin(time / 5000) * 64);
     }
 
-    // updateables.forEach((u) => {u.update(time);});
+    updateables.forEach((u) => {u.update(time);});
 
     controls.update();
     renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
+
+
+// -- helpers --
+
+function placeJoshuaTree(x, y, z, config, leaf) {
+    let t = new TurtleLSystem(3, 0.07, 33, ["FAA", "FAA", "AFA"], config, leaf);
+    t.position.set(x,y,z);
+    t.draw();
+    trees.push(t);
+    scene.add(t);
+    updateables.push(t);
+}

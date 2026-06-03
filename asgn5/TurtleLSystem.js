@@ -4,6 +4,8 @@ import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 
+import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "./lib/THREE.MeshLine.js";
+
 export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can add this to scene, and add lines to this
     constructor(iters, dist, rot, initStr, rulesObj, leafModel) {
         super();
@@ -23,6 +25,9 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
         this.rules = rulesObj;
         this.leafModel = leafModel;
         this.stemMaterial = new LineMaterial( { color: 0x443322, linewidth: 5 } );
+
+        this.texLoader = new THREE.TextureLoader();
+        // this.lokiTex = texLoader.load("img/test_loki.png");
     }
 
     draw() {
@@ -41,9 +46,19 @@ export class TurtleLSystem extends THREE.Object3D { // extend Obj3D so we can ad
 
         // console.log("got points", points)
         lines.forEach((line) => {
-            let g = new LineGeometry().setFromPoints( line );
-            let l = new Line2( g, this.stemMaterial.clone() );
-            this.add(l);
+            // let g = new MeshLineGeometry().setPoints( line );
+            // let l = new Line2( g, this.stemMaterial.clone() );
+
+            let l = new MeshLine();
+            l.setPoints(line, p => (1-p/4)*Math.cos(p));  // THIS HAS TO BE ON ITS OWN LINE
+            // l.setPoints(g);
+            let lokiTex = this.texLoader.load("img/wood.png", () => {
+                let m = new MeshLineMaterial({useMap: true, map: lokiTex, lineWidth: 0.1})
+                // let m = new THREE.MeshPhongMaterial();
+                const mesh = new THREE.Mesh(l, m);
+                // console.log(mesh)
+                this.add(mesh);
+            })
         });
     }
 

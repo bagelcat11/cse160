@@ -5,6 +5,8 @@ import { Turtle } from "./3DGraphicsTurtle.js";
 import { TurtleLSystem } from "./TurtleLSystem.js";
 import {PointerLockControls} from "three/addons/controls/PointerLockControls.js";
 
+import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "./lib/THREE.MeshLine.js";
+
 // -- setup --
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
@@ -91,15 +93,15 @@ controls.update();  // controls need to be updated any time the camera transform
 // scene.add(bracketed);
 // bracketed.draw();
 
-const threedtest = new TurtleLSystem(2, 0.1, 90, "A", {
-    "A": "B-F+CFC+F-D&F^D-F+&&CFC+F+B//",
-    "B": "A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//",
-    "C": "|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//",
-    "D": "|CFB-F+B|FA&F^A&&FB-F+B|FC//"
-});
-scene.add(threedtest);
-threedtest.position.x = 10;
-threedtest.draw();
+// const threedtest = new TurtleLSystem(2, 0.1, 90, "A", {
+//     "A": "B-F+CFC+F-D&F^D-F+&&CFC+F+B//",
+//     "B": "A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//",
+//     "C": "|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//",
+//     "D": "|CFB-F+B|FA&F^A&&FB-F+B|FC//"
+// });
+// scene.add(threedtest);
+// threedtest.position.x = 10;
+// threedtest.draw();
 
 let leafModel = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), background);  // dummy
 gltfLoader.load("model/Leaf.glb", (gltf) => {
@@ -118,10 +120,7 @@ gltfLoader.load("model/Leaf.glb", (gltf) => {
 scene.add(threeplant);
     threeplant.draw();
     // scene.add(leafModel);
-
-
 });
-
 
 
 // -- update loop --

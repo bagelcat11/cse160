@@ -11,6 +11,11 @@ import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "./lib/THREE.MeshLin
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
 renderer.shadowMap.enabled = true;
 scene.fog = new THREE.FogExp2(0x555544, 0.03);
 document.body.appendChild(renderer.domElement);
@@ -48,16 +53,24 @@ const background = texLoader.load("img/sky.png", () => {
 const gltfLoader = new GLTFLoader();
 
 const sun = new THREE.DirectionalLight(0xFFFFEE, 2);
-sun.position.set(128,24,128);
+sun.position.set(164,24,128);
 sun.target.position.set(0,0,0);
+// let helper = new THREE.DirectionalLightHelper(sun, 5);
+// scene.add(helper)
 sun.castShadow = true;
 scene.add(sun);
 scene.add(sun.target);
+sun.shadow.camera.top = 20; // configuring shadow camera bounds helps it shade the whole scene somehow
+sun.shadow.camera.bottom = - 20;
+sun.shadow.camera.left = - 20;
+sun.shadow.camera.right = 20;
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 1000;
 const ambient = new THREE.AmbientLight(0xFFFFFF, 0.1);
 scene.add(ambient);
 
 // -- camera/controls --
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 3;
 camera.position.y = 1;
 
@@ -172,12 +185,18 @@ let ufo = gltfLoader.load("model/Flying saucer.glb", (gltf) => {
     ufo = gltf.scene;
     let samt = 0.1;
     ufo.scale.set(samt,samt/2,samt);
-    ufo.position.set(10,10,10)
+    ufo.position.set(10,10,10);
+    ufo.receiveShadow = true;
+    ufo.castShadow = true;
     scene.add(ufo);
 
     let beamTarget = new THREE.Object3D();
     // beamTarget.position.set(0, 0, 0);
     ufo.add(beamTarget);
+
+    let ufoBeamSource = new THREE.Mesh(new THREE.CylinderGeometry(10,10,1), new THREE.MeshLambertMaterial({emissive: 0x00FF00, emissiveIntensity: 1}));
+    ufo.add(ufoBeamSource);
+    ufoBeamSource.position.y += 15;
     
     let ufoBeam = new THREE.SpotLight(0x00FF33);
     ufoBeam.castShadow = true;
@@ -186,7 +205,6 @@ let ufo = gltfLoader.load("model/Flying saucer.glb", (gltf) => {
     ufoBeam.decay = 0;
     ufoBeam.angle = Math.PI / 6;
     ufoBeam.target = beamTarget;
-    console.log(beamTarget.position)
     ufo.add(ufoBeam);
 });
 
@@ -204,7 +222,7 @@ const lantern = gltfLoader.load("model/Lantern.glb", (gltf) => {
             o.castShadow = true;    // have to do this for every mesh in glb!!!
             o.receiveShadow = true;
         }
-    })
+    });
     t.position.set(-0.5,0.25,0);
     scene.add(t);
 
@@ -215,14 +233,23 @@ const lantern = gltfLoader.load("model/Lantern.glb", (gltf) => {
 });
 
 const rockyTex = texLoader.load("img/worn-sandy-rock.png", () => {
-    const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(),
-    new THREE.MeshLambertMaterial({map: rockyTex, color: 0xCCCCBB}));
-    rock.rotateOnAxis(new THREE.Vector3(1,1,1).normalize(),2.0);
-    scene.add(rock);
-    rock.scale.set(2,3,2);
-    rock.position.set(-5,1,-10);
-    rock.castShadow = true;
-    rock.receiveShadow = true;
+    const rockMat = new THREE.MeshLambertMaterial({map: rockyTex, color: 0xCCCCBB});
+    
+    let rock1 = new THREE.Mesh(new THREE.IcosahedronGeometry(), rockMat);
+    rock1.rotateOnAxis(new THREE.Vector3(1,1,1).normalize(),2.0);
+    scene.add(rock1);
+    rock1.scale.set(2,3,2);
+    rock1.position.set(-5,1,-10);
+    rock1.castShadow = true;
+    rock1.receiveShadow = true;
+
+    let rock2 = new THREE.Mesh(new THREE.DodecahedronGeometry(), rockMat);
+    rock2.rotateOnAxis(new THREE.Vector3(1,-5,0.2).normalize(),3.0);
+    rock2.scale.set(4,3,2);
+    rock2.position.set(-1,-1,-12);
+    rock2.castShadow = true;
+    rock2.receiveShadow = true;
+    scene.add(rock2);
 });
 
 
@@ -235,9 +262,10 @@ function animate(time) {
 
     if (ufo) {
         // gerono lemniscate (figure 8)
+        time += 1000;
         ufo.position.set(Math.sin(time / 5000) * 64, Math.sin(time / 3000) * 5 + 15, Math.cos(time / 5000) * Math.sin(time / 5000) * 64);
-        // ufo.lookAt(0,5,0);
     }
+
     // updateables.forEach((u) => {u.update(time);});
 
     controls.update();
